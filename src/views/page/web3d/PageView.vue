@@ -47,16 +47,16 @@ const { frames, selectFrame, launch } = useDrama(container, toolbox, rightsideba
 
 onMounted(async () => {
     const middlewares = [
+        { name: 'answer-cache' },
+        { name: 'answer-history' },
         { name: 'render-sampling' },
         { name: 'spatial-indexing', params: { impl: 'octree' } },
     ];
-
     for (const middleware of middlewares) {
         await import(`./middlewares/${middleware.name}/index.ts`).then(({ useMiddleware }) => {
             useMiddleware(middleware);
         });
     };
-
     for (const plugin of props.page.template.plugins) {
         await import(`./plugins/${plugin.name}/index.ts`).then(({ usePlugin }) => {
             usePlugin(plugin);
@@ -64,7 +64,6 @@ onMounted(async () => {
     }
     launch();
 });
-
 </script>
 
 <style scoped>

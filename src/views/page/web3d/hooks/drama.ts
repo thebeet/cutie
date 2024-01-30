@@ -40,10 +40,13 @@ const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefined>, too
     frames.forEach(frame => scene.add(frame));
 
     const answerStore = useAnswerStore();
-    const { answer, canUndo, canRedo } = storeToRefs(answerStore);
-    const { applyOperation, undo, redo } = answerStore;
+    const { answer } = storeToRefs(answerStore);
+    const { setupAnswer, applyOperation } = answerStore;
 
-    const launch = () => {
+    const launch = async () => {
+        await setupAnswer({
+            elements: []
+        });
         frames.forEach(frame => {
             if (frame.index === 0) {
                 return;
@@ -71,7 +74,7 @@ const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefined>, too
             frames, activeFrames, selectFrame,
             activeTool,
             page,
-            answer, applyOperation, undo, redo, canUndo, canRedo,
+            answer, applyOperation,
             annotations,
             operations,
             camera: camera,

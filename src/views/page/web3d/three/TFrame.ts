@@ -23,7 +23,7 @@ export class TFrame extends THREE.Object3D implements ITFrame {
     readonly index: number;
     _points: THREE.Points | undefined;
     intersectDelegate: PointsIntersect | undefined;
-    
+
     _pointsLoadedPromise: {
         promise: Promise<{frame: TFrame; points: THREE.Points}>,
         resolve: (payload: {frame: TFrame; points: THREE.Points}) => void,

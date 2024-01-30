@@ -54,6 +54,7 @@ export const usePlugin = () => {
                     if (cube) {
                         const frame = cube.parent as TFrame;
                         cube.removeFromParent();
+                        cube.dispose();
                         frame.update();
                         cubes.delete(key);
                     }

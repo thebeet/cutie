@@ -1,4 +1,4 @@
-import { watch, h, Ref } from 'vue';
+import { watch, h } from 'vue';
 import { useDrama } from '@web3d/hooks/drama';
 import { watchPausable } from '@vueuse/core';
 import { measure } from '@/stores/performance';
@@ -13,7 +13,8 @@ import { addNodeToContainer } from '..';
 import { rectAction as _rectAction } from './actions/rect';
 import { polylineAction as _polylineAction } from './actions/polygon';
 import { capsuleAction as _capsuleAction } from './actions/capsule';
-import { AnswerContent } from './types';
+import { storeToRefs } from 'pinia';
+import { useParsingAnswerStore } from './stores/answer';
 const rectAction = measure('web3d::parsing::rect', _rectAction);
 const polylineAction = measure('web3d::parsing::polyline', _polylineAction);
 const capsuleActionBrushing = measure('web3d::parsing::brushing', _capsuleAction);
@@ -58,10 +59,10 @@ const watchMouseAction = () => {
 };
 
 export const usePlugin = () => {
-    const { toolbox, container, rightsidebar, activeTool, frames, answer: _answer } = useDrama();
+    const { toolbox, container, rightsidebar, activeTool, frames } = useDrama();
     const { pointsMaterial } = useParsingStore();
 
-    const answer = _answer as Ref<AnswerContent>;
+    const { answer } = storeToRefs(useParsingAnswerStore());
 
     frames.forEach(frame => {
         frame.onPointsLoaded.then(({ points }) => {
@@ -71,11 +72,11 @@ export const usePlugin = () => {
             geometry.setAttribute('label', new THREE.BufferAttribute(label, 1));
         });
     });
-    watch(() => answer.value.parsing!.frames.map(frame => ({
+    watch(() => answer.value.parsing?.frames.map(frame => ({
         frame,
         points: frames[frame.index]!.points
     })), (value) => {
-        value.forEach(({ frame, points }) => {
+        value?.forEach(({ frame, points }) => {
             if (points) {
                 const geometry = points.geometry;
                 const labelAttribute = geometry.getAttribute('label');

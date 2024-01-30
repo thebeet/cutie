@@ -33,7 +33,7 @@ export class TCube extends THREE.Mesh {
         this._label.translateX(rect3d.position.x).translateY(rect3d.position.y).translateZ(rect3d.position.z + rect3d.size.height / 2);
         this._label.updateMatrix();
         this.add(this._label);
-        
+
         this._boxgeo = geometry;
         this._edgegeo = edges;
     }
@@ -44,5 +44,6 @@ export class TCube extends THREE.Mesh {
     dispose() {
         this._boxgeo.dispose();
         this._edgegeo.dispose();
+        this.remove(this._label);
     }
 }
