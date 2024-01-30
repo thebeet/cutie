@@ -1,0 +1,48 @@
+import { ref, readonly } from 'vue';
+import { AnswerContent } from '../types';
+import { Operation } from '../operator/Operation';
+import { defineStore } from 'pinia';
+import { createEventHook } from '@vueuse/core';
+import { Composer } from 'middleware-io';
+
+export const useAnswerStore = defineStore('answer', () => {
+    const setupAnswerEvent = createEventHook<{ answer: AnswerContent }>();
+    const applyOperationEvent = createEventHook<{ answer: AnswerContent, operation: Operation }>();
+
+
+    const answer = ref<AnswerContent>({
+        elements: [],
+    });
+
+    const composedSetupAnswer = new Composer<{ answer: AnswerContent }>();
+    composedSetupAnswer.use(({ answer: newAnswer }, next) => {
+        answer.value = newAnswer;
+        next();
+    });
+    const setup = (newContent: AnswerContent) => {
+        return composedSetupAnswer.compose()({ answer: newContent }, () => {
+            setupAnswerEvent.trigger({ answer: answer.value });
+            return Promise.resolve();
+        });
+    };
+
+    const composedApplyOperation = new Composer<{ answer: AnswerContent, operation: Operation }>();
+    composedApplyOperation.use(({ answer, operation}, next) => {
+        operation.apply(answer);
+        next();
+    });
+    const applyOperation = (operation: Operation) => {
+        return composedApplyOperation.compose()({ answer: answer.value, operation}, () => {
+            applyOperationEvent.trigger({ answer: answer.value, operation });
+            return Promise.resolve();
+        });
+    };
+
+    return {
+        answer: readonly(answer),
+        applyOperation, setup,
+
+        useApplyOperation: composedApplyOperation.use.bind(composedApplyOperation),
+        useSetupAnswer: composedSetupAnswer.use.bind(composedSetupAnswer),
+    };
+});
