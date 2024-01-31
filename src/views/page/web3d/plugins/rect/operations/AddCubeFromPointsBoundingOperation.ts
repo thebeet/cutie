@@ -9,10 +9,34 @@ import { Cube } from '../types';
 export class AddCubeFromPointsBoundingOperation implements Operation {
     private frame: TFrame;
     private index: number[];
+    result: Cube;
 
     constructor(frame: TFrame, index: number[]) {
         this.frame = frame;
         this.index = index;
+        this.result = {
+            uuid: THREE.MathUtils.generateUUID(),
+            schema: 'cube',
+            type: 'cube',
+            frameIndex: frame.index,
+            label: 'label',
+            description: 'description',
+            position: {
+                x: 0,
+                y: 0,
+                z: 0,
+            },
+            size: {
+                length: 1,
+                width: 1,
+                height: 1,
+            },
+            rotation: {
+                phi: 0,
+                psi: 0,
+                theta: 0
+            }
+        };
     }
 
     /**
@@ -41,29 +65,13 @@ export class AddCubeFromPointsBoundingOperation implements Operation {
         const size = new THREE.Vector3();
         box.getCenter(center);
         box.getSize(size);
-        answer.elements.push({
-            uuid: THREE.MathUtils.generateUUID(),
-            schema: 'cube',
-            type: 'cube',
-            frameIndex: this.frame.index,
-            label: 'label',
-            description: 'description',
-            position: {
-                x: center.x,
-                y: center.y,
-                z: center.z,
-            },
-            size: {
-                length: size.x,
-                width: size.y,
-                height: size.z,
-            },
-            rotation: {
-                phi: 0,
-                psi: 0,
-                theta: 0
-            }
-        } as Cube);
+        this.result.position.x = center.x;
+        this.result.position.y = center.y;
+        this.result.position.z = center.z;
+        this.result.size.length = size.x;
+        this.result.size.width = size.y;
+        this.result.size.height = size.z;
+        answer.elements.push(this.result);
     }
 
 }

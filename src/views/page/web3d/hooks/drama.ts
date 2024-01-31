@@ -41,7 +41,17 @@ const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefined>, too
 
     const answerStore = useAnswerStore();
     const { answer } = storeToRefs(answerStore);
-    const { setupAnswer, applyOperation } = answerStore;
+    const { setupAnswer, applyOperation, onApplyOperation } = answerStore;
+
+    const threeView = ref({
+        position: { x: 0.42, y: 2.72, z: 1.04 },
+        size: { length: 4.2, width: 2.1, height: 1.35 },
+        rotation: {
+            phi: 0,
+            psi: 0,
+            theta: 0
+        },
+    });
 
     const launch = async () => {
         await setupAnswer({
@@ -74,7 +84,7 @@ const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefined>, too
             frames, activeFrames, selectFrame,
             activeTool,
             page,
-            answer, applyOperation,
+            answer, applyOperation, onApplyOperation,
             annotations,
             operations,
             camera: camera,
@@ -82,6 +92,8 @@ const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefined>, too
             scene2: scene2,
 
             launch,
+
+            threeView,
         },
 
         advance: {

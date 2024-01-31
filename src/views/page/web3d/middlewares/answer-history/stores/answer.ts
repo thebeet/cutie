@@ -26,6 +26,6 @@ export const useAnswerHistoryStore = defineStore('plugin::answer-history', () =>
 
     return {
         history,
-        undo, redo, clear, canUndo, canRedo
+        undo, redo, clear, canUndo, canRedo,
     };
 });

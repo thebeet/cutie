@@ -27,7 +27,7 @@ const watchMouseAction = () => {
 };
 
 export const usePlugin = () => {
-    const { frames, activeTool, toolbox, answer } = useDrama();
+    const { frames, activeTool, toolbox, answer, onApplyOperation, threeView } = useDrama();
     const cubes: Map<string, TCube> = new Map([]);
     watch(() => answer.value.elements.filter(e => e.schema === 'cube'), (newValue) => {
         if (newValue) {
@@ -66,6 +66,13 @@ export const usePlugin = () => {
     const { pause, resume } = watchMouseAction();
     watch(activeTool, (value) => {
         value === 'rect' ? resume() : pause();
+    });
+
+    onApplyOperation(({ operation }) => {
+        if (operation instanceof AddCubeFromPointsBoundingOperation) {
+            const o = operation as AddCubeFromPointsBoundingOperation;
+            threeView.value = { ...o.result };
+        }
     });
 
     addNodeToContainer(h(ToolBox), toolbox);

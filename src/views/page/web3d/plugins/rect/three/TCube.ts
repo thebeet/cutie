@@ -25,6 +25,7 @@ export class TCube extends THREE.Mesh {
         div.textContent = rect3d.label;
         div.style.padding = '2px';
         div.style.color = '#fff';
+        div.style.marginTop = '-1em';
         div.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
         div.style.fontSize = '14px';
         div.style.pointerEvents = 'none';
@@ -32,10 +33,24 @@ export class TCube extends THREE.Mesh {
         this._label = new CSS2DObject(div);
         this._label.translateX(rect3d.position.x).translateY(rect3d.position.y).translateZ(rect3d.position.z + rect3d.size.height / 2);
         this._label.updateMatrix();
+        this._label.onBeforeRender = () => {
+            div.style.visibility = this.worldVisible ? 'visible' : 'hidden';
+        };
         this.add(this._label);
 
         this._boxgeo = geometry;
         this._edgegeo = edges;
+    }
+
+    get worldVisible() {
+        let p: THREE.Object3D | null = this;
+        while (p) {
+            if (!p.visible) {
+                return false;
+            }
+            p = p.parent;
+        }
+        return true;
     }
 
     get isTCube() {

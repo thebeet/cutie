@@ -1,7 +1,11 @@
 import { Element } from '@web3d/types';
 
 export interface Cube extends Element {
-    position: Point3
+    position: {
+        x: number
+        y: number
+        z: number
+    }
     rotation: {
         phi: number
         psi: number
