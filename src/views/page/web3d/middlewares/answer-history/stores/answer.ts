@@ -24,8 +24,13 @@ export const useAnswerHistoryStore = defineStore('plugin::answer-history', () =>
         }
     });
 
+    const reset = () => {
+        originAnswer.value.elements = [];
+        clear();
+    };
+
     return {
         history,
-        undo, redo, clear, canUndo, canRedo,
+        undo, redo, clear, canUndo, canRedo, reset,
     };
 });

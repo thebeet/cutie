@@ -4,6 +4,11 @@
         <button
             type="button"
             class="toolbox-button"
+            @click="reset"
+        >reset</button>
+        <button
+            type="button"
+            class="toolbox-button"
             :disabled="!canUndo"
             @click="undo"
         >undo</button>
@@ -21,7 +26,7 @@ import { storeToRefs } from 'pinia';
 
 const answerHistoryStore = useAnswerHistoryStore();
 const { canUndo, canRedo } = storeToRefs(answerHistoryStore);
-const { undo, redo } = answerHistoryStore;
+const { undo, redo, reset } = answerHistoryStore;
 </script>
 <style lang="less" scoped>
 </style>

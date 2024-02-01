@@ -1,7 +1,7 @@
 import { defineStore, storeToRefs } from 'pinia';
 import { useAnswerStore } from '@web3d/stores/answer';
 import { AnswerContent } from '../types';
-import { Ref, markRaw, DeepReadonly } from 'vue';
+import { Ref, DeepReadonly } from 'vue';
 import { usePageStore } from '@web3d/stores/page';
 
 export const useParsingAnswerStore = defineStore('plugin::parsing-answer', () => {
@@ -39,10 +39,10 @@ export const useParsingAnswerStore = defineStore('plugin::parsing-answer', () =>
                 frames: [{
                     index: 0,
                     label: new Int32Array(),
-                }, ...page.value.data.frames.map(frame => (markRaw({
+                }, ...page.value.data.frames.map(frame => ({
                     index: frame.index,
                     label: new Int32Array(frame.points)
-                })))],
+                }))],
             };
         }
         await next();

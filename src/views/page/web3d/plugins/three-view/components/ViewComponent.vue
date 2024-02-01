@@ -1,20 +1,27 @@
 <template>
     <div ref="container" class="three-views-container">
-        <div ref="front" class="front-view-container view-container"></div>
-        <div ref="side" class="side-view-container view-container"></div>
-        <div ref="top" class="top-view-container view-container"></div>
+        <div ref="front" class="view-container">
+            <ResizeableRect :current="rects.front"/>
+        </div>
+        <div ref="side" class="view-container">
+            <ResizeableRect :current="rects.side"/>
+        </div>
+        <div ref="top" class="view-container">
+            <ResizeableRect :current="rects.top"/>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRender } from '../hooks/render';
+import ResizeableRect from './ResizeableRect.vue';
 
 const container = ref<HTMLDivElement>();
 const front = ref<HTMLDivElement>();
 const side = ref<HTMLDivElement>();
 const top = ref<HTMLDivElement>();
 
-useRender({
+const { rects } = useRender({
     container, front, side, top
 });
 </script>

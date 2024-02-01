@@ -314,7 +314,7 @@ export class Octree {
             new Vector3(trees[0].box.min.x, trees[0].box.min.y, trees[0].box.min.z),
             new Vector3(trees[0].box.max.x, trees[0].box.max.y, trees[0].box.max.z)
         ), index, position);
-        const stack = [{octree, data: trees[0]}];
+        const stack = [{ octree, data: trees[0] }];
         for (let i = 1; i < trees.length; i++) {
             const subtree = new Octree(new Box3(
                 new Vector3(trees[i].box.min.x, trees[i].box.min.y, trees[i].box.min.z),

@@ -42,6 +42,15 @@ export class TCube extends THREE.Mesh {
         this._edgegeo = edges;
     }
 
+    apply(newValue: Cube) {
+        this._boxgeo.applyMatrix4(
+            new THREE.Matrix4().makeTranslation(newValue.position.x, newValue.position.y, newValue.position.z)
+                .multiply(new THREE.Matrix4().makeRotationFromEuler(
+                    new THREE.Euler(newValue.rotation.phi, newValue.rotation.psi, newValue.rotation.theta))));
+        this._boxgeo.applyMatrix4(
+            new THREE.Matrix4().makeScale(newValue.size.length, newValue.size.width, newValue.size.height));
+    }
+
     get worldVisible() {
         let p: THREE.Object3D | null = this;
         while (p) {

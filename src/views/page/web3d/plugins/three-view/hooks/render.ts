@@ -20,11 +20,33 @@ export const useRender = (containers: Containers) => {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.domElement.style.position = 'absolute';
     renderer.domElement.style.inset = '0';
+    renderer.domElement.style.inset = '0';
+    renderer.domElement.style.pointerEvents = 'none';
     renderer.setScissorTest(true);
 
     let dirty = true;
 
     const padding = 0.2;
+
+    const calcRect = (w: number, h: number) => {
+        const m = Math.max(w, h);
+        const fullPadding = 1 + padding * 2;
+        return {
+            x: padding / fullPadding,
+            width: w / m / fullPadding,
+            y: (1 - h / m + 2 * padding) / 2 / fullPadding,
+            height: h / m / fullPadding,
+        };
+    };
+
+    const rects = computed(() => {
+        return {
+            front: calcRect(threeView.value.size.width, threeView.value.size.height),
+            side: calcRect(threeView.value.size.length, threeView.value.size.height),
+            top: calcRect(threeView.value.size.length, threeView.value.size.width),
+        };
+    });
+
     const cameras = computed(() => {
         const frontSize = Math.max(threeView.value.size.width, threeView.value.size.height) * (0.5 + padding);
         const front = new THREE.OrthographicCamera(
@@ -124,4 +146,8 @@ export const useRender = (containers: Containers) => {
             });
         }
     });
+
+    return {
+        rects,
+    };
 };
