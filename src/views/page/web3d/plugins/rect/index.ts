@@ -6,8 +6,9 @@ import { addNodeToContainer } from '..';
 import { watchPausable } from '@vueuse/core';
 import { rectAction } from './actions/rect';
 import { AddCubeFromPointsBoundingOperation } from './operations/AddCubeFromPointsBoundingOperation';
-import { Cube } from './types';
-import { TFrame } from '../../three/TFrame';
+import { TFrame } from '@web3d/three/TFrame';
+import { storeToRefs } from 'pinia';
+import { useRectStore } from './stores';
 
 const watchMouseAction = () => {
     const { camera, mouseEvent, applyOperation } = useDrama();
@@ -27,9 +28,10 @@ const watchMouseAction = () => {
 };
 
 export const usePlugin = () => {
-    const { frames, activeTool, toolbox, answer, onApplyOperation, threeView } = useDrama();
+    const { frames, activeTool, toolbox, onApplyOperation, threeView } = useDrama();
     const cubes: Map<string, TCube> = new Map([]);
-    watch(() => answer.value.elements.filter(e => e.schema === 'cube'), (newValue) => {
+    const { elements } = storeToRefs(useRectStore());
+    watch(elements, (newValue) => {
         if (newValue) {
             const used: Map<string, boolean> = new Map([]);
             for (const key of cubes.keys()) {
@@ -42,7 +44,7 @@ export const usePlugin = () => {
                     //cube.apply(element); modify
                 } else {
                     const frame = frames[element.frameIndex];
-                    const cube = new TCube(element as Cube);
+                    const cube = new TCube(element);
                     cubes.set(element.uuid, cube);
                     frame!.add(cube);
                     frame.update();
@@ -61,7 +63,7 @@ export const usePlugin = () => {
                 }
             }
         }
-    }, { immediate: true });
+    });
 
     const { pause, resume } = watchMouseAction();
     watch(activeTool, (value) => {

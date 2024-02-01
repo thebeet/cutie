@@ -42,14 +42,14 @@ describe('DouglasPeucker', () => {
 
     test('rect with small change but large than esp', () => {
         const rect = [
-            [1, 1], [1, 2], [1, 3], [2, 3], [3, 3], [3.002, 2], [3, 1], [2, 1]
+            [1, 1], [1, 2], [1, 3], [2, 3], [3, 3], [3.0021, 2], [3, 1], [2, 1]
         ].map(([x, y]) => new THREE.Vector2(x, y));
         const result = DouglasPeucker(rect, 0.001);
         expect(result).toStrictEqual([
             new THREE.Vector2(1, 1),
             new THREE.Vector2(1, 3),
             new THREE.Vector2(3, 3),
-            new THREE.Vector2(3.002, 2),
+            new THREE.Vector2(3.0021, 2),
             new THREE.Vector2(3, 1),
             new THREE.Vector2(2, 1),
         ]);

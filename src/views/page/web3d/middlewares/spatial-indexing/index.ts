@@ -23,7 +23,6 @@ const useOctree = (points: THREE.Points) => {
     }).then(octree => {
         if (octree) {
             octree.intersect = measure('web3d::octree::intersect', octree.intersect);
-            //frame.add(new OctreeHelper(frame.intersectDelegate as unknown as TOctree, 0x00ff00));
         }
         return octree;
     });

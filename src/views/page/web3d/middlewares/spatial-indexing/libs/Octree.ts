@@ -44,6 +44,7 @@ export type OctreeSerialization = {
     trees: {
         offset: number
         length: number
+        depth: number
         box: Box3
     }[]
     index: Uint32Array
@@ -143,11 +144,13 @@ export class Octree {
             new Vector3(-Infinity, -Infinity, -Infinity),
         );
         if ((level <= 0) || (this.index.length <= maxCount)) {
-            this.forEachPoint((point) => {
-                box.min.min(point);
-                box.max.max(point);
-            });
-            this.box = box;
+            if (this.index.length > 0) {
+                this.forEachPoint((point) => {
+                    box.min.min(point);
+                    box.max.max(point);
+                });
+                this.box = box;
+            }
             return;
         }
 
@@ -244,19 +247,15 @@ export class Octree {
     }
 
     /**
-     * 遍历八叉树，并执行回调函数
+     * 前序遍历八叉树，并执行回调函数
      *
      * @param callback 回调函数，参数为当前八叉树
-     * @param deep 最大深度，默认为0
+     * @param deep 当前深度，默认为0
      */
-    traversal(callback: (tree: Octree) => void, deep = -1) {
-        if ((deep !== 0) && (this.subTrees.length > 0)) {
-            callback(this);
-            for (const subTree of this.subTrees) {
-                subTree.traversal(callback, deep - 1);
-            }
-        } else {
-            callback(this);
+    traversal(callback: (tree: Octree, depth: number) => void, depth = 0) {
+        callback(this, depth);
+        for (const subTree of this.subTrees) {
+            subTree.traversal(callback, depth + 1);
         }
     }
 
@@ -278,12 +277,14 @@ export class Octree {
         const trees: {
             offset: number
             length: number
+            depth: number
             box: Box3
         }[] = [];
-        this.traversal((tree) => {
+        this.traversal((tree, depth) => {
             trees.push({
                 offset: tree.index.byteOffset / tree.index.BYTES_PER_ELEMENT,
                 length: tree.index.length,
+                depth: depth,
                 box: tree.box
             });
         });
@@ -309,17 +310,24 @@ export class Octree {
         if (position.count !== index.length) {
             return null; // 点云数量不匹配
         }
-        const octree = new Octree(Object.setPrototypeOf(trees[0].box, Box3.prototype), index, position);
-        const stack = [octree];
+        const octree = new Octree(new Box3(
+            new Vector3(trees[0].box.min.x, trees[0].box.min.y, trees[0].box.min.z),
+            new Vector3(trees[0].box.max.x, trees[0].box.max.y, trees[0].box.max.z)
+        ), index, position);
+        const stack = [{octree, data: trees[0]}];
         for (let i = 1; i < trees.length; i++) {
-            const subtree = new Octree(Object.setPrototypeOf(trees[i].box, Box3.prototype), index.subarray(trees[i].offset, trees[i].offset + trees[i].length), position);
-            for (; stack.length > 0; stack.pop()) {
-                const lastP = stack[stack.length - 1];
-                if (lastP.box.containsBox(subtree.box)) {
-                    lastP.subTrees.push(subtree);
-                    stack.push(subtree);
+            const subtree = new Octree(new Box3(
+                new Vector3(trees[i].box.min.x, trees[i].box.min.y, trees[i].box.min.z),
+                new Vector3(trees[i].box.max.x, trees[i].box.max.y, trees[i].box.max.z)
+            ), index.subarray(trees[i].offset, trees[i].offset + trees[i].length), position);
+            while (stack.length > 0) {
+                const { octree: lastParentNode, data: tree } = stack[stack.length - 1];
+                if (tree.depth < trees[i].depth) {
+                    lastParentNode.subTrees.push(subtree);
+                    stack.push({ octree: subtree, data: trees[i] });
                     break;
                 }
+                stack.pop();
             }
             if (stack.length === 0) {
                 return null; // 栈为空，无法创建八叉树

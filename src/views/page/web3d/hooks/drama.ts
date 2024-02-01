@@ -33,7 +33,7 @@ export const useAdvanceDrama = () => {
 };
 
 const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefined>, toolbox: MaybeRefOrGetter<HTMLDivElement | undefined>, rightsidebar?: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
-    const { controls, scene, renderer, camera, scene2 } = useScene(container);
+    const { controls, scene, renderer, camera } = useScene(container);
 
     const { page } = usePageStore();
     const { frames, activeFrames, selectFrame } = useFrame();
@@ -89,10 +89,8 @@ const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefined>, too
             operations,
             camera: camera,
             scene: scene,
-            scene2: scene2,
 
             launch,
-
             threeView,
         },
 

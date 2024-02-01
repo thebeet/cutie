@@ -18,7 +18,7 @@ describe('Octree rebuild', () => {
     const points = new THREE.Points(geometry);
     const octree = Octree.fromPoints(points);
 
-    const rebuildoctree = Octree.fromSerialization(points, octree.serialization());
+    const rebuildoctree = Octree.fromSerialization(geometry, octree.serialization());
     test('rebuildoctree test intersect box', () => {
         let sum = 0;
         expect(rebuildoctree).not.toBe(null);
