@@ -14,12 +14,16 @@ const loader = usePCDCachedLoader(new PCDLoader());
 
 export type Drama = ReturnType<typeof setupDrama>;
 let defaultDrama: Drama;
-export const useDrama = (container?: MaybeRefOrGetter<HTMLDivElement | undefined>, toolbox?: MaybeRefOrGetter<HTMLDivElement | undefined>, rightsidebar?: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
+export const useDrama = (container?: MaybeRefOrGetter<HTMLDivElement | undefined>,
+    toolbox?: MaybeRefOrGetter<HTMLDivElement | undefined>,
+    footer?: MaybeRefOrGetter<HTMLDivElement | undefined>,
+    rightsidebar?: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
+
     if (defaultDrama === undefined) {
         if (container === undefined) {
             throw new Error('drama not setup');
         } else {
-            defaultDrama = setupDrama(container, toolbox, rightsidebar);
+            defaultDrama = setupDrama(container, toolbox, footer, rightsidebar);
         }
     }
     return defaultDrama.normal;
@@ -32,7 +36,10 @@ export const useAdvanceDrama = () => {
     }!;
 };
 
-const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefined>, toolbox: MaybeRefOrGetter<HTMLDivElement | undefined>, rightsidebar?: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
+export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefined>,
+    toolbox: MaybeRefOrGetter<HTMLDivElement | undefined>,
+    footer: MaybeRefOrGetter<HTMLDivElement | undefined>,
+    rightsidebar?: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
     const { controls, scene, renderer, camera } = useScene(container);
 
     const { page } = usePageStore();
@@ -81,7 +88,7 @@ const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefined>, too
     });
     return {
         normal: {
-            container, toolbox, rightsidebar,
+            container, toolbox, footer, rightsidebar,
             mouseEvent, mouseState, onAdvanceMouseEvent,
             frames, activeFrames, selectFrame,
             activeTool,

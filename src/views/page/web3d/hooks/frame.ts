@@ -19,19 +19,25 @@ export const useFrame = () => {
         return frame;
     })];
     const activeFrames = shallowRef<TFrame[]>([]);
-    const selectFrame = (id: number) => {
+    const selectFrame = (id: number | number[]) => {
         for (const frame of frames) {
-            const isVisible = id === frame.index;
-            if (frame.visible !== isVisible) {
-                frame.visible = isVisible;
-                if (isVisible) {
-                    activeFrames.value = [frame];
-                }
-                frame.update();
-            }
+            frame.visible = false;
         }
+        if (id instanceof Array) {
+            const ids = id as number[];
+            activeFrames.value = ids.map(i => frames[i]);
+        } else {
+            const frame = frames[id as number];
+            frame.visible = true;
+            activeFrames.value = [frame];
+        }
+        activeFrames.value.forEach(f => {
+            f.visible = true;
+            f.update();
+        });
     };
     selectFrame(1);
+
     return {
         frames, activeFrames,
         selectFrame,

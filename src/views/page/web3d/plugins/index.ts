@@ -1,4 +1,4 @@
-import { watchEffect, MaybeRefOrGetter, VNode, render, toValue, h } from 'vue';
+import { watchEffect, MaybeRefOrGetter, VNode, render, toValue } from 'vue';
 
 export const addNodeToContainer = (node: VNode, container: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
     watchEffect(() => {

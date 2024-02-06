@@ -46,7 +46,7 @@ export const useProjection2d = (container: MaybeRefOrGetter<HTMLDivElement | und
     composer.addPass(renderPass);
 
     let distortionPass: ShaderPass | null = null;
-    if (cameraParam.distortionType === 'fisheye-p') {
+    if (cameraParam.distortionType === 'fisheye') {
         distortionPass = new ShaderPass(FisheyeDistortionShaderPreCalc);
         const distortionLUTTexture = computeFisheyeLUT(
             matrixK,
@@ -60,7 +60,7 @@ export const useProjection2d = (container: MaybeRefOrGetter<HTMLDivElement | und
         distortionPass.uniforms.uRelAspect.value = 1;
         distortionPass.setSize(width, height);
         composer.addPass(distortionPass);
-    } else if (cameraParam.distortionType === 'fisheye') {
+    } else if (cameraParam.distortionType === 'fisheye-p') {
         distortionPass = new ShaderPass(FisheyeDistortionShader);
         distortionPass.uniforms.uCoefficients.value = [
             cameraParam.distortionCoefficients.k1,
