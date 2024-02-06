@@ -1,4 +1,4 @@
-import { watchEffect, MaybeRefOrGetter, VNode, render, toValue } from 'vue';
+import { watchEffect, MaybeRefOrGetter, VNode, render, toValue, h } from 'vue';
 
 export const addNodeToContainer = (node: VNode, container: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
     watchEffect(() => {
@@ -6,7 +6,7 @@ export const addNodeToContainer = (node: VNode, container: MaybeRefOrGetter<HTML
         if (dom) {
             const wrap = document.createElement('div');
             render(node, wrap);
-            dom.appendChild(wrap);
+            dom.appendChild(wrap.childNodes[0]);
         }
     });
 };

@@ -34,7 +34,7 @@ const { cameras, panelVisible } = storeToRefs(useProjection2DStore());
     left: 0;
     width: 384px;
     height: 216px;
-    z-index: 1;
+    z-index: 100;
 }
 
 .container-inner {

@@ -9,7 +9,6 @@ import { storeToRefs } from 'pinia';
 import { usePageStore } from '@web3d/stores/page';
 import { Frame } from '@web3d/types';
 import { useFrame } from './frame';
-import * as THREE from 'three';
 
 const loader = usePCDCachedLoader(new PCDLoader());
 
@@ -60,34 +59,6 @@ const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefined>, too
         const tAnswer: AnswerContent = {
             elements: []
         };
-        for (let i = 1; i < frames.length; ++i) {
-            const frame = frames[i];
-            for (let j = 0; j < 300; j++) {
-                tAnswer.elements.push({
-                    uuid: THREE.MathUtils.generateUUID(),
-                    schema: 'cube',
-                    type: 'cube',
-                    frameIndex: frame.index,
-                    label: 'label',
-                    description: 'description',
-                    position: {
-                        x: Math.random() * 50 - 25,
-                        y: Math.random() * 50 - 25,
-                        z: 1,
-                    },
-                    size: {
-                        length: 2,
-                        width: 3,
-                        height: 1,
-                    },
-                    rotation: {
-                        phi: 0,
-                        psi: 0,
-                        theta: 0
-                    }
-                });
-            }
-        }
         await setupAnswer(tAnswer);
         frames.forEach(frame => {
             if (frame.index === 0) {

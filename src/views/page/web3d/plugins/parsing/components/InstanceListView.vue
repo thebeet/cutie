@@ -22,10 +22,10 @@ import { useParsingStore } from '../stores';
 import { storeToRefs } from 'pinia';
 import { useDrama } from '@web3d/hooks/drama';
 
-const parsingPluginStore = useParsingStore();
 const { applyOperation } = useDrama();
 
-const { mainLabelID, instances, showIDOnly } = storeToRefs(parsingPluginStore);
+const { mainLabelID, instances, showIDOnly } = storeToRefs(useParsingStore());
+
 const select = (id: number) => {
     mainLabelID.value = id;
 };
