@@ -33,7 +33,7 @@ const { rects } = useRender({
     right: 0;
     left: 70%;
     background-color: aquamarine;
-    z-index: 100;
+    z-index: 1000;
     display: flex;
     flex-direction: column;
     row-gap: 4px;

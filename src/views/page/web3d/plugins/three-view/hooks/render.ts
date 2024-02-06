@@ -20,7 +20,6 @@ export const useRender = (containers: Containers) => {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.domElement.style.position = 'absolute';
     renderer.domElement.style.inset = '0';
-    renderer.domElement.style.inset = '0';
     renderer.domElement.style.pointerEvents = 'none';
     renderer.setScissorTest(true);
 
@@ -32,7 +31,7 @@ export const useRender = (containers: Containers) => {
         const m = Math.max(w, h);
         const fullPadding = 1 + padding * 2;
         return {
-            x: padding / fullPadding,
+            x: (1 - w / m + 2 * padding) / 2 / fullPadding,
             width: w / m / fullPadding,
             y: (1 - h / m + 2 * padding) / 2 / fullPadding,
             height: h / m / fullPadding,
@@ -50,52 +49,35 @@ export const useRender = (containers: Containers) => {
     const cameras = computed(() => {
         const frontSize = Math.max(threeView.value.size.width, threeView.value.size.height) * (0.5 + padding);
         const front = new THREE.OrthographicCamera(
-            -frontSize,
-            frontSize,
-            frontSize,
-            -frontSize,
+            -frontSize, frontSize, frontSize, -frontSize,
             0, threeView.value.size.length * (1 + padding * 2));
         front.up.set(0, 0, 1);
         front.position.set(
             threeView.value.position.x - threeView.value.size.length * (0.5 + padding),
-            threeView.value.position.y,
-            threeView.value.position.z);
+            threeView.value.position.y, threeView.value.position.z);
         front.lookAt(
-            threeView.value.position.x,
-            threeView.value.position.y,
-            threeView.value.position.z);
+            threeView.value.position.x, threeView.value.position.y, threeView.value.position.z);
         front.updateProjectionMatrix();
         const sideSize = Math.max(threeView.value.size.length, threeView.value.size.height) * (0.5 + padding);
         const side = new THREE.OrthographicCamera(
-            -sideSize,
-            sideSize,
-            sideSize,
-            -sideSize,
+            -sideSize, sideSize, sideSize, -sideSize,
             0, threeView.value.size.width * (1 + padding * 2));
         side.up.set(0, 0, 1);
         side.position.set(
             threeView.value.position.x,
             threeView.value.position.y - threeView.value.size.width * (0.5 + padding),
             threeView.value.position.z);
-        side.lookAt(threeView.value.position.x,
-            threeView.value.position.y,
-            threeView.value.position.z);
+        side.lookAt(threeView.value.position.x, threeView.value.position.y, threeView.value.position.z);
         side.updateProjectionMatrix();
         const topSize = Math.max(threeView.value.size.length, threeView.value.size.width) * (0.5 + padding);
         const top = new THREE.OrthographicCamera(
-            -topSize,
-            topSize,
-            topSize,
-            -topSize,
+            -topSize, topSize, topSize, -topSize,
             0, threeView.value.size.height * (1 + padding * 2));
         top.up.set(0, 1, 0);
         top.position.set(
-            threeView.value.position.x,
-            threeView.value.position.y,
+            threeView.value.position.x, threeView.value.position.y,
             threeView.value.position.z + threeView.value.size.height * (0.5 + padding));
-        top.lookAt(threeView.value.position.x,
-            threeView.value.position.y,
-            threeView.value.position.z);
+        top.lookAt(threeView.value.position.x, threeView.value.position.y, threeView.value.position.z);
         top.updateProjectionMatrix();
         return {
             front, side, top,

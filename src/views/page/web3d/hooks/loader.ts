@@ -31,7 +31,6 @@ export const usePCDCachedLoader = (loader: THREE.Loader<THREE.Points>) => {
                             g.setAttribute(key, attribute);
                         }
                         const obj = new THREE.Points(g, _pointsMaterial);
-                        obj.matrixAutoUpdate = false;
                         resolve(obj);
                     }
                 });

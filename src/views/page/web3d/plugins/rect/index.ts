@@ -30,7 +30,7 @@ const watchMouseAction = () => {
 export const usePlugin = () => {
     const { frames, activeTool, toolbox, onApplyOperation, threeView } = useDrama();
     const cubes: Map<string, TCube> = new Map([]);
-    const { elements } = storeToRefs(useRectStore());
+    const { focused, elements } = storeToRefs(useRectStore());
     watch(elements, (newValue) => {
         if (newValue) {
             const used: Map<string, boolean> = new Map([]);
@@ -41,7 +41,7 @@ export const usePlugin = () => {
                 const cube = cubes.get(element.uuid);
                 if (cube) {
                     used.set(element.uuid, true);
-                    //cube.apply(element); modify
+                    cube.apply(element);
                 } else {
                     const frame = frames[element.frameIndex];
                     const cube = new TCube(element);
@@ -74,6 +74,7 @@ export const usePlugin = () => {
         if (operation instanceof AddCubeFromPointsBoundingOperation) {
             const o = operation as AddCubeFromPointsBoundingOperation;
             threeView.value = { ...o.result };
+            focused.value = o.result;
         }
     });
 

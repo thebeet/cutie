@@ -3,7 +3,7 @@ import { useAdvanceDrama } from '@web3d/hooks/drama';
 import { useRafFn } from '@vueuse/core';
 
 export const useMiddleware = () => {
-    const { controls, scene, renderer, frames, page } = useAdvanceDrama();
+    const { controls, scene, frames, page } = useAdvanceDrama();
 
     let pointsCountTotal = 0;
     let maxPointsCounts = 1;
@@ -12,7 +12,8 @@ export const useMiddleware = () => {
         maxPointsCounts = Math.max(maxPointsCounts, frameData.points);
     });
 
-    const sampleStep = Math.floor(pointsCountTotal / 1_000_000) + 1;
+    const sampleStep = Math.floor(pointsCountTotal / 2_000_000) + 1;
+    const thredhold = 500_000;
     const n = Math.floor(maxPointsCounts / sampleStep);
     const indexArr = new Uint32Array(n);
     for (let i = 0; i < n; i++) {
@@ -25,8 +26,10 @@ export const useMiddleware = () => {
             if (frame.points) {
                 const geometry = frame.points.geometry;
                 const n = geometry.attributes.position.count;
-                geometry.setIndex(indexAttribute);
-                geometry.setDrawRange(0, Math.floor(n / sampleStep));
+                if (n > thredhold) {
+                    geometry.setIndex(indexAttribute);
+                    geometry.setDrawRange(0, Math.floor(n / sampleStep));
+                }
             }
         });
     });
@@ -45,13 +48,13 @@ export const useMiddleware = () => {
         scene.dispatchEvent({ 'type': isSampled ? 'downsampling' : 'resetsampling' });
     };
     let sampling = 0;
-    renderer.domElement.addEventListener('mousedown', () => {
+    controls.domElement.addEventListener('mousedown', () => {
         if (controls.enabled && sampling < 6) {
             sampling = 6;
             setPointCloudSampled(true);
         }
     });
-    renderer.domElement.addEventListener('mouseup', () => {
+    controls.domElement.addEventListener('mouseup', () => {
         if (controls.enabled && sampling !== 0) {
             sampling = 0;
             setPointCloudSampled(false);
@@ -60,8 +63,10 @@ export const useMiddleware = () => {
     });
     controls.addEventListener('change', () => {
         if (sampling < 5) {
+            if (sampling === 0) {
+                setPointCloudSampled(true);
+            }
             sampling = 5;
-            setPointCloudSampled(true);
         }
     });
 

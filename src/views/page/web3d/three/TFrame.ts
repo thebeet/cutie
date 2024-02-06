@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { markRaw } from 'vue';
 
 export interface IntersectAbleObject {
     containsPoint(point: THREE.Vector3): boolean;
@@ -39,7 +38,6 @@ export class TFrame extends THREE.Object3D implements ITFrame {
             // @ts-ignore
             this.frame.parent?.dispatchEvent({ type: 'change' });
         });
-        markRaw(this);
     }
 
     get frame() {
@@ -52,12 +50,23 @@ export class TFrame extends THREE.Object3D implements ITFrame {
         }
         this._points = obj;
         if (this._points !== undefined) {
-            this.frame.add(this._points);
+            this.add(this._points);
+            if (this.frame.visible) {
+                this.update();
+            }
             this._pointsLoadedPromise.resolve({
                 frame: this,
                 points: this._points
             });
         }
+    }
+
+    add(...object: THREE.Object3D<THREE.Object3DEventMap>[]): this {
+        super.add(...object);
+        for (const obj of object) {
+            obj.updateMatrixWorld(true);
+        }
+        return this;
     }
 
     get points(): THREE.Points | undefined {

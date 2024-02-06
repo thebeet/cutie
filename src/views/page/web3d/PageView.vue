@@ -101,6 +101,7 @@ onMounted(async () => {
 
 .frame-pagination-container {
     display: flex;
+    flex-wrap: wrap;
     padding: 8px;
     column-gap: 8px;
 }

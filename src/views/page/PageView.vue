@@ -8,7 +8,7 @@ import { type Component, defineAsyncComponent, ref, markRaw } from 'vue';
 const pageComponent = ref<Component>();
 const page = ref<Page>();
 
-fetch('/230400/page.json').then((response) => response.json() as Promise<Page>).then(data => {
+fetch('/200/page.json').then((response) => response.json() as Promise<Page>).then(data => {
     page.value = data;
     pageComponent.value = markRaw(
         defineAsyncComponent(() => import(`./${page.value?.template.name}/PageView.vue`))

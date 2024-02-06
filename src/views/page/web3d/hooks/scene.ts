@@ -5,7 +5,9 @@ import { useControls } from './controls';
 import { TScene } from '@web3d/three/TScene';
 import { useCamera } from './camera';
 import { measure } from '@/stores/performance';
-import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+//import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+
+import { CSS2DRenderer } from '../three/CSS2DRenderer';
 
 export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
     const { camera } = useCamera(container);
@@ -19,10 +21,12 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
     labelRenderer.domElement.style.position = 'absolute';
     labelRenderer.domElement.style.inset = '0';
     labelRenderer.domElement.style.pointerEvents = 'none';
+    labelRenderer.render = measure('web3d::2drenderer::render', labelRenderer.render.bind(labelRenderer));
 
     const { controls } = useControls(camera, renderer);
 
     const scene = new TScene();
+
     let dirty = true;
     controls.addEventListener('change', () => { dirty = true; });
     scene.addEventListener('change', () => { dirty = true; });

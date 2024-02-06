@@ -28,6 +28,7 @@
 </template>
 
 <script setup lang="ts">
+import { useElementSize } from '@vueuse/core';
 import { computed, reactive, ref, watchEffect } from 'vue';
 
 const controlPointSize = 10;
@@ -55,13 +56,14 @@ const rect = reactive({
     height: 50
 });
 
+const { width, height } = useElementSize(container);
+
 watchEffect(() => {
     if (container.value) {
-        const domRect = container.value.getBoundingClientRect();
-        rect.x = props.current.x * domRect.width;
-        rect.y = props.current.y * domRect.height;
-        rect.width = props.current.width * domRect.width;
-        rect.height = props.current.height * domRect.height;
+        rect.x = props.current.x * width.value;
+        rect.y = props.current.y * height.value;
+        rect.width = props.current.width * width.value;
+        rect.height = props.current.height * height.value;
     }
 });
 
