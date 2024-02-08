@@ -3,7 +3,6 @@
         <div class="header">header</div>
         <div class="main-container">
             <div ref="toolbox" class="leftsidebar">
-                <CommonToolBox/>
             </div>
             <div class="main">
                 <div ref="container" class="main-canvas">
@@ -24,7 +23,6 @@ import { Page } from '@web3d/types';
 import { useDrama } from '@web3d/hooks/drama';
 import { usePageStore } from '@web3d/stores/page';
 import MouseActionPreview from '@web3d/components/MouseActionPreview.vue';
-import CommonToolBox from '@web3d/components/CommonToolBox.vue';
 
 const props = defineProps<{
     page: Page
@@ -40,10 +38,12 @@ const { launch } = useDrama(container, toolbox, footer, rightsidebar);
 
 onMounted(async () => {
     const middlewares = [
+        { name: 'camera-control' },
         { name: 'answer-cache' },
         { name: 'answer-history' },
         { name: 'render-sampling' },
         { name: 'spatial-indexing', params: { impl: 'octree' } },
+        { name: 'three-view' },
     ];
     for (const middleware of middlewares) {
         await import(`./middlewares/${middleware.name}/index.ts`).then(({ useMiddleware }) => {

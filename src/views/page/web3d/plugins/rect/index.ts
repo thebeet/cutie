@@ -9,6 +9,7 @@ import { AddCubeFromPointsBoundingOperation } from './operations/AddCubeFromPoin
 import { TFrame } from '@web3d/three/TFrame';
 import { storeToRefs } from 'pinia';
 import { useRectStore } from './stores';
+import * as THREE from 'three';
 
 const watchMouseAction = () => {
     const { camera, mouseEvent, applyOperation } = useDrama();
@@ -20,7 +21,7 @@ const watchMouseAction = () => {
         if (value.type === 'rected') {
             const results = rectAction(value.points, camera);
             results.forEach(([frame, index]) => {
-                const op = new AddCubeFromPointsBoundingOperation(frame, index);
+                const op = new AddCubeFromPointsBoundingOperation(frame, index, new THREE.Euler(0, 0, camera.rotation.z));
                 applyOperation(op);
             });
         }
@@ -73,7 +74,13 @@ export const usePlugin = () => {
     onApplyOperation(({ operation }) => {
         if (operation instanceof AddCubeFromPointsBoundingOperation) {
             const o = operation as AddCubeFromPointsBoundingOperation;
+            const frame = o.frame;
             threeView.value = { ...o.result };
+            threeView.value.position = {
+                x: o.result.position.x + frame.position.x,
+                y: o.result.position.y + frame.position.y,
+                z: o.result.position.z + frame.position.z,
+            };
             focused.value = o.result;
         }
     });

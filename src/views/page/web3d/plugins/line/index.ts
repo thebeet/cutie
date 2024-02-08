@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { watch } from 'vue';
 
 export const useLine = () => {
-    const { scene2, camera, mouseEvent } = useDrama();
+    const { scene, camera, mouseEvent } = useDrama();
 
     const material = new THREE.LineBasicMaterial({
         color: 0x0000ff
@@ -15,7 +15,7 @@ export const useLine = () => {
     const geometry = new THREE.BufferGeometry().setFromPoints( points );
 
     const line = new THREE.Line( geometry, material );
-    scene2.add(line);
+    scene.add(line);
     watch(mouseEvent, (mouse) => {
         if (mouse.points.length > 0) {
             const point = new THREE.Vector2(
@@ -29,7 +29,7 @@ export const useLine = () => {
             geometry.setFromPoints( points );
             geometry.getAttribute('position').needsUpdate = true;
             // @ts-ignore
-            scene2.dispatchEvent({ type: 'change' });
+            scene.dispatchEvent({ type: 'change' });
         }
     }, { deep: true });
 };

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { ref, watch } from 'vue';
 
 export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -9,7 +10,20 @@ export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
     controls.minDistance = 10;
     controls.screenSpacePanning = false;
     controls.update();
+
+    const mode = ref<string>('free');
+
+    watch(mode, (value) => {
+        if (value === 'top-down') {
+            controls.maxPolarAngle = 0;
+            controls.update();
+        } else {
+            controls.maxPolarAngle = Math.PI / 2;
+        }
+    });
+
     return {
-        controls
+        controls,
+        controlMode: mode
     };
 };

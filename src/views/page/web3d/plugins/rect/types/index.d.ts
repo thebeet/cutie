@@ -8,8 +8,8 @@ export interface Cube extends Element {
     }
     rotation: {
         phi: number
-        psi: number
         theta: number
+        psi: number
     }
     size: {
         length: number

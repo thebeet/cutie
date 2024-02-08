@@ -23,7 +23,7 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
     labelRenderer.domElement.style.pointerEvents = 'none';
     labelRenderer.render = measure('web3d::2drenderer::render', labelRenderer.render.bind(labelRenderer));
 
-    const { controls } = useControls(camera, renderer);
+    const { controls, controlMode } = useControls(camera, renderer);
 
     const scene = new TScene();
 
@@ -65,6 +65,6 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
         scene,
         camera,
         renderer,
-        controls,
+        controls, controlMode,
     };
 };

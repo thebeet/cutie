@@ -5,6 +5,7 @@ import { useDrama } from '@web3d/hooks/drama';
 import { storeToRefs } from 'pinia';
 import * as THREE from 'three';
 import _ from 'lodash';
+import { Camera2D } from '@web3d/types';
 
 export const useProjection2DStore = defineStore('plugin::projection2d', () => {
     const panelVisible = ref(false);
@@ -22,7 +23,7 @@ export const useProjection2DStore = defineStore('plugin::projection2d', () => {
                     ...camera.params,
                     M: matrixM.elements
                 }
-            };
+            } as Camera2D;
         });
     })));
 

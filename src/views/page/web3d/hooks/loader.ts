@@ -1,8 +1,9 @@
 import localforage from 'localforage';
 
 import * as THREE from 'three';
+import { PointsMaterial } from '@web3d/three/PointsMaterial';
 
-const _pointsMaterial = new THREE.PointsMaterial({ size: .25, fog: false, vertexColors: true });
+const _pointsMaterial = new PointsMaterial({ size: 1.0 });
 
 export const usePCDCachedLoader = (loader: THREE.Loader<THREE.Points>) => {
     const promises: {

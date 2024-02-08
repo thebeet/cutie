@@ -7,11 +7,11 @@ import { Cube } from '../types';
 //import * as MathUtils from 'three/math/MathUtils.js';
 
 export class AddCubeFromPointsBoundingOperation implements Operation {
-    private frame: TFrame;
     private index: number[];
+    frame: TFrame;
     result: Cube;
 
-    constructor(frame: TFrame, index: number[]) {
+    constructor(frame: TFrame, index: number[], euler: THREE.Euler) {
         this.frame = frame;
         this.index = index;
         this.result = {
@@ -32,39 +32,41 @@ export class AddCubeFromPointsBoundingOperation implements Operation {
                 height: 1,
             },
             rotation: {
-                phi: 0,
-                psi: 0,
-                theta: 0
+                phi: euler.x,
+                theta: euler.y,
+                psi: euler.z,
             }
         };
     }
 
     /**
      * 计算边界框
-     *
-     * @returns {THREE.Box3} 边界框
      */
-    computeBoundingBox(): THREE.Box3 {
+    computeBoundingBox() {
         const box = new THREE.Box3(
             new THREE.Vector3(Infinity, Infinity, Infinity),
             new THREE.Vector3(-Infinity, -Infinity, -Infinity)
         );
         const position = this.frame.points!.geometry.getAttribute('position');
         const _v = new THREE.Vector3();
+        const quaternion = new THREE.Quaternion().setFromEuler(
+            new THREE.Euler(this.result.rotation.phi, this.result.rotation.theta, this.result.rotation.psi, 'XYZ'));
+        const invertQuaternion = quaternion.clone().invert();
         this.index.forEach(i => {
-            _v.fromBufferAttribute(position, i);
+            _v.fromBufferAttribute(position, i).applyQuaternion(invertQuaternion);
             box.min.min(_v);
             box.max.max(_v);
         });
-        return box;
-    }
-
-    apply(answer: AnswerContent): void {
-        const box = this.computeBoundingBox();
         const center = new THREE.Vector3();
         const size = new THREE.Vector3();
         box.getCenter(center);
         box.getSize(size);
+        center.applyQuaternion(quaternion);
+        return { box, center, size };
+    }
+
+    apply(answer: AnswerContent): void {
+        const { center, size } = this.computeBoundingBox();
         this.result.position.x = center.x;
         this.result.position.y = center.y;
         this.result.position.z = center.z;

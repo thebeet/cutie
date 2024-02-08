@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Cube } from '../types';
+import { LAYER_BOX, LAYER_ELEMENT, LAYER_EDGE, LAYER_LABEL } from '@web3d/constants';
 
 const _rectMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
 const _edgeMaterial = /*@__PURE__*/ new THREE.LineBasicMaterial({ color: 0xffffff });
@@ -19,9 +20,13 @@ export class TCube extends THREE.Object3D {
         this.applyMatrix4(
             new THREE.Matrix4().makeTranslation(rect3d.position.x, rect3d.position.y, rect3d.position.z)
                 .multiply(new THREE.Matrix4().makeRotationFromEuler(
-                    new THREE.Euler(rect3d.rotation.phi, rect3d.rotation.psi, rect3d.rotation.theta))));
-        this.add(new THREE.Mesh(_boxGeometry, _rectMaterial));
-        this.add(new THREE.LineSegments(_edgesGeometry, _edgeMaterial));
+                    new THREE.Euler(rect3d.rotation.phi, rect3d.rotation.theta, rect3d.rotation.psi))));
+        const mesh = new THREE.Mesh(_boxGeometry, _rectMaterial);
+        mesh.layers.set(LAYER_BOX);
+        this.add(mesh);
+        const edge = new THREE.LineSegments(_edgesGeometry, _edgeMaterial);
+        edge.layers.set(LAYER_EDGE);
+        this.add(edge);
 
         const div = document.createElement('div');
         div.textContent = rect3d.label;
@@ -33,6 +38,9 @@ export class TCube extends THREE.Object3D {
         div.style.pointerEvents = 'none';
         div.style.userSelect = 'none';
         this._label = new CSS2DObject(div);
+        this._label.layers.set(LAYER_LABEL);
+
+        this.layers.set(LAYER_ELEMENT);
         this.add(this._label);
     }
 
@@ -43,7 +51,7 @@ export class TCube extends THREE.Object3D {
             this.applyMatrix4(
                 new THREE.Matrix4().makeTranslation(newValue.position.x, newValue.position.y, newValue.position.z)
                     .multiply(new THREE.Matrix4().makeRotationFromEuler(
-                        new THREE.Euler(newValue.rotation.phi, newValue.rotation.psi, newValue.rotation.theta))));
+                        new THREE.Euler(newValue.rotation.phi, newValue.rotation.theta, newValue.rotation.psi))));
             this._rect = newValue;
         }
     }

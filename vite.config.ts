@@ -34,7 +34,14 @@ export default defineConfig({
                     ...Object.fromEntries(glob.sync('src/views/page/web3d/plugins/*/index.ts').map((file: string) => {
                         const template = file.slice('src/views/page/web3d/plugins/'.length, -'/index.ts'.length);
                         return [
-                            'plugin-' + template,
+                            'web3d-plugin-' + template,
+                            [file]
+                        ];
+                    })),
+                    ...Object.fromEntries(glob.sync('src/views/page/web3d/middlewares/*/index.ts').map((file: string) => {
+                        const template = file.slice('src/views/page/web3d/middlewares/'.length, -'/index.ts'.length);
+                        return [
+                            'web3d-middleware-' + template,
                             [file]
                         ];
                     }))
