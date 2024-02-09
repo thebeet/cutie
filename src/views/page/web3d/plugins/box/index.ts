@@ -1,6 +1,6 @@
 import { useDrama } from '@web3d/hooks/drama';
 import { h, watch } from 'vue';
-import { TCube } from '@web3d/plugins/rect/three/TCube';
+import { TCube } from '@web3d/plugins/box/three/TCube';
 import ToolBox from './components/ToolBox.vue';
 import { addNodeToContainer } from '..';
 import { watchPausable } from '@vueuse/core';
@@ -10,6 +10,7 @@ import { TFrame } from '@web3d/three/TFrame';
 import { storeToRefs } from 'pinia';
 import { useRectStore } from './stores';
 import * as THREE from 'three';
+import { GroupOperation } from '@web3d/operator/Operation';
 
 const watchMouseAction = () => {
     const { camera, mouseEvent, applyOperation } = useDrama();
@@ -20,10 +21,12 @@ const watchMouseAction = () => {
     }), (value) => {
         if (value.type === 'rected') {
             const results = rectAction(value.points, camera);
-            results.forEach(([frame, index]) => {
-                const op = new AddCubeFromPointsBoundingOperation(frame, index, new THREE.Euler(0, 0, camera.rotation.z));
-                applyOperation(op);
-            });
+            const ops = results.map(([frame, index]) => new AddCubeFromPointsBoundingOperation(frame, index, new THREE.Euler(0, 0, camera.rotation.z)));
+            if (ops.length === 1) {
+                applyOperation(ops[0]);
+            } else {
+                applyOperation(new GroupOperation(ops));
+            }
         }
     }, { deep: true });
 };
@@ -76,10 +79,11 @@ export const usePlugin = () => {
             const o = operation as AddCubeFromPointsBoundingOperation;
             const frame = o.frame;
             threeView.value = { ...o.result };
+            const center = new THREE.Vector3(o.result.position.x, o.result.position.y, o.result.position.z).applyMatrix4(frame.matrixWorld);
             threeView.value.position = {
-                x: o.result.position.x + frame.position.x,
-                y: o.result.position.y + frame.position.y,
-                z: o.result.position.z + frame.position.z,
+                x: center.x,
+                y: center.y,
+                z: center.z,
             };
             focused.value = o.result;
         }

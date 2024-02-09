@@ -39,6 +39,7 @@ const { launch } = useDrama(container, toolbox, footer, rightsidebar);
 onMounted(async () => {
     const middlewares = [
         { name: 'camera-control' },
+        { name: 'frame-pagination' },
         { name: 'answer-cache' },
         { name: 'answer-history' },
         { name: 'render-sampling' },
