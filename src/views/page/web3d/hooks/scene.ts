@@ -26,6 +26,7 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
     const { controls, controlMode } = useControls(camera, renderer);
 
     const scene = new TScene();
+    scene.add(new THREE.AxesHelper( 20 ) );
 
     let dirty = true;
     controls.addEventListener('change', () => { dirty = true; });

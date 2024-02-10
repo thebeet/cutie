@@ -1,6 +1,6 @@
 <template>
     <div class="toolbox-panel">
-        <div class="toolbox-title">Rect</div>
+        <div class="toolbox-title">Box</div>
         <button type="button" class="toolbox-button" @click="click('rect')">Rect</button>
     </div>
 </template>

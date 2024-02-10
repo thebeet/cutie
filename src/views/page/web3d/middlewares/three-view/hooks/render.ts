@@ -25,34 +25,13 @@ export const useRender = (containers: Containers) => {
 
     let dirty = true;
 
-    const padding = 0.2;
-
-    const calcRect = (w: number, h: number) => {
-        const m = Math.max(w, h);
-        const fullPadding = 1 + padding * 2;
-        return {
-            x: (1 - w / m + 2 * padding) / 2 / fullPadding,
-            width: w / m / fullPadding,
-            y: (1 - h / m + 2 * padding) / 2 / fullPadding,
-            height: h / m / fullPadding,
-        };
-    };
-
-    const rects = computed(() => {
-        return {
-            front: calcRect(threeView.value.size.width, threeView.value.size.height),
-            side: calcRect(threeView.value.size.length, threeView.value.size.height),
-            top: calcRect(threeView.value.size.length, threeView.value.size.width),
-        };
-    });
-
     const layers = new THREE.Layers();
     layers.enableAll();
 
     const getCamera = (center: THREE.Vector3, size: number, deep: number, toward: THREE.Vector3, up: THREE.Vector3, rotation: THREE.Quaternion) => {
-        const camera = new THREE.OrthographicCamera(-size, size, size, -size, 0, deep * 2);
+        const camera = new THREE.OrthographicCamera(-size / 2, size / 2, size / 2, -size / 2, 0, deep);
         camera.up.set(...up.clone().applyQuaternion(rotation).toArray());
-        camera.position.set(...center.clone().add(toward.clone().applyQuaternion(rotation).multiplyScalar(deep)).toArray());
+        camera.position.set(...center.clone().add(toward.clone().applyQuaternion(rotation).multiplyScalar(deep / 2)).toArray());
         camera.lookAt(...center.toArray());
         camera.layers = layers;
         camera.updateProjectionMatrix();
@@ -67,21 +46,25 @@ export const useRender = (containers: Containers) => {
     const ZUp = new THREE.Vector3(0, 1, 0);
 
     const cameras = computed(() => {
-        const position = new THREE.Vector3(threeView.value.position.x, threeView.value.position.y, threeView.value.position.z);
-        const quaternion = new THREE.Quaternion().setFromEuler(
-            new THREE.Euler(threeView.value.rotation.phi, threeView.value.rotation.theta, threeView.value.rotation.psi));
+        const outer = threeView.value.outer;
+        if (outer) {
+            const position = new THREE.Vector3(outer.position.x, outer.position.y, outer.position.z);
+            const quaternion = new THREE.Quaternion().setFromEuler(
+                new THREE.Euler(outer.rotation.phi, outer.rotation.theta, outer.rotation.psi));
 
-        const frontSize = Math.max(threeView.value.size.width, threeView.value.size.height) * (0.5 + padding);
-        const front = getCamera(position, frontSize, threeView.value.size.length * (0.5 + padding), X, XUp, quaternion);
+            const frontSize = Math.max(outer.size.width, outer.size.height);
+            const front = getCamera(position, frontSize, outer.size.length, X, XUp, quaternion);
 
-        const sideSize = Math.max(threeView.value.size.length, threeView.value.size.height) * (0.5 + padding);
-        const side = getCamera(position, sideSize, threeView.value.size.width * (0.5 + padding), Y, YUp, quaternion);
+            const sideSize = Math.max(outer.size.length, outer.size.height);
+            const side = getCamera(position, sideSize, outer.size.width, Y, YUp, quaternion);
 
-        const topSize = Math.max(threeView.value.size.length, threeView.value.size.width) * (0.5 + padding);
-        const top = getCamera(position, topSize, threeView.value.size.height * (0.5 + padding), Z, ZUp, quaternion);
-        return {
-            front, side, top,
-        };
+            const topSize = Math.max(outer.size.length, outer.size.width);
+            const top = getCamera(position, topSize, outer.size.height, Z, ZUp, quaternion);
+            return {
+                front, side, top,
+            };
+        }
+        return undefined;
     });
 
     scene.addEventListener('change', () => { dirty = true; });
@@ -99,13 +82,16 @@ export const useRender = (containers: Containers) => {
     };
     useRafFn(() => {
         if (dirty) {
-            dirty = false;
-            renderer.setScissorTest( false );
-            renderer.clear();
-            renderer.setScissorTest( true );
-            renderTo(cameras.value.front, containers.front);
-            renderTo(cameras.value.side, containers.side);
-            renderTo(cameras.value.top, containers.top);
+            if (cameras.value) {
+                dirty = false;
+                renderer.setScissorTest( false );
+                renderer.clear();
+                renderer.setScissorTest( true );
+                renderTo(cameras.value.front, containers.front);
+                renderTo(cameras.value.side, containers.side);
+                renderTo(cameras.value.top, containers.top);
+            }
+
         }
     });
 
@@ -130,6 +116,5 @@ export const useRender = (containers: Containers) => {
     });
 
     return {
-        rects,
     };
 };

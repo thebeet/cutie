@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Cube } from '../types';
 import { LAYER_BOX, LAYER_ELEMENT, LAYER_EDGE, LAYER_LABEL } from '@web3d/constants';
+import { TFrame } from '@web3d/three/TFrame';
 
 const _rectMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
 const _edgeMaterial = /*@__PURE__*/ new THREE.LineBasicMaterial({ color: 0xffffff });
@@ -16,7 +17,8 @@ export class TCube extends THREE.Object3D {
         super();
         this._rect = rect3d;
         this.applyMatrix4(
-            new THREE.Matrix4().makeScale(rect3d.size.length, rect3d.size.width, rect3d.size.height));
+            new THREE.Matrix4().makeScale(rect3d.size.length, rect3d.size.width, rect3d.size.height)
+        );
         this.applyMatrix4(
             new THREE.Matrix4().makeTranslation(rect3d.position.x, rect3d.position.y, rect3d.position.z)
                 .multiply(new THREE.Matrix4().makeRotationFromEuler(
@@ -46,13 +48,18 @@ export class TCube extends THREE.Object3D {
 
     apply(newValue: Cube) {
         if (this._rect !== newValue) {
+            this.applyMatrix4(this.matrix.clone().invert());
             this.applyMatrix4(
-                new THREE.Matrix4().makeScale(newValue.size.length, newValue.size.width, newValue.size.height));
+                new THREE.Matrix4().makeScale(newValue.size.length, newValue.size.width, newValue.size.height)
+            );
             this.applyMatrix4(
                 new THREE.Matrix4().makeTranslation(newValue.position.x, newValue.position.y, newValue.position.z)
                     .multiply(new THREE.Matrix4().makeRotationFromEuler(
                         new THREE.Euler(newValue.rotation.phi, newValue.rotation.theta, newValue.rotation.psi))));
             this._rect = newValue;
+            this.updateMatrix();
+            this.updateMatrixWorld(true);
+            (this.parent as TFrame).update();
         }
     }
 

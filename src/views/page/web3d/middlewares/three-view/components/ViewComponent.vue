@@ -1,13 +1,34 @@
 <template>
-    <div ref="container" class="three-views-container">
+    <div v-if="threeView.outer && threeView.inner" ref="container" class="three-views-container">
         <div ref="front" class="view-container">
-            <ResizeableRect :current="rects.front"/>
+            <ResizeableRect
+                v-model="threeView.inner"
+                :outer="threeView.outer"
+                name="front"
+                x="y"
+                y="z"
+                @confirm="confirm"
+            />
         </div>
         <div ref="side" class="view-container">
-            <ResizeableRect :current="rects.side"/>
+            <ResizeableRect
+                v-model="threeView.inner"
+                :outer="threeView.outer"
+                name="side"
+                x="x"
+                y="z"
+                @confirm="confirm"
+            />
         </div>
         <div ref="top" class="view-container">
-            <ResizeableRect :current="rects.top"/>
+            <ResizeableRect
+                v-model="threeView.inner"
+                :outer="threeView.outer"
+                name="top"
+                x="x"
+                y="y"
+                @confirm="confirm"
+            />
         </div>
     </div>
 </template>
@@ -15,13 +36,27 @@
 import { ref } from 'vue';
 import { useRender } from '../hooks/render';
 import ResizeableRect from './ResizeableRect.vue';
+import { useDrama } from '@web3d/hooks/drama';
+import { klona } from 'klona';
 
 const container = ref<HTMLDivElement>();
 const front = ref<HTMLDivElement>();
 const side = ref<HTMLDivElement>();
 const top = ref<HTMLDivElement>();
 
-const { rects } = useRender({
+const { threeView, scene } = useDrama();
+
+const confirm = () => {
+    threeView.value.outer = klona(threeView.value.inner);
+    threeView.value.outer!.size = {
+        length: threeView.value.inner!.size.length * 1.4,
+        width: threeView.value.inner!.size.width * 1.4,
+        height: threeView.value.inner!.size.height * 1.4,
+    };
+    scene.update();
+};
+
+useRender({
     container, front, side, top
 });
 </script>

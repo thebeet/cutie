@@ -3,7 +3,7 @@ import { AnswerContent } from '@web3d/types';
 import { Cube } from '../types';
 
 export class ModifyCubeOperation implements Operation {
-    private newValue: Cube;
+    newValue: Cube;
 
     constructor(newValue: Cube) {
         this.newValue = newValue;

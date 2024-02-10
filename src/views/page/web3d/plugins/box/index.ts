@@ -11,6 +11,7 @@ import { storeToRefs } from 'pinia';
 import { useRectStore } from './stores';
 import * as THREE from 'three';
 import { GroupOperation } from '@web3d/operator/Operation';
+import { ModifyCubeOperation } from './operations/ModifyCubeOperation';
 
 const watchMouseAction = () => {
     const { camera, mouseEvent, applyOperation } = useDrama();
@@ -32,7 +33,7 @@ const watchMouseAction = () => {
 };
 
 export const usePlugin = () => {
-    const { frames, activeTool, toolbox, onApplyOperation, threeView } = useDrama();
+    const { frames, activeTool, toolbox, applyOperation, onApplyOperation, threeView } = useDrama();
     const cubes: Map<string, TCube> = new Map([]);
     const { focused, elements } = storeToRefs(useRectStore());
     watch(elements, (newValue) => {
@@ -74,18 +75,49 @@ export const usePlugin = () => {
         value === 'rect' ? resume() : pause();
     });
 
+    watch(() => threeView.value.inner, (value) => {
+        if (focused.value) {
+            const op = new ModifyCubeOperation({
+                ...focused.value,
+                ...value
+            });
+            applyOperation(op, false);
+
+        }
+    }, { deep: true });
+
+
     onApplyOperation(({ operation }) => {
         if (operation instanceof AddCubeFromPointsBoundingOperation) {
             const o = operation as AddCubeFromPointsBoundingOperation;
             const frame = o.frame;
-            threeView.value = { ...o.result };
+            threeView.value.inner = { ...o.result };
+            threeView.value.outer = { ...o.result };
             const center = new THREE.Vector3(o.result.position.x, o.result.position.y, o.result.position.z).applyMatrix4(frame.matrixWorld);
-            threeView.value.position = {
+            threeView.value.inner.position = {
                 x: center.x,
                 y: center.y,
                 z: center.z,
             };
+            threeView.value.outer.position = {
+                x: center.x,
+                y: center.y,
+                z: center.z,
+            };
+            threeView.value.outer.size = {
+                length: threeView.value.outer.size.length * 1.4,
+                width: threeView.value.outer.size.width * 1.4,
+                height: threeView.value.outer.size.height * 1.4,
+            };
             focused.value = o.result;
+        }
+        if (operation instanceof ModifyCubeOperation) {
+            const o = operation as ModifyCubeOperation;
+            const cube = cubes.get(o.newValue.uuid);
+            if (cube) {
+                cube.apply(o.newValue);
+                console.log(cube);
+            }
         }
     });
 

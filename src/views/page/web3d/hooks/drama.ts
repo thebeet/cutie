@@ -1,5 +1,5 @@
 import { ref, watchEffect, MaybeRefOrGetter } from 'vue';
-import { Annotation, AnswerContent, Operation } from '../types';
+import { Annotation, AnswerContent, Operation, RBox } from '@web3d/types';
 import { useScene } from '@web3d/hooks/scene';
 import { usePCDCachedLoader } from '@web3d/hooks/loader';
 import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
@@ -52,15 +52,10 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     const { answer } = storeToRefs(answerStore);
     const { setupAnswer, applyOperation, onApplyOperation } = answerStore;
 
-    const threeView = ref({
-        position: { x: 0.42, y: 2.72, z: 1.04 },
-        size: { length: 4.2, width: 2.1, height: 1.35 },
-        rotation: {
-            phi: 0,
-            psi: 0,
-            theta: 0
-        },
-    });
+    const threeView = ref<{
+        inner?: RBox
+        outer?: RBox
+    }>({});
 
     const launch = async () => {
         const tAnswer: AnswerContent = {
