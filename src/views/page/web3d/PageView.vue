@@ -14,6 +14,8 @@
             <div ref="rightsidebar" class="rightsidebar">
             </div>
         </div>
+        <div class="statusbar">
+        </div>
     </div>
 </template>
 
@@ -45,6 +47,7 @@ onMounted(async () => {
         { name: 'render-sampling' },
         { name: 'spatial-indexing', params: { impl: 'octree' } },
         { name: 'three-view' },
+        { name: 'fullscreen' },
     ];
     for (const middleware of middlewares) {
         await import(`./middlewares/${middleware.name}/index.ts`).then(({ useMiddleware }) => {
@@ -91,6 +94,11 @@ onMounted(async () => {
 
 .rightsidebar {
     width: 320px;
+}
+
+.statusbar {
+    height: 22px;
+    background-color: grey;
 }
 
 </style>

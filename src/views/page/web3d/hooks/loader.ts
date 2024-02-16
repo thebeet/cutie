@@ -41,5 +41,5 @@ export const usePCDCachedLoader = (loader: THREE.Loader<THREE.Points>) => {
     };
     return {
         load
-    };
+    } as const;
 };

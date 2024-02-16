@@ -6,7 +6,6 @@ export const useCamera = (container: MaybeRefOrGetter<HTMLDivElement | undefined
     camera.position.z = 100;
     camera.up.set(0, 0, 1);
     camera.lookAt(0, 0, 0);
-    camera.layers.enableAll();
     camera.updateProjectionMatrix();
 
     useResizeObserver(container, (entries) => {
@@ -15,5 +14,5 @@ export const useCamera = (container: MaybeRefOrGetter<HTMLDivElement | undefined
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
     });
-    return { camera: camera as THREE.Camera };
+    return { camera: camera as THREE.Camera } as const;
 };

@@ -17,3 +17,7 @@ export class GroupOperation implements Operation {
         this.group.forEach(op => op.apply(answer));
     }
 }
+
+export interface UndoAbleOperation extends Operation {
+    undo(): void;
+}

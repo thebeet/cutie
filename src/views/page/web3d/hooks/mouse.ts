@@ -47,6 +47,7 @@ export const useMouseEvent = (domRef: MaybeRefOrGetter<HTMLElement | undefined>)
             });
         }
     });
+
     watch(state, (value) => {
         if (value === 'free') {
             mouseEvent.value.type = null;
@@ -191,6 +192,7 @@ const rect = (dom: HTMLElement, mouseEvent: Ref<AdvanceMouseEvent>, state: Ref<M
 
 const polyline = (dom: HTMLElement, mouseEvent: Ref<AdvanceMouseEvent>, state: Ref<MouseMode>, eventHook: EventHook<AdvanceMouseEvent>) => {
     const startDraw = (event: MouseEvent) => {
+        if (event.target !== dom) return;
         const { x, y } = usePos(event, dom);
         mouseEvent.value.type = 'polylining';
         mouseEvent.value.points = [{ x, y }];
@@ -250,4 +252,3 @@ const polyline = (dom: HTMLElement, mouseEvent: Ref<AdvanceMouseEvent>, state: R
 
     return { mouseEvent };
 };
-

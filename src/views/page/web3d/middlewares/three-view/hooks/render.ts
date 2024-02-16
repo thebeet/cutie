@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { useDrama } from '@web3d/hooks/drama';
-import { MaybeRefOrGetter, computed, toValue, watchEffect } from 'vue';
+import { MaybeRefOrGetter, computed, toValue, watch, watchEffect } from 'vue';
 import { useRafFn, useResizeObserver } from '@vueuse/core';
 
 type Containers = {
@@ -11,7 +11,7 @@ type Containers = {
 }
 
 export const useRender = (containers: Containers) => {
-    const { scene, threeView } = useDrama();
+    const { scene, threeViewOuter } = useDrama();
     const renderer = new THREE.WebGLRenderer({
         powerPreference: 'high-performance',
         antialias: false,
@@ -25,15 +25,11 @@ export const useRender = (containers: Containers) => {
 
     let dirty = true;
 
-    const layers = new THREE.Layers();
-    layers.enableAll();
-
     const getCamera = (center: THREE.Vector3, size: number, deep: number, toward: THREE.Vector3, up: THREE.Vector3, rotation: THREE.Quaternion) => {
         const camera = new THREE.OrthographicCamera(-size / 2, size / 2, size / 2, -size / 2, 0, deep);
         camera.up.set(...up.clone().applyQuaternion(rotation).toArray());
         camera.position.set(...center.clone().add(toward.clone().applyQuaternion(rotation).multiplyScalar(deep / 2)).toArray());
         camera.lookAt(...center.toArray());
-        camera.layers = layers;
         camera.updateProjectionMatrix();
         return camera;
     };
@@ -46,7 +42,7 @@ export const useRender = (containers: Containers) => {
     const ZUp = new THREE.Vector3(0, 1, 0);
 
     const cameras = computed(() => {
-        const outer = threeView.value.outer;
+        const outer = threeViewOuter.value;
         if (outer) {
             const position = new THREE.Vector3(outer.position.x, outer.position.y, outer.position.z);
             const quaternion = new THREE.Quaternion().setFromEuler(
@@ -68,6 +64,8 @@ export const useRender = (containers: Containers) => {
     });
 
     scene.addEventListener('change', () => { dirty = true; });
+    watch(threeViewOuter, () => { dirty = true; });
+
     const renderTo = (camera: THREE.Camera, container: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
         const dom = toValue(container);
         if (dom) {
@@ -114,7 +112,4 @@ export const useRender = (containers: Containers) => {
             });
         }
     });
-
-    return {
-    };
 };

@@ -67,5 +67,5 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
         camera,
         renderer,
         controls, controlMode,
-    };
+    } as const;
 };

@@ -1,7 +1,8 @@
 import { useDrama } from '@web3d/hooks/drama';
-import { h, watch } from 'vue';
+import { toRaw, h, watch } from 'vue';
 import { TCube } from '@web3d/plugins/box/three/TCube';
 import ToolBox from './components/ToolBox.vue';
+import InstanceDetail from './components/InstanceDetail.vue';
 import { addNodeToContainer } from '..';
 import { watchPausable } from '@vueuse/core';
 import { rectAction } from './actions/rect';
@@ -33,7 +34,9 @@ const watchMouseAction = () => {
 };
 
 export const usePlugin = () => {
-    const { frames, activeTool, toolbox, applyOperation, onApplyOperation, threeView } = useDrama();
+    const { frames, activeTool, toolbox, rightsidebar,
+        threeViewInner,
+        applyOperation, onApplyOperation } = useDrama();
     const cubes: Map<string, TCube> = new Map([]);
     const { focused, elements } = storeToRefs(useRectStore());
     watch(elements, (newValue) => {
@@ -75,13 +78,13 @@ export const usePlugin = () => {
         value === 'rect' ? resume() : pause();
     });
 
-    watch(() => threeView.value.inner, (value) => {
+    watch(threeViewInner, (value, oldValue) => {
         if (focused.value) {
             const op = new ModifyCubeOperation({
-                ...focused.value,
-                ...value
+                ...toRaw(focused.value),
+                ...toRaw(value)
             });
-            applyOperation(op, false);
+            applyOperation(op, value !== oldValue);
 
         }
     }, { deep: true });
@@ -91,23 +94,14 @@ export const usePlugin = () => {
         if (operation instanceof AddCubeFromPointsBoundingOperation) {
             const o = operation as AddCubeFromPointsBoundingOperation;
             const frame = o.frame;
-            threeView.value.inner = { ...o.result };
-            threeView.value.outer = { ...o.result };
             const center = new THREE.Vector3(o.result.position.x, o.result.position.y, o.result.position.z).applyMatrix4(frame.matrixWorld);
-            threeView.value.inner.position = {
-                x: center.x,
-                y: center.y,
-                z: center.z,
-            };
-            threeView.value.outer.position = {
-                x: center.x,
-                y: center.y,
-                z: center.z,
-            };
-            threeView.value.outer.size = {
-                length: threeView.value.outer.size.length * 1.4,
-                width: threeView.value.outer.size.width * 1.4,
-                height: threeView.value.outer.size.height * 1.4,
+            threeViewInner.value = {
+                ...o.result,
+                position: {
+                    x: center.x,
+                    y: center.y,
+                    z: center.z,
+                },
             };
             focused.value = o.result;
         }
@@ -116,10 +110,10 @@ export const usePlugin = () => {
             const cube = cubes.get(o.newValue.uuid);
             if (cube) {
                 cube.apply(o.newValue);
-                console.log(cube);
             }
         }
     });
 
     addNodeToContainer(h(ToolBox), toolbox);
+    addNodeToContainer(h(InstanceDetail), rightsidebar);
 };

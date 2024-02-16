@@ -4,8 +4,6 @@ import { TFrame } from '@web3d/three/TFrame';
 import * as THREE from 'three';
 import { Cube } from '../types';
 
-//import * as MathUtils from 'three/math/MathUtils.js';
-
 export class AddCubeFromPointsBoundingOperation implements Operation {
     private index: number[];
     frame: TFrame;

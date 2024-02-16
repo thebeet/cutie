@@ -61,7 +61,7 @@ export class TFrame extends THREE.Object3D implements ITFrame {
         }
     }
 
-    add(...object: THREE.Object3D<THREE.Object3DEventMap>[]): this {
+    add(...object: THREE.Object3D<THREE.Object3DEventMap>[]) {
         super.add(...object);
         for (const obj of object) {
             obj.updateMatrixWorld(true);
@@ -69,7 +69,7 @@ export class TFrame extends THREE.Object3D implements ITFrame {
         return this;
     }
 
-    get points(): THREE.Points | undefined {
+    get points() {
         return this._points;
     }
 

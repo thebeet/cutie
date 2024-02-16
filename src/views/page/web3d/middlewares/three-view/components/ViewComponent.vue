@@ -1,9 +1,9 @@
 <template>
-    <div v-if="threeView.outer && threeView.inner" ref="container" class="three-views-container">
+    <div v-if="threeViewOuter && threeViewInner" ref="container" class="three-views-container">
         <div ref="front" class="view-container">
             <ResizeableRect
-                v-model="threeView.inner"
-                :outer="threeView.outer"
+                v-model="threeViewInner"
+                :outer="threeViewOuter"
                 name="front"
                 x="y"
                 y="z"
@@ -12,8 +12,8 @@
         </div>
         <div ref="side" class="view-container">
             <ResizeableRect
-                v-model="threeView.inner"
-                :outer="threeView.outer"
+                v-model="threeViewInner"
+                :outer="threeViewOuter"
                 name="side"
                 x="x"
                 y="z"
@@ -22,8 +22,8 @@
         </div>
         <div ref="top" class="view-container">
             <ResizeableRect
-                v-model="threeView.inner"
-                :outer="threeView.outer"
+                v-model="threeViewInner"
+                :outer="threeViewOuter"
                 name="top"
                 x="x"
                 y="y"
@@ -37,23 +37,16 @@ import { ref } from 'vue';
 import { useRender } from '../hooks/render';
 import ResizeableRect from './ResizeableRect.vue';
 import { useDrama } from '@web3d/hooks/drama';
-import { klona } from 'klona';
 
 const container = ref<HTMLDivElement>();
 const front = ref<HTMLDivElement>();
 const side = ref<HTMLDivElement>();
 const top = ref<HTMLDivElement>();
 
-const { threeView, scene } = useDrama();
+const { threeViewInner, threeViewOuter, threeViewRejust } = useDrama();
 
 const confirm = () => {
-    threeView.value.outer = klona(threeView.value.inner);
-    threeView.value.outer!.size = {
-        length: threeView.value.inner!.size.length * 1.4,
-        width: threeView.value.inner!.size.width * 1.4,
-        height: threeView.value.inner!.size.height * 1.4,
-    };
-    scene.update();
+    threeViewRejust();
 };
 
 useRender({

@@ -8,8 +8,8 @@ export * from '@web3d/types/shape';
 export type PageTemplate = BasePageTemplate;
 
 export type Frame = {
-    index: number
-    url: string
+    readonly index: number
+    readonly url: string
     pose: number[] & { length: 9 }
     points: number
     cameras: Camera2D[]
@@ -21,19 +21,19 @@ export type Data = {
 }
 
 export interface Page {
-    uuid: string
-    data: Data
-    template: PageTemplate
-    response?: Response
+    readonly uuid: string
+    readonly data: Data
+    readonly template: PageTemplate
+    readonly response?: Response
     answers: Answer<any>[]
     annotations: Annotation<any>[]
 }
 
 export interface Element {
-    uuid: string
-    schema: string
-    type: string
-    frameIndex: number
+    readonly uuid: string
+    readonly schema: string
+    readonly type: string
+    readonly frameIndex: number
     label: string
     description: string
 };
@@ -43,7 +43,7 @@ export interface AnswerContent {
 }
 
 export interface Response {
-    id: number
+    readonly id: number
     expire: number
     createdAt: Date
 }

@@ -8,22 +8,27 @@ import {
     Matrix4,
     Raycaster,
 } from 'three';
+import { rbox2Matrix } from './rbox';
+import { RBox } from '../types';
 
 /**
  * 创建一个从立方体生成的视锥体（Frustum）。
- * @param {Vector3} size - 立方体的大小。
  * @param {Matrix4} mat - 立方体现有位置的4x4 变换逆矩阵。
  * @returns {Frustum} 返回一个根据输入立方体大小和变换逆矩阵生成的视锥体对象。
  */
-export const frustumFromCube = (size: Vector3, mat: Matrix4): Frustum => {
+export const frustumFromMatrix = (mat: Matrix4): Frustum => {
     return new Frustum(...[
-        new Plane(new Vector3(-1, 0, 0), size.x / 2),
-        new Plane(new Vector3(1, 0, 0), size.x / 2),
-        new Plane(new Vector3(0, -1, 0), size.y / 2),
-        new Plane(new Vector3(0, 1, 0), size.y / 2),
-        new Plane(new Vector3(0, 0, -1), size.z / 2),
-        new Plane(new Vector3(0, 0, 1), size.z / 2),
+        new Plane(new Vector3(-1, 0, 0), .5),
+        new Plane(new Vector3(1, 0, 0), .5),
+        new Plane(new Vector3(0, -1, 0), .5),
+        new Plane(new Vector3(0, 1, 0), .5),
+        new Plane(new Vector3(0, 0, -1), .5),
+        new Plane(new Vector3(0, 0, 1), .5),
     ].map(p => p.applyMatrix4(mat)));
+};
+
+export const frustumFromRBox = (rbox: RBox): Frustum => {
+    return frustumFromMatrix(rbox2Matrix(rbox));
 };
 
 /**

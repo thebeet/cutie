@@ -1,5 +1,5 @@
 import { ref, watchEffect, MaybeRefOrGetter } from 'vue';
-import { Annotation, AnswerContent, Operation, RBox } from '@web3d/types';
+import { Annotation, AnswerContent, Operation } from '@web3d/types';
 import { useScene } from '@web3d/hooks/scene';
 import { usePCDCachedLoader } from '@web3d/hooks/loader';
 import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
@@ -9,6 +9,7 @@ import { storeToRefs } from 'pinia';
 import { usePageStore } from '@web3d/stores/page';
 import { Frame } from '@web3d/types';
 import { useFrame } from './frame';
+import { useThreeView } from './threeview';
 
 const loader = usePCDCachedLoader(new PCDLoader());
 
@@ -52,10 +53,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     const { answer } = storeToRefs(answerStore);
     const { setupAnswer, applyOperation, onApplyOperation } = answerStore;
 
-    const threeView = ref<{
-        inner?: RBox
-        outer?: RBox
-    }>({});
+    const { inner: threeViewInner, outer: threeViewOuter, rejust: threeViewRejust } = useThreeView();
 
     const launch = async () => {
         const tAnswer: AnswerContent = {
@@ -91,15 +89,15 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
             answer, applyOperation, onApplyOperation,
             annotations,
             operations,
-            camera: camera,
-            scene: scene,
+            camera,
+            scene,
 
             launch,
-            threeView,
-        },
+            threeViewInner, threeViewOuter, threeViewRejust
+        } as const,
 
         advance: {
             controls, renderer, controlMode,
-        }
-    };
+        } as const
+    } as const;
 };

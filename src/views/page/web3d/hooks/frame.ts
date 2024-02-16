@@ -41,5 +41,5 @@ export const useFrame = () => {
     return {
         frames, activeFrames,
         selectFrame,
-    };
+    } as const;
 };

@@ -25,5 +25,5 @@ export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
     return {
         controls,
         controlMode: mode
-    };
+    } as const;
 };
