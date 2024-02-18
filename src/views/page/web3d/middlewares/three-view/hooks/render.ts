@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { useDrama } from '@web3d/hooks/drama';
 import { MaybeRefOrGetter, computed, toValue, watch, watchEffect } from 'vue';
-import { useRafFn, useResizeObserver } from '@vueuse/core';
+import { useElementSize, useRafFn, useResizeObserver } from '@vueuse/core';
 
 type Containers = {
     container: MaybeRefOrGetter<HTMLDivElement | undefined>;
@@ -25,8 +25,11 @@ export const useRender = (containers: Containers) => {
 
     let dirty = true;
 
-    const getCamera = (center: THREE.Vector3, size: number, deep: number, toward: THREE.Vector3, up: THREE.Vector3, rotation: THREE.Quaternion) => {
-        const camera = new THREE.OrthographicCamera(-size / 2, size / 2, size / 2, -size / 2, 0, deep);
+
+    const getCamera = (center: THREE.Vector3, aspect: number, width: number, height: number, deep: number, toward: THREE.Vector3, up: THREE.Vector3, rotation: THREE.Quaternion) => {
+        const xSize = Math.max(width, height * aspect);
+        const ySize = Math.max(height, width / aspect);
+        const camera = new THREE.OrthographicCamera(-xSize / 2, xSize / 2, ySize / 2, -ySize / 2, 0, deep);
         camera.up.set(...up.clone().applyQuaternion(rotation).toArray());
         camera.position.set(...center.clone().add(toward.clone().applyQuaternion(rotation).multiplyScalar(deep / 2)).toArray());
         camera.lookAt(...center.toArray());
@@ -41,6 +44,10 @@ export const useRender = (containers: Containers) => {
     const Z = new THREE.Vector3(0, 0, 1);
     const ZUp = new THREE.Vector3(0, 1, 0);
 
+    const frontContainerSize = useElementSize(containers.front);
+    const sideContainerSize = useElementSize(containers.front);
+    const topContainerSize = useElementSize(containers.front);
+
     const cameras = computed(() => {
         const outer = threeViewOuter.value;
         if (outer) {
@@ -48,14 +55,15 @@ export const useRender = (containers: Containers) => {
             const quaternion = new THREE.Quaternion().setFromEuler(
                 new THREE.Euler(outer.rotation.phi, outer.rotation.theta, outer.rotation.psi));
 
-            const frontSize = Math.max(outer.size.width, outer.size.height);
-            const front = getCamera(position, frontSize, outer.size.length, X, XUp, quaternion);
+            const front = getCamera(position, frontContainerSize.width.value / frontContainerSize.height.value,
+                outer.size.width, outer.size.height, outer.size.length, X, XUp, quaternion);
 
-            const sideSize = Math.max(outer.size.length, outer.size.height);
-            const side = getCamera(position, sideSize, outer.size.width, Y, YUp, quaternion);
+            const side = getCamera(position, sideContainerSize.width.value / sideContainerSize.height.value,
+                outer.size.length, outer.size.height, outer.size.width, Y, YUp, quaternion);
 
-            const topSize = Math.max(outer.size.length, outer.size.width);
-            const top = getCamera(position, topSize, outer.size.height, Z, ZUp, quaternion);
+            const top = getCamera(position, topContainerSize.width.value / topContainerSize.height.value,
+                outer.size.length, outer.size.width, outer.size.height, Z, ZUp, quaternion);
+
             return {
                 front, side, top,
             };
@@ -106,6 +114,9 @@ export const useRender = (containers: Containers) => {
             dom.appendChild(renderer.domElement);
             dirty = true;
             onCleanup(() => {
+                frontContainerSize.stop();
+                sideContainerSize.stop();
+                topContainerSize.stop();
                 dom.removeChild(renderer.domElement);
                 renderer.dispose();
                 renderer.forceContextLoss();

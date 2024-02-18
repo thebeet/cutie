@@ -76,13 +76,14 @@ const innerBoxHeight = computed({
     set: (value) => setBoxSize(modelValue.value, props.y, value),
 });
 
-const outerBoxX = computed(() => getBoxPosition(props.outer, props.name, props.x));
-const outerBoxY = computed(() => getBoxPosition(props.outer, props.name, props.y));
-const outerBoxWidth = computed(() => Math.max(getBoxSize(props.outer, props.x), getBoxSize(props.outer, props.y)));
-const outerBoxHeight = computed(() => Math.max(getBoxSize(props.outer, props.x), getBoxSize(props.outer, props.y)));
-
 const container = ref<SVGElement>();
 const { width, height } = useElementSize(container);
+const aspect = computed(() => height.value > 0 ? width.value / height.value : 1);
+
+const outerBoxX = computed(() => getBoxPosition(props.outer, props.name, props.x));
+const outerBoxY = computed(() => getBoxPosition(props.outer, props.name, props.y));
+const outerBoxWidth = computed(() => Math.max(getBoxSize(props.outer, props.x), getBoxSize(props.outer, props.y) * aspect.value));
+const outerBoxHeight = computed(() => Math.max(getBoxSize(props.outer, props.x) / aspect.value, getBoxSize(props.outer, props.y)));
 
 const rect = computed(() => ({
     x: ((innerBoxX.value - innerBoxWidth.value / 2) - (outerBoxX.value - outerBoxWidth.value / 2)) / outerBoxWidth.value * width.value,
@@ -188,7 +189,9 @@ const mouseMove = (event: MouseEvent) => {
 
 <style scope>
 .svg-container {
-    width:100%;
-    height:100%;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
 }
 </style>
