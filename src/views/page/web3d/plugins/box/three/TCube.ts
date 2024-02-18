@@ -3,12 +3,14 @@ import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Cube } from '../types';
 import { TFrame } from '@web3d/three/TFrame';
 import { rbox2Matrix } from '@web3d/utils/rbox';
-import { frustumFromRBox } from '@web3d/utils/frustum';
 
 const _rectMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
 const _edgeMaterial = /*@__PURE__*/ new THREE.LineBasicMaterial({ color: 0xffffff });
 const _boxGeometry = /*@__PURE__*/ new THREE.BoxGeometry();
 const _edgesGeometry = /*@__PURE__*/ new THREE.EdgesGeometry(_boxGeometry);
+
+const _o = new THREE.Vector3(0, 0, 0);
+const _arrow = new THREE.Vector3(1, 0, 0);
 
 export class TCube extends THREE.Object3D {
     private _label: CSS2DObject;
@@ -24,6 +26,8 @@ export class TCube extends THREE.Object3D {
         this.add(mesh);
         const edge = new THREE.LineSegments(_edgesGeometry, _edgeMaterial);
         this.add(edge);
+        const arrow = new THREE.ArrowHelper(_arrow, _o, 1, 0xffff00);
+        this.add(arrow);
 
         this._label = new CSS2DObject(this._makeLabelDom(rect3d));
 
