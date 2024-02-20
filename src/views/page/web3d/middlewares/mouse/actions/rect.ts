@@ -1,51 +1,54 @@
-import { Ref } from 'vue';
+import { MaybeRefOrGetter, Ref, toValue } from 'vue';
 import { usePos } from '../hooks/pos';
 import { ESP } from '../constants';
-import { EventHook } from '@vueuse/core';
+import { EventHook, useEventListener } from '@vueuse/core';
 import { AdvanceMouseEvent } from '../types';
 
-export const drawRect = (mouseEvent: Ref<AdvanceMouseEvent>,
+export const drawRect = (
+    dom: MaybeRefOrGetter<HTMLElement>,
+    enabled: MaybeRefOrGetter<boolean>,
+    mouseEvent: Ref<AdvanceMouseEvent>,
     eventHook: EventHook<AdvanceMouseEvent>) => {
-    const startDraw = (dom: HTMLElement, event: MouseEvent) => {
-        const { x, y } = usePos(event, dom);
-        mouseEvent.value.type = 'recting';
-        mouseEvent.value.points = [{ x, y }, { x, y }];
-        const onMove = (event: MouseEvent) => {
-            mouseEvent.value.points[1] = usePos(event, dom);
-        };
 
-        const onMouseUp = (event: MouseEvent) => {
-            mouseEvent.value.points[1] = usePos(event, dom);
+    let recting = false;
 
-            const { x: prevX, y: prevY } = mouseEvent.value.points[0];
-            const { x, y } = mouseEvent.value.points[1];
-            if (((x - prevX) * (x - prevX) > ESP) && ((y - prevY) * (y - prevY) > ESP)) {
-                mouseEvent.value.type = 'rected';
-                eventHook.trigger(mouseEvent.value);
-                cancel(false);
-            } else {
-                cancel();
-            }
-        };
-
-        const onLeave = () => {
-            cancel();
-        };
-
-        const cancel = (clear: boolean = true) => {
-            dom.removeEventListener('mouseup', onMouseUp);
-            dom.removeEventListener('mousemove', onMove);
-            dom.removeEventListener('mouseleave', onLeave);
-            if (clear) {
-                mouseEvent.value.type = null;
-                mouseEvent.value.points = [];
-            }
-        };
-
-        dom.addEventListener('mouseup', onMouseUp);
-        dom.addEventListener('mousemove', onMove);
-        dom.addEventListener('mouseleave', onLeave);
+    const condition = (func: (event: MouseEvent) => void) => (event: MouseEvent) => {
+        toValue(enabled) ? func(event) : null;
     };
 
-    return { startDraw };
+    useEventListener(dom, 'mousemove', condition((event: MouseEvent) => {
+        if (recting) {
+            const { x, y } = usePos(event, toValue(dom));
+            mouseEvent.value.points[1] = { x, y };
+        }
+    }));
+
+    useEventListener(dom, 'mousedown', condition((event: MouseEvent) => {
+        recting = true;
+        const { x, y } = usePos(event, toValue(dom));
+        mouseEvent.value.type = 'recting';
+        mouseEvent.value.points = [
+            { x, y },
+            { x, y }
+        ];
+    }));
+
+    useEventListener(dom, 'mouseup', condition((event: MouseEvent) => {
+        if (recting) {
+            recting = false;
+            const { x, y } = usePos(event, toValue(dom));
+            const { x: prevX, y: prevY } = mouseEvent.value.points[0];
+            if (((x - prevX) * (x - prevX) > ESP) && ((y - prevY) * (y - prevY) > ESP)) {
+                mouseEvent.value.type = 'rected';
+                mouseEvent.value.points[1] = { x, y };
+                eventHook.trigger(mouseEvent.value);
+            } else {
+                recting = false;
+            }
+        }
+    }));
+
+    useEventListener(dom, 'mouseleave', condition(() => {
+        recting = false;
+    }));
 };

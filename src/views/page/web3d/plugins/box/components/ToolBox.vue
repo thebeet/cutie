@@ -6,12 +6,11 @@
 </template>
 <script lang="ts" setup>
 import { useDrama } from '@web3d/hooks/drama';
-import { MouseMode } from '@web3d/hooks/mouse';
 
 const { activeTool, mouseState } = useDrama();
 const click = (mode: string) => {
     activeTool.value = 'rect';
-    mouseState.value = mode as MouseMode;
+    mouseState.value = mode;
 };
 </script>
 <style scoped>

@@ -1,5 +1,5 @@
 export interface AdvanceMouseEvent {
-    type: string | null
+    type: string
     points: {
         x: number
         y: number

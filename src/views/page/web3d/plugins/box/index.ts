@@ -4,7 +4,6 @@ import { TCube } from '@web3d/plugins/box/three/TCube';
 import ToolBox from './components/ToolBox.vue';
 import InstanceDetail from './components/InstanceDetail.vue';
 import { addNodeToContainer } from '..';
-import { watchPausable } from '@vueuse/core';
 import { rectAction } from './actions/rect';
 import { AddCubeFromPointsBoundingOperation } from './operations/AddCubeFromPointsBoundingOperation';
 import { TFrame } from '@web3d/three/TFrame';
@@ -14,28 +13,10 @@ import * as THREE from 'three';
 import { GroupOperation } from '@web3d/operator/Operation';
 import { ModifyCubeOperation } from './operations/ModifyCubeOperation';
 
-const watchMouseAction = () => {
-    const { camera, mouseEvent, applyOperation } = useDrama();
-
-    return watchPausable(() => ({
-        type: mouseEvent.value.type,
-        points: mouseEvent.value.points
-    }), (value) => {
-        if (value.type === 'rected') {
-            const results = rectAction(value.points, camera);
-            const ops = results.map(([frame, index]) => new AddCubeFromPointsBoundingOperation(frame, index, new THREE.Euler(0, 0, camera.rotation.z)));
-            if (ops.length === 1) {
-                applyOperation(ops[0]);
-            } else {
-                applyOperation(new GroupOperation(ops));
-            }
-        }
-    }, { deep: true });
-};
-
 export const usePlugin = () => {
     const { frames, activeTool, toolbox, rightsidebar,
-        threeViewInner,
+        threeViewInner, camera,
+        onAdvanceMouseEvent,
         applyOperation, onApplyOperation } = useDrama();
     const cubes: Map<string, TCube> = new Map([]);
     const { focused, elements } = storeToRefs(useRectStore());
@@ -73,11 +54,6 @@ export const usePlugin = () => {
         }
     });
 
-    const { pause, resume } = watchMouseAction();
-    watch(activeTool, (value) => {
-        value === 'rect' ? resume() : pause();
-    });
-
     watch(threeViewInner, (value, oldValue) => {
         if (focused.value) {
             const op = new ModifyCubeOperation({
@@ -89,6 +65,17 @@ export const usePlugin = () => {
         }
     }, { deep: true });
 
+    onAdvanceMouseEvent((event) => {
+        if (activeTool.value === 'rect' && event.type === 'rected') {
+            const results = rectAction(event.points, camera);
+            const ops = results.map(([frame, index]) => new AddCubeFromPointsBoundingOperation(frame, index, new THREE.Euler(0, 0, camera.rotation.z)));
+            if (ops.length === 1) {
+                applyOperation(ops[0]);
+            } else {
+                applyOperation(new GroupOperation(ops));
+            }
+        }
+    });
 
     onApplyOperation(({ operation }) => {
         if (operation instanceof AddCubeFromPointsBoundingOperation) {

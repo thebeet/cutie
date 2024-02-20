@@ -12,7 +12,7 @@ export const useThreeView = () => {
         if (inner.value) {
             outer.value = klona(inner.value);
             const scale = 1 + padding.value * 2;
-            outer.value!.size = {
+            outer.value.size = {
                 length: inner.value.size.length * scale,
                 width: inner.value.size.width * scale,
                 height: inner.value.size.height * scale,

@@ -4,7 +4,7 @@ import { useScene } from '@web3d/hooks/scene';
 import { usePCDCachedLoader } from '@web3d/hooks/loader';
 import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
 import { useAnswerStore } from '@web3d/stores/answer';
-import { useMouseEvent } from '@web3d/hooks/mouse';
+import { useMouse } from '@web3d/hooks/mouse';
 import { storeToRefs } from 'pinia';
 import { usePageStore } from '@web3d/stores/page';
 import { Frame } from '@web3d/types';
@@ -71,7 +71,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
         });
     };
 
-    const { mouseEvent, state: mouseState, onAdvanceMouseEvent } = useMouseEvent(container);
+    const { mouseEvent, state: mouseState, eventHook: mouseEventHook } = useMouse();
     const activeTool = ref('');
     const annotations = ref<Annotation<any>[]>([]);
     const operations = ref<Operation<any>[]>([]);
@@ -81,8 +81,11 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     });
     return {
         normal: {
-            container, toolbox, footer, rightsidebar,
-            mouseEvent, mouseState, onAdvanceMouseEvent,
+            container: container as MaybeRefOrGetter<HTMLDivElement>,
+            toolbox: toolbox as MaybeRefOrGetter<HTMLDivElement>,
+            footer: footer as MaybeRefOrGetter<HTMLDivElement>,
+            rightsidebar: rightsidebar as MaybeRefOrGetter<HTMLDivElement>,
+            mouseEvent, mouseState, onAdvanceMouseEvent: mouseEventHook.on,
             frames, activeFrames, selectFrame,
             activeTool,
             page,
@@ -97,7 +100,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
         } as const,
 
         advance: {
-            controls, renderer, controlMode,
+            controls, renderer, controlMode, mouseEventHook,
         } as const
     } as const;
 };

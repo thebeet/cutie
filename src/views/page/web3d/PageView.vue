@@ -2,20 +2,14 @@
     <div class="main-wrap">
         <div class="header">header</div>
         <div class="main-container">
-            <div ref="toolbox" class="leftsidebar">
-            </div>
+            <div ref="toolbox" class="leftsidebar"/>
             <div class="main">
-                <div ref="container" class="main-canvas">
-                    <MouseActionPreview/>
-                </div>
-                <div ref="footer" class="main-footer">
-                </div>
+                <div ref="container" class="main-canvas"/>
+                <div ref="footer" class="main-footer"/>
             </div>
-            <div ref="rightsidebar" class="rightsidebar">
-            </div>
+            <div ref="rightsidebar" class="rightsidebar"/>
         </div>
-        <div class="statusbar">
-        </div>
+        <div class="statusbar"/>
     </div>
 </template>
 
@@ -48,6 +42,7 @@ onMounted(async () => {
         { name: 'spatial-indexing', params: { impl: 'octree' } },
         { name: 'three-view' },
         { name: 'fullscreen' },
+        { name: 'mouse' },
     ];
     for (const middleware of middlewares) {
         await import(`./middlewares/${middleware.name}/index.ts`).then(({ useMiddleware }) => {
