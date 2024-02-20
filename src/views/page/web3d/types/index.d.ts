@@ -2,8 +2,9 @@ import {
     PageTemplate as BasePageTemplate
 } from '@/types';
 export * from '@/types';
-export * from '@web3d/types/camera';
-export * from '@web3d/types/shape';
+export * from './camera';
+export * from './shape';
+export * from './mouse';
 
 export type PageTemplate = BasePageTemplate;
 

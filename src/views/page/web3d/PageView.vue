@@ -18,7 +18,6 @@ import { ref, onMounted } from 'vue';
 import { Page } from '@web3d/types';
 import { useDrama } from '@web3d/hooks/drama';
 import { usePageStore } from '@web3d/stores/page';
-import MouseActionPreview from '@web3d/components/MouseActionPreview.vue';
 
 const props = defineProps<{
     page: Page

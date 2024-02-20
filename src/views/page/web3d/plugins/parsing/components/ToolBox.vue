@@ -9,7 +9,6 @@
 </template>
 <script lang="ts" setup>
 import { useDrama } from '@web3d/hooks/drama';
-import { MouseMode } from '@web3d/hooks/mouse';
 import { dumpBinary, PCDField, FieldX, FieldY, FieldZ } from '../features/dump';
 import { useParsingStore } from '../stores';
 import { storeToRefs } from 'pinia';
@@ -20,7 +19,7 @@ const { instances } = storeToRefs(useParsingStore());
 
 const click = (mode: string) => {
     activeTool.value = 'parsing';
-    mouseState.value = mode as MouseMode;
+    mouseState.value = mode;
 };
 
 const dump = () => {
