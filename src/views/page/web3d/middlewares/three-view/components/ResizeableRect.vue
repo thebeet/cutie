@@ -3,16 +3,12 @@
         ref="container"
         xmlns="http://www.w3.org/2000/svg"
         class="svg-container"
-        @mousemove="mouseMove"
-        @mouseup="deselectControlPoint"
+        :style="{ cursor: initialRotatePosition ? 'grabbing' : 'auto' }"
+        @mousedown.stop
+        @mousemove.stop="mouseMove"
+        @mouseup.stop="deselectControlPoint"
         @mouseleave="deselectControlPoint"
     >
-        <rect
-            :x="rect.x"
-            :y="rect.y"
-            :width="rect.width"
-            :height="rect.height"
-        />
         <rect
             v-for="(point, index) in controlPoints"
             :key="'control-point-' + index"
@@ -24,6 +20,22 @@
             :style="{ cursor: point.cursor }"
             @mousedown.prevent.stop="selectControlPoint(point, $event)"
         />
+        <line
+            :x1="controlPoints[4].x"
+            :y1="controlPoints[4].y"
+            :x2="rotatePoint.x"
+            :y2="rotatePoint.y"
+            stroke="white"
+        />
+        <rect
+            :x="rotatePoint.x - controlPointSize / 2"
+            :y="rotatePoint.y - controlPointSize / 2"
+            :width="controlPointSize"
+            :height="controlPointSize"
+            fill="white"
+            :style="{ cursor: rotatePoint.cursor }"
+            @mousedown.prevent.stop="rotateControlPoint($event)"
+        />
     </svg>
 </template>
 
@@ -32,6 +44,7 @@ import { useElementSize } from '@vueuse/core';
 import { computed, ref } from 'vue';
 import { RBox } from '@web3d/types';
 import { useBoxHelper } from '../hooks/boxHelper';
+import * as THREE from 'three';
 
 const controlPointSize = 10;
 
@@ -45,6 +58,7 @@ const props = defineProps<{
     name: 'front' | 'side' | 'top'
     x: 'x' | 'y' | 'z'
     y: 'x' | 'y' | 'z'
+    camera: THREE.Camera
 }>();
 
 const modelValue = defineModel<RBox>({
@@ -55,13 +69,11 @@ const emits = defineEmits<{
     (e: 'confirm', value: RBox): void
 }>();
 
-const { getBoxSize, getBoxPosition, setBoxSize, setBoxPosition } = useBoxHelper();
+const { getBoxSize, getBoxPosition, setBoxSize, setBoxPosition, setBoxRotation, getControlPoints, getRotateControlPoint } = useBoxHelper();
 
 const innerBoxX = computed({
     get: () => getBoxPosition(modelValue.value, props.name, props.x),
-    set: (value) => {
-        setBoxPosition(modelValue.value, props.name, props.x, value);
-    },
+    set: (value) => setBoxPosition(modelValue.value, props.name, props.x, value),
 });
 const innerBoxY = computed({
     get: () => getBoxPosition(modelValue.value, props.name, props.y),
@@ -80,31 +92,27 @@ const container = ref<SVGElement>();
 const { width, height } = useElementSize(container);
 const aspect = computed(() => height.value > 0 ? width.value / height.value : 1);
 
-const outerBoxX = computed(() => getBoxPosition(props.outer, props.name, props.x));
-const outerBoxY = computed(() => getBoxPosition(props.outer, props.name, props.y));
 const outerBoxWidth = computed(() => Math.max(getBoxSize(props.outer, props.x), getBoxSize(props.outer, props.y) * aspect.value));
 const outerBoxHeight = computed(() => Math.max(getBoxSize(props.outer, props.x) / aspect.value, getBoxSize(props.outer, props.y)));
 
-const rect = computed(() => ({
-    x: ((innerBoxX.value - innerBoxWidth.value / 2) - (outerBoxX.value - outerBoxWidth.value / 2)) / outerBoxWidth.value * width.value,
-    y: ((innerBoxY.value - innerBoxHeight.value / 2) - (outerBoxY.value - outerBoxHeight.value / 2)) / outerBoxHeight.value * height.value,
-    width: innerBoxWidth.value / outerBoxWidth.value * width.value,
-    height: innerBoxHeight.value / outerBoxHeight.value * height.value,
-}));
+const controlPoints = computed(() => getControlPoints(modelValue.value, props.x, props.y).map(({ pos, point }) => {
+    const p = point.clone().project(props.camera);
+    return {
+        x: (p.x + 1) / 2 * width.value,
+        y: (1 - p.y) / 2 * height.value,
+        cursor: pos + '-resize'
+    };
+}) as ControlPoint[]);
 
-const controlPoints = computed(() => {
-    const points: ControlPoint[] = [];
-    // 四个角的控制点
-    points.push({ x: rect.value.x, y: rect.value.y, cursor: 'nw-resize' }); // 左上角
-    points.push({ x: rect.value.x + rect.value.width, y: rect.value.y, cursor: 'ne-resize' }); // 右上角
-    points.push({ x: rect.value.x, y: rect.value.y + rect.value.height, cursor: 'sw-resize' }); // 左下角
-    points.push({ x: rect.value.x + rect.value.width, y: rect.value.y + rect.value.height, cursor: 'se-resize' }); // 右下角
-    // 四条边的中点控制点
-    points.push({ x: rect.value.x + rect.value.width / 2, y: rect.value.y, cursor: 'n-resize' }); // 上中点
-    points.push({ x: rect.value.x, y: rect.value.y + rect.value.height / 2, cursor: 'w-resize' }); // 左中点
-    points.push({ x: rect.value.x + rect.value.width, y: rect.value.y + rect.value.height / 2, cursor: 'e-resize' }); // 右中点
-    points.push({ x: rect.value.x + rect.value.width / 2, y: rect.value.y + rect.value.height, cursor: 's-resize' }); // 下中点
-    return points;
+const rotatePoint = computed(() => {
+    const boxAspect = innerBoxWidth.value / innerBoxHeight.value;
+    const point = getRotateControlPoint(modelValue.value, props.x, props.y, Math.min(Math.max(1, boxAspect / aspect.value) * 0.2, 1));
+    const p = point.clone().project(props.camera);
+    return {
+        x: (p.x + 1) / 2 * width.value,
+        y: (1 - p.y) / 2 * height.value,
+        cursor: 'grab'
+    };
 });
 
 const selectedControlPoint = ref<ControlPoint>();
@@ -116,73 +124,91 @@ const selectControlPoint = (point: ControlPoint, event: MouseEvent) => {
     event.preventDefault();
 };
 
+const initialRotatePosition = ref<{x: number; y: number}>();
+const rotateControlPoint = (event: MouseEvent) => {
+    initialRotatePosition.value = { x: event.clientX, y: event.clientY };
+};
+
 const deselectControlPoint = () => {
     selectedControlPoint.value = undefined;
+    initialRotatePosition.value = undefined;
     emits('confirm', modelValue.value);
 };
 
+const rotatePointMouseMove = (event: MouseEvent) => {
+    if (initialRotatePosition.value) {
+        const before = new THREE.Vector2(0, height.value / 2);
+        const current = new THREE.Vector2(event.clientX - initialRotatePosition.value.x, event.clientY - initialRotatePosition.value.y + height.value / 2);
+        const angle = Math.atan2(current.y, current.x) - Math.atan2(before.y, before.x);
+        setBoxRotation(modelValue.value, props.name, angle);
+        initialRotatePosition.value = { x: event.clientX, y: event.clientY };
+    }
+};
+
 const mouseMove = (event: MouseEvent) => {
-    if (!selectedControlPoint.value) return;
-    const dx = (event.clientX - initialMousePosition.value.x) * outerBoxWidth.value / width.value;
-    const dy = (event.clientY - initialMousePosition.value.y) * outerBoxHeight.value / height.value;
-    const current = {
-        x: innerBoxX.value,
-        y: innerBoxY.value,
-        width: innerBoxWidth.value,
-        height: innerBoxHeight.value,
-    };
-    switch (selectedControlPoint.value.cursor) {
-    case 'nw-resize':
-        current.x += dx / 2;
-        current.y += dy / 2;
-        current.width -= dx;
-        current.height -= dy;
-        break;
-    case 'ne-resize':
-        current.x += dx / 2;
-        current.y += dy / 2;
-        current.width += dx;
-        current.height -= dy;
-        break;
-    case 'sw-resize':
-        current.x += dx / 2;
-        current.y += dy / 2;
-        current.width -= dx;
-        current.height += dy;
-        break;
-    case 'se-resize':
-        current.x += dx / 2;
-        current.y += dy / 2;
-        current.width += dx;
-        current.height += dy;
-        break;
-    case 'n-resize':
-        current.y += dy / 2;
-        current.height -= dy;
-        break;
-    case 's-resize':
-        current.y += dy / 2;
-        current.height += dy;
-        break;
-    case 'w-resize':
-        current.x += dx / 2;
-        current.width -= dx;
-        break;
-    case 'e-resize':
-        current.x += dx / 2;
-        current.width += dx;
-        break;
-    }
-    const controlPointSize = 10 * outerBoxHeight.value / height.value;
-    if (current.width >= controlPointSize) {
-        innerBoxX.value = current.x;
-        innerBoxWidth.value = current.width;
-        initialMousePosition.value.x = event.clientX;
-    }
-    if (current.height >= controlPointSize) {
-        innerBoxY.value = current.y;
-        innerBoxHeight.value = current.height;
-        initialMousePosition.value.y = event.clientY;
+    rotatePointMouseMove(event);
+    if (selectedControlPoint.value) {
+        const dx = (event.clientX - initialMousePosition.value.x) * outerBoxWidth.value / width.value;
+        const dy = (event.clientY - initialMousePosition.value.y) * outerBoxHeight.value / height.value;
+        const current = {
+            x: innerBoxX.value,
+            y: innerBoxY.value,
+            width: innerBoxWidth.value,
+            height: innerBoxHeight.value,
+        };
+        switch (selectedControlPoint.value.cursor) {
+        case 'nw-resize':
+            current.x += dx / 2;
+            current.y += dy / 2;
+            current.width -= dx;
+            current.height -= dy;
+            break;
+        case 'ne-resize':
+            current.x += dx / 2;
+            current.y += dy / 2;
+            current.width += dx;
+            current.height -= dy;
+            break;
+        case 'sw-resize':
+            current.x += dx / 2;
+            current.y += dy / 2;
+            current.width -= dx;
+            current.height += dy;
+            break;
+        case 'se-resize':
+            current.x += dx / 2;
+            current.y += dy / 2;
+            current.width += dx;
+            current.height += dy;
+            break;
+        case 'n-resize':
+            current.y += dy / 2;
+            current.height -= dy;
+            break;
+        case 's-resize':
+            current.y += dy / 2;
+            current.height += dy;
+            break;
+        case 'w-resize':
+            current.x += dx / 2;
+            current.width -= dx;
+            break;
+        case 'e-resize':
+            current.x += dx / 2;
+            current.width += dx;
+            break;
+        }
+        const controlPointSize = 10 * outerBoxHeight.value / height.value;
+        if (current.width >= controlPointSize) {
+            innerBoxX.value = current.x;
+            innerBoxWidth.value = current.width;
+            initialMousePosition.value.x = event.clientX;
+        }
+        if (current.height >= controlPointSize) {
+            innerBoxY.value = current.y;
+            innerBoxHeight.value = current.height;
+            initialMousePosition.value.y = event.clientY;
+        }
     }
 };
 </script>

@@ -7,6 +7,7 @@
                 name="front"
                 x="y"
                 y="z"
+                :camera="cameras!.front"
                 @confirm="confirm"
             />
         </div>
@@ -17,6 +18,7 @@
                 name="side"
                 x="x"
                 y="z"
+                :camera="cameras!.side"
                 @confirm="confirm"
             />
         </div>
@@ -27,6 +29,7 @@
                 name="top"
                 x="x"
                 y="y"
+                :camera="cameras!.top"
                 @confirm="confirm"
             />
         </div>
@@ -49,9 +52,10 @@ const confirm = () => {
     threeViewRejust();
 };
 
-useRender({
+const { cameras } = useRender({
     container, front, side, top
 });
+
 </script>
 <style scoped>
 .three-views-container {

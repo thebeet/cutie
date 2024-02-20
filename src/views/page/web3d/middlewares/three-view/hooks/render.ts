@@ -25,7 +25,6 @@ export const useRender = (containers: Containers) => {
 
     let dirty = true;
 
-
     const getCamera = (center: THREE.Vector3, aspect: number, width: number, height: number, deep: number, toward: THREE.Vector3, up: THREE.Vector3, rotation: THREE.Quaternion) => {
         const xSize = Math.max(width, height * aspect);
         const ySize = Math.max(height, width / aspect);
@@ -33,6 +32,7 @@ export const useRender = (containers: Containers) => {
         camera.up.set(...up.clone().applyQuaternion(rotation).toArray());
         camera.position.set(...center.clone().add(toward.clone().applyQuaternion(rotation).multiplyScalar(deep / 2)).toArray());
         camera.lookAt(...center.toArray());
+        camera.updateMatrixWorld();
         camera.updateProjectionMatrix();
         return camera;
     };
@@ -54,16 +54,12 @@ export const useRender = (containers: Containers) => {
             const position = new THREE.Vector3(outer.position.x, outer.position.y, outer.position.z);
             const quaternion = new THREE.Quaternion().setFromEuler(
                 new THREE.Euler(outer.rotation.phi, outer.rotation.theta, outer.rotation.psi));
-
             const front = getCamera(position, frontContainerSize.width.value / frontContainerSize.height.value,
                 outer.size.width, outer.size.height, outer.size.length, X, XUp, quaternion);
-
             const side = getCamera(position, sideContainerSize.width.value / sideContainerSize.height.value,
                 outer.size.length, outer.size.height, outer.size.width, Y, YUp, quaternion);
-
             const top = getCamera(position, topContainerSize.width.value / topContainerSize.height.value,
                 outer.size.length, outer.size.width, outer.size.height, Z, ZUp, quaternion);
-
             return {
                 front, side, top,
             };
@@ -90,14 +86,13 @@ export const useRender = (containers: Containers) => {
         if (dirty) {
             if (cameras.value) {
                 dirty = false;
-                renderer.setScissorTest( false );
+                renderer.setScissorTest(false);
                 renderer.clear();
-                renderer.setScissorTest( true );
+                renderer.setScissorTest(true);
                 renderTo(cameras.value.front, containers.front);
                 renderTo(cameras.value.side, containers.side);
                 renderTo(cameras.value.top, containers.top);
             }
-
         }
     });
 
@@ -123,4 +118,8 @@ export const useRender = (containers: Containers) => {
             });
         }
     });
+
+    return {
+        cameras,
+    };
 };
