@@ -5,8 +5,6 @@
                 v-model="threeViewInner"
                 :outer="threeViewOuter"
                 name="front"
-                x="y"
-                y="z"
                 :camera="cameras!.front"
                 @confirm="confirm"
             />
@@ -16,8 +14,6 @@
                 v-model="threeViewInner"
                 :outer="threeViewOuter"
                 name="side"
-                x="x"
-                y="z"
                 :camera="cameras!.side"
                 @confirm="confirm"
             />
@@ -27,8 +23,6 @@
                 v-model="threeViewInner"
                 :outer="threeViewOuter"
                 name="top"
-                x="x"
-                y="y"
                 :camera="cameras!.top"
                 @confirm="confirm"
             />

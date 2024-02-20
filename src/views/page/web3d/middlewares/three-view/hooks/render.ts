@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { useDrama } from '@web3d/hooks/drama';
 import { MaybeRefOrGetter, computed, toValue, watch, watchEffect } from 'vue';
 import { useElementSize, useRafFn, useResizeObserver } from '@vueuse/core';
+import { useThreeViewStore } from '../stores';
 
 type Containers = {
     container: MaybeRefOrGetter<HTMLDivElement | undefined>;
@@ -37,12 +38,7 @@ export const useRender = (containers: Containers) => {
         return camera;
     };
 
-    const X = new THREE.Vector3(1, 0, 0);
-    const XUp = new THREE.Vector3(0, 0, 1);
-    const Y = new THREE.Vector3(0, -1, 0);
-    const YUp = new THREE.Vector3(0, 0, 1);
-    const Z = new THREE.Vector3(0, 0, 1);
-    const ZUp = new THREE.Vector3(0, 1, 0);
+    const { X, XUp, Y, YUp, Z, ZUp } = useThreeViewStore();
 
     const frontContainerSize = useElementSize(containers.front);
     const sideContainerSize = useElementSize(containers.front);

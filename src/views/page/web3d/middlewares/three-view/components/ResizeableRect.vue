@@ -21,13 +21,15 @@
             @mousedown.prevent.stop="selectControlPoint(point, $event)"
         />
         <line
-            :x1="controlPoints[4].x"
-            :y1="controlPoints[4].y"
-            :x2="rotatePoint.x"
-            :y2="rotatePoint.y"
+            v-if="hasView && controlPoints.length === 8"
+            :x1="controlPoints[1].x"
+            :y1="controlPoints[1].y"
+            :x2="rotatePoint!.x"
+            :y2="rotatePoint!.y"
             stroke="white"
         />
         <rect
+            v-if="rotatePoint"
             :x="rotatePoint.x - controlPointSize / 2"
             :y="rotatePoint.y - controlPointSize / 2"
             :width="controlPointSize"
@@ -47,7 +49,6 @@ import { useBoxHelper } from '../hooks/boxHelper';
 import * as THREE from 'three';
 
 const controlPointSize = 10;
-
 type ControlPoint = {
     x: number
     y: number
@@ -56,9 +57,7 @@ type ControlPoint = {
 const props = defineProps<{
     outer: RBox
     name: 'front' | 'side' | 'top'
-    x: 'x' | 'y' | 'z'
-    y: 'x' | 'y' | 'z'
-    camera: THREE.Camera
+    camera: THREE.Camera | undefined
 }>();
 
 const modelValue = defineModel<RBox>({
@@ -69,45 +68,49 @@ const emits = defineEmits<{
     (e: 'confirm', value: RBox): void
 }>();
 
-const { getBoxSize, getBoxPosition, setBoxSize, setBoxPosition, setBoxRotation, getControlPoints, getRotateControlPoint } = useBoxHelper();
+const { getBoxSize, getBoxPosition, setBoxSize, setBoxPosition, setBoxRotation, getControlPoints, getRotateControlPoint } = useBoxHelper(props.name);
 
 const innerBoxX = computed({
-    get: () => getBoxPosition(modelValue.value, props.name, props.x),
-    set: (value) => setBoxPosition(modelValue.value, props.name, props.x, value),
+    get: () => getBoxPosition(modelValue.value, 'x'),
+    set: (value) => setBoxPosition(modelValue.value, 'x', value),
 });
 const innerBoxY = computed({
-    get: () => getBoxPosition(modelValue.value, props.name, props.y),
-    set: (value) => setBoxPosition(modelValue.value, props.name, props.y, value),
+    get: () => getBoxPosition(modelValue.value, 'y'),
+    set: (value) => setBoxPosition(modelValue.value, 'y', value),
 });
 const innerBoxWidth = computed({
-    get: () => getBoxSize(modelValue.value, props.x),
-    set: (value) => setBoxSize(modelValue.value, props.x, value),
+    get: () => getBoxSize(modelValue.value, 'x'),
+    set: (value) => setBoxSize(modelValue.value, 'x', value),
 });
 const innerBoxHeight = computed({
-    get: () => getBoxSize(modelValue.value, props.y),
-    set: (value) => setBoxSize(modelValue.value, props.y, value),
+    get: () => getBoxSize(modelValue.value, 'y'),
+    set: (value) => setBoxSize(modelValue.value, 'y', value),
 });
 
 const container = ref<SVGElement>();
 const { width, height } = useElementSize(container);
+
+const hasView = computed(() => width.value > 0 && height.value > 0 && props.camera);
+
 const aspect = computed(() => height.value > 0 ? width.value / height.value : 1);
 
-const outerBoxWidth = computed(() => Math.max(getBoxSize(props.outer, props.x), getBoxSize(props.outer, props.y) * aspect.value));
-const outerBoxHeight = computed(() => Math.max(getBoxSize(props.outer, props.x) / aspect.value, getBoxSize(props.outer, props.y)));
+const outerBoxWidth = computed(() => Math.max(getBoxSize(props.outer, 'x'), getBoxSize(props.outer, 'y') * aspect.value));
+const outerBoxHeight = computed(() => Math.max(getBoxSize(props.outer, 'x') / aspect.value, getBoxSize(props.outer, 'y')));
 
-const controlPoints = computed(() => getControlPoints(modelValue.value, props.x, props.y).map(({ pos, point }) => {
-    const p = point.clone().project(props.camera);
+const controlPoints = computed<ControlPoint[]>(() => hasView.value ? getControlPoints(modelValue.value).map(({ pos, point }) => {
+    const p = point.clone().project(props.camera!);
     return {
         x: (p.x + 1) / 2 * width.value,
         y: (1 - p.y) / 2 * height.value,
         cursor: pos + '-resize'
     };
-}) as ControlPoint[]);
+}) : []);
 
-const rotatePoint = computed(() => {
+const rotatePoint = computed<ControlPoint | undefined>(() => {
+    if (!hasView.value) { return undefined; }
     const boxAspect = innerBoxWidth.value / innerBoxHeight.value;
-    const point = getRotateControlPoint(modelValue.value, props.x, props.y, Math.min(Math.max(1, boxAspect / aspect.value) * 0.2, 1));
-    const p = point.clone().project(props.camera);
+    const point = getRotateControlPoint(modelValue.value, Math.min(Math.max(1, boxAspect / aspect.value) * 0.2, 1));
+    const p = point.clone().project(props.camera!);
     return {
         x: (p.x + 1) / 2 * width.value,
         y: (1 - p.y) / 2 * height.value,
@@ -140,7 +143,7 @@ const rotatePointMouseMove = (event: MouseEvent) => {
         const before = new THREE.Vector2(0, height.value / 2);
         const current = new THREE.Vector2(event.clientX - initialRotatePosition.value.x, event.clientY - initialRotatePosition.value.y + height.value / 2);
         const angle = Math.atan2(current.y, current.x) - Math.atan2(before.y, before.x);
-        setBoxRotation(modelValue.value, props.name, angle);
+        setBoxRotation(modelValue.value, angle);
         initialRotatePosition.value = { x: event.clientX, y: event.clientY };
     }
 };
