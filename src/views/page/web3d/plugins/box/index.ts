@@ -12,6 +12,7 @@ import { useRectStore } from './stores';
 import * as THREE from 'three';
 import { GroupOperation } from '@web3d/operator/Operation';
 import { ModifyCubeOperation } from './operations/ModifyCubeOperation';
+import { klona } from 'klona';
 
 export const usePlugin = () => {
     const { frames, activeTool, toolbox, rightsidebar,
@@ -74,6 +75,44 @@ export const usePlugin = () => {
             } else {
                 applyOperation(new GroupOperation(ops));
             }
+        }
+        if (event.type === 'click') {
+            const { x, y } = event.points[0];
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(
+                new THREE.Vector2(x, y),
+                camera
+            );
+            const items = Array.from(cubes, (entry) => {
+                return entry[1];
+            }).filter(item => item.visible && item.parent?.visible);
+            const result = raycaster.intersectObjects(items, false);
+            if (result.length > 0) {
+                let intersect = result[0];
+                for (let i = 1; i < result.length; ++i) {
+                    if (intersect.distance > result[i].distance) {
+                        intersect = result[i];
+                    }
+                }
+                const cube = intersect.object as TCube;
+                threeViewInner.value = klona(cube.box);
+                focused.value = cube.box;
+            } else {
+                focused.value = undefined;
+            }
+        }
+    });
+
+    watch(focused, (value, oldValue) => {
+        if (oldValue) {
+            const cube = cubes.get(oldValue.uuid);
+            cube?.dispatchEvent({ type: 'blur' });
+        }
+        if (value) {
+            const cube = cubes.get(value.uuid);
+            cube?.dispatchEvent({ type: 'focus' });
+        } else {
+            threeViewInner.value = undefined;
         }
     });
 

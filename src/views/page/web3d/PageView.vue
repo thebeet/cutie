@@ -1,6 +1,6 @@
 <template>
     <div class="main-wrap">
-        <div class="header">header</div>
+        <div class="header">header<svg-icon type="mdi" :path="mdiCar"></svg-icon></div>
         <div class="main-container">
             <div ref="toolbox" class="leftsidebar"/>
             <div class="main">
@@ -18,6 +18,7 @@ import { ref, onMounted } from 'vue';
 import { Page } from '@web3d/types';
 import { useDrama } from '@web3d/hooks/drama';
 import { usePageStore } from '@web3d/stores/page';
+import { mdiCar } from '@mdi/js';
 
 const props = defineProps<{
     page: Page

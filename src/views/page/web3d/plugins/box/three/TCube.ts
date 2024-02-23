@@ -4,39 +4,64 @@ import { Cube } from '../types';
 import { TFrame } from '@web3d/three/TFrame';
 import { rbox2Matrix } from '@web3d/utils/rbox';
 
-const _rectMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
+const _rectMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.2, transparent: true });
+const _rectFocusMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
 const _edgeMaterial = /*@__PURE__*/ new THREE.LineBasicMaterial({ color: 0xffffff });
+const _edgeFocusMaterial = /*@__PURE__*/ new THREE.LineBasicMaterial({ color: 0x007bff });
 const _boxGeometry = /*@__PURE__*/ new THREE.BoxGeometry();
 const _edgesGeometry = /*@__PURE__*/ new THREE.EdgesGeometry(_boxGeometry);
 
 const _o = new THREE.Vector3(0, 0, 0);
 const _arrow = new THREE.Vector3(1, 0, 0);
 
-export class TCube extends THREE.Object3D {
-    private _label: CSS2DObject;
-    private _rect: Cube;
+export interface TCubeEventMap extends THREE.Object3DEventMap {
+    focus: {}
+    blur: {}
+}
 
-    constructor(rect3d: Cube) {
+export class TCube extends THREE.Object3D<TCubeEventMap> {
+    private _label: CSS2DObject;
+    private _mesh: THREE.Mesh;
+    private _edge: THREE.LineSegments;
+    box: Cube;
+
+    constructor(box: Cube) {
         super();
         this.matrixAutoUpdate = false;
         this.matrixWorldNeedsUpdate = false;
-        this._rect = rect3d;
-        this.applyMatrix4(rbox2Matrix(rect3d));
-        const mesh = new THREE.Mesh(_boxGeometry, _rectMaterial);
-        this.add(mesh);
-        const edge = new THREE.LineSegments(_edgesGeometry, _edgeMaterial);
-        this.add(edge);
+        this.box = box;
+        this.applyMatrix4(rbox2Matrix(box));
+        this._mesh = new THREE.Mesh(_boxGeometry, _rectMaterial);
+        this.add(this._mesh);
+        this._edge = new THREE.LineSegments(_edgesGeometry, _edgeMaterial);
+        this.add(this._edge);
         const arrow = new THREE.ArrowHelper(_arrow, _o, 1, 0xffff00);
         this.add(arrow);
 
-        this._label = new CSS2DObject(this._makeLabelDom(rect3d));
+        this._label = new CSS2DObject(this._makeLabelDom(box));
 
         this.add(this._label);
+        this._bindEvent();
+    }
+
+    private _bindEvent() {
+        this.addEventListener('focus', this._onFocus.bind(this));
+        this.addEventListener('blur', this._onBlur.bind(this));
+    };
+
+    private _onFocus() {
+        this._mesh.material = _rectFocusMaterial;
+        this._edge.material = _edgeFocusMaterial;
+    }
+
+    private _onBlur() {
+        this._mesh.material = _rectMaterial;
+        this._edge.material = _edgeMaterial;
     }
 
     apply(newValue: Cube) {
-        if (this._rect !== newValue) {
-            this._rect = newValue;
+        if (this.box !== newValue) {
+            this.box = newValue;
             this.matrix.identity();
             this.applyMatrix4(rbox2Matrix(newValue));
             this.updateMatrixWorld(true);
@@ -63,6 +88,15 @@ export class TCube extends THREE.Object3D {
 
     get isTCube() {
         return true;
+    }
+
+    raycast(raycaster: THREE.Raycaster, intersects: THREE.Intersection[]) {
+        const innerIntersect = [] as THREE.Intersection[];
+        this._mesh.raycast(raycaster, innerIntersect);
+        if (innerIntersect.length > 0) {
+            innerIntersect[0].object = this;
+            intersects.push(innerIntersect[0]);
+        }
     }
 
     dispose() {

@@ -25,14 +25,14 @@ export class AddCubeFromPointsBoundingOperation implements Operation {
                 z: 0,
             },
             size: {
-                length: 1,
-                width: 1,
-                height: 1,
+                x: 1,
+                y: 1,
+                z: 1,
             },
             rotation: {
-                phi: euler.x,
-                theta: euler.y,
-                psi: euler.z,
+                x: euler.x,
+                y: euler.y,
+                z: euler.z,
             }
         };
     }
@@ -48,7 +48,7 @@ export class AddCubeFromPointsBoundingOperation implements Operation {
         const position = this.frame.points!.geometry.getAttribute('position');
         const _v = new THREE.Vector3();
         const quaternion = new THREE.Quaternion().setFromEuler(
-            new THREE.Euler(this.result.rotation.phi, this.result.rotation.theta, this.result.rotation.psi, 'XYZ'));
+            new THREE.Euler(this.result.rotation.x, this.result.rotation.y, this.result.rotation.z));
         const invertQuaternion = quaternion.clone().invert();
         this.index.forEach(i => {
             _v.fromBufferAttribute(position, i).applyQuaternion(invertQuaternion);
@@ -60,6 +60,7 @@ export class AddCubeFromPointsBoundingOperation implements Operation {
         box.getCenter(center);
         box.getSize(size);
         center.applyQuaternion(quaternion);
+        center.applyMatrix4(this.frame.matrixWorld.clone().invert());
         return { box, center, size };
     }
 
@@ -68,9 +69,9 @@ export class AddCubeFromPointsBoundingOperation implements Operation {
         this.result.position.x = center.x;
         this.result.position.y = center.y;
         this.result.position.z = center.z;
-        this.result.size.length = size.x;
-        this.result.size.width = size.y;
-        this.result.size.height = size.z;
+        this.result.size.x = size.x;
+        this.result.size.y = size.y;
+        this.result.size.z = size.z;
         answer.elements.push(this.result);
     }
 

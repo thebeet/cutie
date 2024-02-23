@@ -1,6 +1,6 @@
 <template>
-    <div v-if="threeViewOuter && threeViewInner" ref="container" class="three-views-container">
-        <div ref="front" class="view-container">
+    <div v-show="threeViewOuter && threeViewInner" ref="container" class="three-views-container">
+        <div v-if="threeViewOuter && threeViewInner" ref="front" class="view-container">
             <ResizeableRect
                 v-model="threeViewInner"
                 :outer="threeViewOuter"
@@ -9,7 +9,7 @@
                 @confirm="confirm"
             />
         </div>
-        <div ref="side" class="view-container">
+        <div v-if="threeViewOuter && threeViewInner" ref="side" class="view-container">
             <ResizeableRect
                 v-model="threeViewInner"
                 :outer="threeViewOuter"
@@ -18,7 +18,7 @@
                 @confirm="confirm"
             />
         </div>
-        <div ref="top" class="view-container">
+        <div v-if="threeViewOuter && threeViewInner" ref="top" class="view-container">
             <ResizeableRect
                 v-model="threeViewInner"
                 :outer="threeViewOuter"

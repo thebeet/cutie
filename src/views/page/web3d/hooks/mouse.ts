@@ -13,5 +13,5 @@ export const useMouse = () => {
         state,
         mouseEvent,
         eventHook,
-    };
+    } as const;
 };

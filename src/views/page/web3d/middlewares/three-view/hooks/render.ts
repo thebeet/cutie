@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { useDrama } from '@web3d/hooks/drama';
-import { MaybeRefOrGetter, computed, toValue, watch, watchEffect } from 'vue';
-import { useElementSize, useRafFn, useResizeObserver } from '@vueuse/core';
+import { MaybeRefOrGetter, computed, ref, toValue, watch, watchEffect } from 'vue';
+import { useElementSize, useEventListener, useRafFn, useResizeObserver } from '@vueuse/core';
 import { useThreeViewStore } from '../stores';
 
 type Containers = {
@@ -26,13 +26,21 @@ export const useRender = (containers: Containers) => {
 
     let dirty = true;
 
-    const getCamera = (center: THREE.Vector3, aspect: number, width: number, height: number, deep: number, toward: THREE.Vector3, up: THREE.Vector3, rotation: THREE.Quaternion) => {
+    const zooms = ref({
+        front: 1,
+        side: 1,
+        top: 1,
+    });
+
+    const getCamera = (name: 'front' | 'side' | 'top', center: THREE.Vector3, aspect: number,
+        width: number, height: number, deep: number, toward: THREE.Vector3, up: THREE.Vector3, rotation: THREE.Quaternion) => {
         const xSize = Math.max(width, height * aspect);
         const ySize = Math.max(height, width / aspect);
         const camera = new THREE.OrthographicCamera(-xSize / 2, xSize / 2, ySize / 2, -ySize / 2, 0, deep);
         camera.up.set(...up.clone().applyQuaternion(rotation).toArray());
         camera.position.set(...center.clone().add(toward.clone().applyQuaternion(rotation).multiplyScalar(deep / 2)).toArray());
         camera.lookAt(...center.toArray());
+        camera.zoom = zooms.value[name];
         camera.updateMatrixWorld();
         camera.updateProjectionMatrix();
         return camera;
@@ -44,24 +52,35 @@ export const useRender = (containers: Containers) => {
     const sideContainerSize = useElementSize(containers.front);
     const topContainerSize = useElementSize(containers.front);
 
+    const zoomCameraHandler = (name: 'front' | 'side' | 'top') => {
+        return (event: WheelEvent) => {
+            zooms.value[name] = Math.max(Math.min(zooms.value[name] - event.deltaY / 200, 2), .25);
+            dirty = true;
+        };
+    };
+
     const cameras = computed(() => {
         const outer = threeViewOuter.value;
         if (outer) {
             const position = new THREE.Vector3(outer.position.x, outer.position.y, outer.position.z);
             const quaternion = new THREE.Quaternion().setFromEuler(
-                new THREE.Euler(outer.rotation.phi, outer.rotation.theta, outer.rotation.psi));
-            const front = getCamera(position, frontContainerSize.width.value / frontContainerSize.height.value,
-                outer.size.width, outer.size.height, outer.size.length, X, XUp, quaternion);
-            const side = getCamera(position, sideContainerSize.width.value / sideContainerSize.height.value,
-                outer.size.length, outer.size.height, outer.size.width, Y, YUp, quaternion);
-            const top = getCamera(position, topContainerSize.width.value / topContainerSize.height.value,
-                outer.size.length, outer.size.width, outer.size.height, Z, ZUp, quaternion);
+                new THREE.Euler(outer.rotation.x, outer.rotation.y, outer.rotation.z));
+            const front = getCamera('front', position, frontContainerSize.width.value / frontContainerSize.height.value,
+                outer.size.y, outer.size.z, outer.size.x, X, XUp, quaternion);
+            const side = getCamera('side', position, sideContainerSize.width.value / sideContainerSize.height.value,
+                outer.size.x, outer.size.z, outer.size.y, Y, YUp, quaternion);
+            const top = getCamera('top', position, topContainerSize.width.value / topContainerSize.height.value,
+                outer.size.x, outer.size.y, outer.size.z, Z, ZUp, quaternion);
             return {
                 front, side, top,
             };
         }
         return undefined;
     });
+
+    useEventListener(containers.front, 'wheel', zoomCameraHandler('front'));
+    useEventListener(containers.side, 'wheel', zoomCameraHandler('side'));
+    useEventListener(containers.top, 'wheel', zoomCameraHandler('top'));
 
     scene.addEventListener('change', () => { dirty = true; });
     watch(threeViewOuter, () => { dirty = true; });

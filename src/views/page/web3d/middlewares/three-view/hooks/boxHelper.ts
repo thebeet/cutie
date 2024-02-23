@@ -29,36 +29,36 @@ export const useBoxHelper = (name: 'front' | 'side' | 'top') => {
     const getBoxSize = (box: RBox, axis: AXIS2D) => {
         switch (axis2d[name][axis]) {
         case 'x':
-            return box.size.length;
+            return box.size.x;
         case 'y':
-            return box.size.width;
+            return box.size.y;
         case 'z':
-            return box.size.height;
+            return box.size.z;
         default:
             throw new Error('Invalid axis');
         };
     };
     const getBoxPosition = (box: RBox, axis: AXIS2D) => {
         const vector = NV[name][axis].clone().applyEuler(
-            new THREE.Euler(box.rotation.phi, box.rotation.theta, box.rotation.psi)
+            new THREE.Euler(box.rotation.x, box.rotation.y, box.rotation.z)
         );
         return vector.dot(box.position);
     };
     const setBoxSize = (box: RBox, axis: AXIS2D, value: number) => {
         switch (axis2d[name][axis]) {
         case 'x':
-            return box.size.length = value;
+            return box.size.x = value;
         case 'y':
-            return box.size.width = value;
+            return box.size.y = value;
         case 'z':
-            return box.size.height = value;
+            return box.size.z = value;
         default:
             throw new Error('Invalid axis');
         };
     };
     const setBoxPosition = (box: RBox, axis: AXIS2D, value: number) => {
         const vector = NV[name][axis].clone().applyEuler(
-            new THREE.Euler(box.rotation.phi, box.rotation.theta, box.rotation.psi)
+            new THREE.Euler(box.rotation.x, box.rotation.y, box.rotation.z)
         );
         const old = vector.dot(box.position);
         vector.multiplyScalar(value - old);
@@ -68,28 +68,28 @@ export const useBoxHelper = (name: 'front' | 'side' | 'top') => {
     };
 
     const setBoxRotation = (box: RBox, angle: number) => {
-        const euler = new THREE.Euler(box.rotation.phi, box.rotation.theta, box.rotation.psi);
+        const euler = new THREE.Euler(box.rotation.x, box.rotation.y, box.rotation.z);
         const rotate = new THREE.Euler(
             name === 'front' ? angle : 0,
             name === 'side' ? -angle : 0,
-            name === 'top' ? angle : 0
+            name === 'top' ? angle : 0,
         );
         const quaternionA = new THREE.Quaternion().setFromEuler(euler);
         const quaternionB = new THREE.Quaternion().setFromEuler(rotate);
         quaternionA.multiply(quaternionB);
         const combinedEuler = new THREE.Euler().setFromQuaternion(quaternionA);
-        box.rotation.phi = combinedEuler.x;
-        box.rotation.theta = combinedEuler.y;
-        box.rotation.psi = combinedEuler.z;
+        box.rotation.x = combinedEuler.x;
+        box.rotation.y = combinedEuler.y;
+        box.rotation.z = combinedEuler.z;
     };
 
     const getAxis = (box: RBox) => {
         const mat = new THREE.Matrix4().compose(
             new THREE.Vector3(box.position.x, box.position.y, box.position.z),
             new THREE.Quaternion().setFromEuler(
-                new THREE.Euler(box.rotation.phi, box.rotation.theta, box.rotation.psi)
+                new THREE.Euler(box.rotation.x, box.rotation.y, box.rotation.z)
             ),
-            new THREE.Vector3(box.size.length / 2, box.size.width / 2, box.size.height / 2)
+            new THREE.Vector3(box.size.x / 2, box.size.y / 2, box.size.z / 2)
         );
         const { x, y, z } = { x: new THREE.Vector3(), y: new THREE.Vector3(), z: new THREE.Vector3() };
         mat.extractBasis(x, y, z);
@@ -120,7 +120,7 @@ export const useBoxHelper = (name: 'front' | 'side' | 'top') => {
     const getRotateControlPoint = (box: RBox, handleLength: number = 0.2) => {
         const axis = getAxis(box);
         const o = new THREE.Vector3(box.position.x, box.position.y, box.position.z);
-        return o.clone().add(axis[axis2d[name].y].clone().multiplyScalar(1 + handleLength));
+        return o.clone().add(axis[axis2d[name].y].clone().multiplyScalar(1 + handleLength).add(axis[axis2d[name].z]));
     };
 
     return {

@@ -5,7 +5,6 @@ import { useControls } from './controls';
 import { TScene } from '@web3d/three/TScene';
 import { useCamera } from './camera';
 import { measure } from '@/stores/performance';
-//import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 
 import { CSS2DRenderer } from '../three/CSS2DRenderer';
 
@@ -26,7 +25,6 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
     const { controls, controlMode } = useControls(camera, renderer);
 
     const scene = new TScene();
-    scene.add(new THREE.AxesHelper( 20 ) );
 
     let dirty = true;
     controls.addEventListener('change', () => { dirty = true; });

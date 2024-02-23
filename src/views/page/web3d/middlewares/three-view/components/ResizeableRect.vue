@@ -57,7 +57,7 @@ type ControlPoint = {
 const props = defineProps<{
     outer: RBox
     name: 'front' | 'side' | 'top'
-    camera: THREE.Camera | undefined
+    camera: THREE.OrthographicCamera | undefined
 }>();
 
 const modelValue = defineModel<RBox>({
@@ -150,9 +150,9 @@ const rotatePointMouseMove = (event: MouseEvent) => {
 
 const mouseMove = (event: MouseEvent) => {
     rotatePointMouseMove(event);
-    if (selectedControlPoint.value) {
-        const dx = (event.clientX - initialMousePosition.value.x) * outerBoxWidth.value / width.value;
-        const dy = (event.clientY - initialMousePosition.value.y) * outerBoxHeight.value / height.value;
+    if (selectedControlPoint.value && props.camera) {
+        const dx = (event.clientX - initialMousePosition.value.x) * outerBoxWidth.value / width.value / props.camera.zoom;
+        const dy = (event.clientY - initialMousePosition.value.y) * outerBoxHeight.value / height.value / props.camera.zoom;
         const current = {
             x: innerBoxX.value,
             y: innerBoxY.value,

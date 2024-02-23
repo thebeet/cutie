@@ -5,13 +5,13 @@ export interface RBox {
         z: number
     }
     rotation: {
-        phi: number
-        theta: number
-        psi: number
+        x: number
+        y: number
+        z: number
     }
     size: {
-        length: number
-        width: number
-        height: number
+        x: number
+        y: number
+        z: number
     }
 }

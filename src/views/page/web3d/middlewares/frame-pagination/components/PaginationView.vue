@@ -29,5 +29,6 @@ const { frames, selectFrame } = useDrama();
     border: 1px solid #333333;
     font-size: 12px;
     text-align: center;
+    cursor: pointer;
 }
 </style>
