@@ -21,7 +21,6 @@ export class ParsingNewInstanceOperation {
             name: this.name,
             description: this.description,
             color: this.color,
-            count: 0
         });
     }
 }

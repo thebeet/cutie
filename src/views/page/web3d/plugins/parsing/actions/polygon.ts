@@ -6,6 +6,7 @@ import { useParsingStore } from '../stores';
 import { GroupOperation, Operation } from '@web3d/operator/Operation';
 import { convexHull2D, pointInPolygon, pointsBox2DBounding } from '../libs/ConvexHull2D';
 import { DouglasPeucker } from '../libs/DouglasPeucker';
+import { toValue } from 'vue';
 
 const getPlane = (points: THREE.Vector2[], camera: THREE.Camera): THREE.Plane[] => {
     return points.map(point => {
@@ -25,7 +26,7 @@ const getPlane = (points: THREE.Vector2[], camera: THREE.Camera): THREE.Plane[] 
 
 export const polylineAction = (points: readonly {x: number, y: number}[], camera: THREE.Camera): Operation | null => {
     const { activeFrames } = useDrama();
-    const { mainLabelID } = storeToRefs(useParsingStore());
+    const { mainLabelID, instances } = storeToRefs(useParsingStore());
 
     const tpoints = [...points, points[0]].map(p => new THREE.Vector2(p.x, p.y));
     const simplePointsTmp = DouglasPeucker(tpoints.slice(1), 1e-3);
@@ -60,7 +61,7 @@ export const polylineAction = (points: readonly {x: number, y: number}[], camera
                 result.push(index);
             }
         });
-        const operation = new ParsingOperation(frame, mainLabelID.value, result);
+        const operation = new ParsingOperation(frame, mainLabelID.value, result, toValue(instances));
         operations.push(operation);
     });
     return new GroupOperation(operations);

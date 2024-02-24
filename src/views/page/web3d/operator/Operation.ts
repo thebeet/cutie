@@ -19,5 +19,5 @@ export class GroupOperation implements Operation {
 }
 
 export interface UndoAbleOperation extends Operation {
-    undo(): void;
+    undo(answer: AnswerContent): void;
 }

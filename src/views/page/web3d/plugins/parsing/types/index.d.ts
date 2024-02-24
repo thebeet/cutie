@@ -1,29 +1,23 @@
 export * from '@web3d/types';
 import { AnswerContent as BaseAnswerContent } from '@web3d/types';
 
-export type ParsingInstanceType = {
-    id: number
+export type ParsingInstance = ParsingAnswerInstance & {
+    visible: boolean
+    lock: boolean
+    counts: number[]
+};
+
+
+export type ParsingAnswerInstance = {
+    readonly id: number
     kind: string
     name: string
     description: string
     color: string
-    visible: boolean
-    lock: boolean
-    count: number
-};
-
-
-export type ParsingInstance = {
-    id: number
-    kind: string
-    name: string
-    description: numbert
-    color: string
-    count: number
 }
 
-export type ParsingResult = {
-    instances: ParsingInstance[]
+export type ParsingAnswerResult = {
+    instances: ParsingAnswerInstance[]
     frames: {
         index: number
         label: Int32Array
@@ -31,5 +25,5 @@ export type ParsingResult = {
 }
 
 export interface AnswerContent extends BaseAnswerContent {
-    parsing: ParsingResult
+    parsing: ParsingAnswerResult
 }

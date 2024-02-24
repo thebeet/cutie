@@ -20,21 +20,18 @@ export const useParsingAnswerStore = defineStore('plugin::parsing-answer', () =>
                     name: 'default',
                     description: 'default',
                     color: '#ffffff',
-                    count: 0,
                 }, {
                     id: 1,
                     kind: 'car',
                     name: 'car',
                     description: 'car',
                     color: '#ffff33',
-                    count: 0,
                 }, {
                     id: 2,
                     kind: 'tree',
                     name: 'tree',
                     description: 'tree',
                     color: '#33ff33',
-                    count: 0,
                 }],
                 frames: [{
                     index: 0,

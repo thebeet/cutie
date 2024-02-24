@@ -4,6 +4,7 @@ import { useDrama } from '@web3d/hooks/drama';
 import { storeToRefs } from 'pinia';
 import { useParsingStore } from '../stores';
 import { GroupOperation, Operation } from '@web3d/operator/Operation';
+import { toValue } from 'vue';
 
 const getPlane = (points: THREE.Vector2[], camera: THREE.Camera): THREE.Plane[] => {
     return points.map(point => {
@@ -23,7 +24,7 @@ const getPlane = (points: THREE.Vector2[], camera: THREE.Camera): THREE.Plane[] 
 
 export const rectAction = (points: readonly {x:  number, y:  number}[], camera: THREE.Camera): Operation | null => {
     const { activeFrames } = useDrama();
-    const { mainLabelID } = storeToRefs(useParsingStore());
+    const { mainLabelID, instances } = storeToRefs(useParsingStore());
 
     const minx = Math.min(points[0].x, points[1].x);
     const maxx = Math.max(points[0].x, points[1].x);
@@ -54,7 +55,7 @@ export const rectAction = (points: readonly {x:  number, y:  number}[], camera: 
             result.push(index);
         });
         if (result.length > 0) {
-            const operation = new ParsingOperation(frame, mainLabelID.value, result);
+            const operation = new ParsingOperation(frame, mainLabelID.value, result, toValue(instances));
             operations.push(operation);
         }
     });

@@ -13,13 +13,15 @@ import { rectAction as _rectAction } from './actions/rect';
 import { polylineAction as _polylineAction } from './actions/polygon';
 import { storeToRefs } from 'pinia';
 import { useParsingAnswerStore } from './stores/answer';
+import { ParsingOperation } from './operations/ParsingOperation';
 const rectAction = measure('web3d::parsing::rect', _rectAction);
 const polylineAction = measure('web3d::parsing::polyline', _polylineAction);
 
 export const usePlugin = () => {
     const { toolbox, container, rightsidebar, activeTool, frames, camera,
-        applyOperation, onAdvanceMouseEvent } = useDrama();
+        applyOperation, onApplyOperation, onAdvanceMouseEvent } = useDrama();
     const { pointsMaterial } = useParsingStore();
+    const { instances } = storeToRefs(useParsingStore());
 
     const { answer } = storeToRefs(useParsingAnswerStore());
 
@@ -60,6 +62,12 @@ export const usePlugin = () => {
                     applyOperation(operation);
                 }
             }
+        }
+    });
+
+    onApplyOperation(({ operation }) => {
+        if (operation instanceof ParsingOperation) {
+            (operation as ParsingOperation).effect(instances.value);
         }
     });
 
