@@ -1,14 +1,17 @@
 import { ref, watch } from 'vue';
 import { RBox } from '../types';
 import { klona } from 'klona';
+import { createEventHook } from '@vueuse/core';
 
 export const useThreeView = () => {
     const inner = ref<RBox>();
     const outer = ref<RBox>();
 
+    const confirmEvent = createEventHook<RBox>();
+
     const padding = ref(0.2);
 
-    const rejust = () => {
+    const confirm = () => {
         if (inner.value) {
             outer.value = klona(inner.value);
             const scale = 1 + padding.value * 2;
@@ -20,11 +23,12 @@ export const useThreeView = () => {
         }
     };
 
-    watch(inner, rejust);
+    watch(inner, confirm);
 
     return {
         inner,
         outer,
-        rejust
+        confirm: confirm,
+        onConfirm: confirmEvent.on
     } as const;
 };

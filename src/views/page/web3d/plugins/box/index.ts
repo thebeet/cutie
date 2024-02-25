@@ -55,13 +55,13 @@ export const usePlugin = () => {
         }
     });
 
-    watch(threeViewInner, (value, oldValue) => {
+    watch(threeViewInner, (value) => {
         if (focused.value) {
             const op = new ModifyCubeOperation({
                 ...toRaw(focused.value),
                 ...toRaw(value)
             });
-            applyOperation(op, value !== oldValue);
+            applyOperation(op, false);
 
         }
     }, { deep: true });

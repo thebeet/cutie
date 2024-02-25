@@ -1,4 +1,4 @@
-import { watch, h } from 'vue';
+import { watchEffect, h } from 'vue';
 import { useDrama } from '@web3d/hooks/drama';
 import { measure } from '@/stores/performance';
 import { useParsingStore } from './stores';
@@ -14,6 +14,7 @@ import { polylineAction as _polylineAction } from './actions/polygon';
 import { storeToRefs } from 'pinia';
 import { useParsingAnswerStore } from './stores/answer';
 import { ParsingOperation } from './operations/ParsingOperation';
+import { GroupOperation } from '../../operator/Operation';
 const rectAction = measure('web3d::parsing::rect', _rectAction);
 const polylineAction = measure('web3d::parsing::polyline', _polylineAction);
 
@@ -33,11 +34,9 @@ export const usePlugin = () => {
             geometry.setAttribute('label', new THREE.BufferAttribute(label, 1));
         });
     });
-    watch(() => answer.value.parsing?.frames.map(frame => ({
-        frame,
-        points: frames[frame.index]!.points
-    })), (value) => {
-        value?.forEach(({ frame, points }) => {
+    watchEffect(() => {
+        answer.value.parsing?.frames.forEach((frame) => {
+            const points = frames[frame.index]!.points;
             if (points) {
                 const geometry = points.geometry;
                 const labelAttribute = geometry.getAttribute('label');
@@ -46,7 +45,7 @@ export const usePlugin = () => {
                 }
             }
         });
-    }, { immediate: true });
+    });
 
     onAdvanceMouseEvent((event) => {
         if (activeTool.value === 'parsing') {
@@ -68,6 +67,9 @@ export const usePlugin = () => {
     onApplyOperation(({ operation }) => {
         if (operation instanceof ParsingOperation) {
             (operation as ParsingOperation).effect(instances.value);
+        }
+        if (operation instanceof GroupOperation) {
+            (operation as GroupOperation).forEach((op) => (op as ParsingOperation).effect(instances.value));
         }
     });
 
