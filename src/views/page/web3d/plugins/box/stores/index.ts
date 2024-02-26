@@ -14,7 +14,7 @@ export const useBoxStore = defineStore('plugin::box', () => {
     const boxes: Map<string, TBox> = new Map([]);
     const focusedUUID = ref<string>('');
     const focused = computed({
-        get: () => boxes.get(focusedUUID.value)?.box,
+        get: () => elements.value.find(item => item.uuid === focusedUUID.value),
         set: (v) => focusedUUID.value = v?.uuid ?? ''
     });
 

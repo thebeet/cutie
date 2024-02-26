@@ -15,7 +15,7 @@ export const useLineStore = defineStore('plugin::line', () => {
 
     const focusedUUID = ref<string>('');
     const focused = computed({
-        get: () => lines.get(focusedUUID.value),
+        get: () => elements.value.find(item => item.uuid === focusedUUID.value),
         set: (v) => focusedUUID.value = v?.uuid ?? ''
     });
 

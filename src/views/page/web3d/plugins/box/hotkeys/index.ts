@@ -13,8 +13,9 @@ export const useHotkeys = () => {
             notUsingInput.value = true;
         }
     });
-    const { Backspace } = useMagicKeys();
+    const { Backspace, Delete } = useMagicKeys();
     const { removeFocus } = useRemoveAction();
 
     whenever(logicAnd(Backspace, notUsingInput), removeFocus);
+    whenever(logicAnd(Delete, notUsingInput), removeFocus);
 };
