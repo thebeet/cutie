@@ -7,7 +7,7 @@ export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
     controls.minPolarAngle = 0;
     controls.maxPolarAngle = Math.PI / 2;
     controls.maxDistance = 1000;
-    controls.minDistance = 10;
+    controls.minDistance = 1;
     controls.screenSpacePanning = false;
     controls.update();
 

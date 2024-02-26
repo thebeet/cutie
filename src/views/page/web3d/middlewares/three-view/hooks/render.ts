@@ -3,6 +3,7 @@ import { useDrama } from '@web3d/hooks/drama';
 import { MaybeRefOrGetter, computed, ref, toValue, watch, watchEffect } from 'vue';
 import { useElementSize, useEventListener, useRafFn, useResizeObserver } from '@vueuse/core';
 import { useThreeViewStore } from '../stores';
+import { RBox } from '@web3d/types';
 
 type Containers = {
     container: MaybeRefOrGetter<HTMLDivElement | undefined>;
@@ -32,62 +33,65 @@ export const useRender = (containers: Containers) => {
         top: 1,
     });
 
-    const getCamera = (name: 'front' | 'side' | 'top', center: THREE.Vector3, aspect: number,
-        width: number, height: number, deep: number, toward: THREE.Vector3, up: THREE.Vector3, rotation: THREE.Quaternion) => {
-        const xSize = Math.max(width, height * aspect);
-        const ySize = Math.max(height, width / aspect);
-        const camera = new THREE.OrthographicCamera(-xSize / 2, xSize / 2, ySize / 2, -ySize / 2, 0, deep);
-        camera.up.set(...up.clone().applyQuaternion(rotation).toArray());
-        camera.position.set(...center.clone().add(toward.clone().applyQuaternion(rotation).multiplyScalar(deep / 2)).toArray());
-        camera.lookAt(...center.toArray());
-        camera.zoom = zooms.value[name];
-        camera.updateMatrixWorld();
-        camera.updateProjectionMatrix();
-        return camera;
+    const config = useThreeViewStore();
+
+    const canvasSize = {
+        front: useElementSize(containers.front),
+        side: useElementSize(containers.side),
+        top: useElementSize(containers.top),
+    };
+    const getCamera = (name: 'front' | 'side' | 'top', rbox: MaybeRefOrGetter<RBox | undefined>) => {
+        const box = toValue(rbox);
+        const containerSize = {
+            width: canvasSize[name].width.value,
+            height: canvasSize[name].height.value,
+        };
+        if (box && containerSize.width > 0 && containerSize.height > 0) {
+            const aspect = containerSize.width / containerSize.height;
+            const center = new THREE.Vector3(box.position.x, box.position.y, box.position.z);
+            const width = box.size[config.axis2d[name].x];
+            const height = box.size[config.axis2d[name].y];
+            const deep = box.size[config.axis2d[name].z];
+            const xSize = Math.max(width, height * aspect);
+            const ySize = Math.max(height, width / aspect);
+            const rotation = new THREE.Quaternion().setFromEuler(
+                new THREE.Euler(box.rotation.x, box.rotation.y, box.rotation.z));
+            const camera = new THREE.OrthographicCamera(-xSize / 2, xSize / 2, ySize / 2, -ySize / 2, 0, deep);
+            camera.up.set(...config[name].UP.clone().applyQuaternion(rotation).toArray());
+            camera.position.set(...center.clone().add(config[name].z.clone().applyQuaternion(rotation).multiplyScalar(deep / 2)).toArray());
+            camera.lookAt(...center.toArray());
+            camera.zoom = zooms.value[name];
+            camera.updateMatrixWorld();
+            camera.updateProjectionMatrix();
+            return camera;
+        }
     };
 
-    const { X, XUp, Y, YUp, Z, ZUp } = useThreeViewStore();
-
-    const frontContainerSize = useElementSize(containers.front);
-    const sideContainerSize = useElementSize(containers.front);
-    const topContainerSize = useElementSize(containers.front);
+    const cameras = {
+        front: computed(() => getCamera('front', threeViewOuter)),
+        side: computed(() => getCamera('side', threeViewOuter)),
+        top: computed(() => getCamera('top', threeViewOuter)),
+    };
 
     const zoomCameraHandler = (name: 'front' | 'side' | 'top') => {
         return (event: WheelEvent) => {
             zooms.value[name] = Math.max(Math.min(zooms.value[name] - event.deltaY / 200, 2), .25);
             dirty = true;
+            event.preventDefault();
+            event.stopPropagation();
         };
     };
-
-    const cameras = computed(() => {
-        const outer = threeViewOuter.value;
-        if (outer) {
-            const position = new THREE.Vector3(outer.position.x, outer.position.y, outer.position.z);
-            const quaternion = new THREE.Quaternion().setFromEuler(
-                new THREE.Euler(outer.rotation.x, outer.rotation.y, outer.rotation.z));
-            const front = getCamera('front', position, frontContainerSize.width.value / frontContainerSize.height.value,
-                outer.size.y, outer.size.z, outer.size.x, X, XUp, quaternion);
-            const side = getCamera('side', position, sideContainerSize.width.value / sideContainerSize.height.value,
-                outer.size.x, outer.size.z, outer.size.y, Y, YUp, quaternion);
-            const top = getCamera('top', position, topContainerSize.width.value / topContainerSize.height.value,
-                outer.size.x, outer.size.y, outer.size.z, Z, ZUp, quaternion);
-            return {
-                front, side, top,
-            };
-        }
-        return undefined;
-    });
-
-    useEventListener(containers.front, 'wheel', zoomCameraHandler('front'));
-    useEventListener(containers.side, 'wheel', zoomCameraHandler('side'));
-    useEventListener(containers.top, 'wheel', zoomCameraHandler('top'));
+    useEventListener(containers.front, 'wheel', zoomCameraHandler('front'), { passive: false });
+    useEventListener(containers.side, 'wheel', zoomCameraHandler('side'), { passive: false });
+    useEventListener(containers.top, 'wheel', zoomCameraHandler('top'), { passive: false });
 
     scene.addEventListener('change', () => { dirty = true; });
     watch(threeViewOuter, () => { dirty = true; });
 
-    const renderTo = (camera: THREE.Camera, container: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
+    const renderTo = (cameraRef: MaybeRefOrGetter<THREE.Camera | undefined>, container: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
         const dom = toValue(container);
-        if (dom) {
+        const camera = toValue(cameraRef);
+        if (dom && camera) {
             const domRect = dom.getBoundingClientRect();
             const parentRect = dom.parentElement!.getBoundingClientRect();
             const left = domRect.left - parentRect.left;
@@ -98,16 +102,14 @@ export const useRender = (containers: Containers) => {
         }
     };
     useRafFn(() => {
-        if (dirty) {
-            if (cameras.value) {
-                dirty = false;
-                renderer.setScissorTest(false);
-                renderer.clear();
-                renderer.setScissorTest(true);
-                renderTo(cameras.value.front, containers.front);
-                renderTo(cameras.value.side, containers.side);
-                renderTo(cameras.value.top, containers.top);
-            }
+        if (dirty && cameras.front.value && cameras.side.value && cameras.top.value) {
+            dirty = false;
+            renderer.setScissorTest(false);
+            renderer.clear();
+            renderer.setScissorTest(true);
+            renderTo(cameras.front, containers.front);
+            renderTo(cameras.side, containers.side);
+            renderTo(cameras.top, containers.top);
         }
     });
 
@@ -124,9 +126,9 @@ export const useRender = (containers: Containers) => {
             dom.appendChild(renderer.domElement);
             dirty = true;
             onCleanup(() => {
-                frontContainerSize.stop();
-                sideContainerSize.stop();
-                topContainerSize.stop();
+                canvasSize.front.stop();
+                canvasSize.side.stop();
+                canvasSize.top.stop();
                 dom.removeChild(renderer.domElement);
                 renderer.dispose();
                 renderer.forceContextLoss();

@@ -17,6 +17,10 @@ export class ParsingOperation {
         this.change = this.instances.map(() => [] as number[]);
     }
 
+    get description() {
+        return `ParsingOperation: ${this.points.length} points to label ${this.labelID}`;
+    }
+
     apply(answer: AnswerContent) {
         const label = answer.parsing.frames[this.frame.index].label;
         this.points.forEach((pid) => {

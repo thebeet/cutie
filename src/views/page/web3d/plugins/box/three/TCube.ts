@@ -52,11 +52,13 @@ export class TCube extends THREE.Object3D<TCubeEventMap> {
     private _onFocus() {
         this._mesh.material = _rectFocusMaterial;
         this._edge.material = _edgeFocusMaterial;
+        this.parentFrame.update();
     }
 
     private _onBlur() {
         this._mesh.material = _rectMaterial;
         this._edge.material = _edgeMaterial;
+        this.parentFrame.update();
     }
 
     apply(newValue: Cube) {

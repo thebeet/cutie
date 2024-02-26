@@ -9,6 +9,10 @@ export class ParsingInstanceModifyColorOperation {
         this.color = color;
     }
 
+    get description() {
+        return `Modify color of instance[${this.id}] to ${this.color}`;
+    }
+
     apply(answer: AnswerContent) {
         answer.parsing.instances[this.id].color = this.color;
     }

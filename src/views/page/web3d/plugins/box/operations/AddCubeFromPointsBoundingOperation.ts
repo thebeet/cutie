@@ -37,6 +37,10 @@ export class AddCubeFromPointsBoundingOperation implements Operation {
         };
     }
 
+    get description(): string {
+        return '添加立方体';
+    }
+
     /**
      * 计算边界框
      */

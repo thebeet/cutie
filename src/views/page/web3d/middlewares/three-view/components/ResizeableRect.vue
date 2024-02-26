@@ -57,7 +57,7 @@ type ControlPoint = {
 const props = defineProps<{
     outer: RBox
     name: 'front' | 'side' | 'top'
-    camera: THREE.OrthographicCamera | undefined
+    camera: THREE.OrthographicCamera
 }>();
 
 const modelValue = defineModel<RBox>({

@@ -2,30 +2,11 @@ import { RBox } from '@web3d/types';
 import * as THREE from 'three';
 import { useThreeViewStore } from '../stores';
 
-type AXIS = 'x' | 'y' | 'z';
 type AXIS2D = 'x' | 'y';
-type THREEVIEWNAME = 'front' | 'side' | 'top';
-
-const axis2d = {
-    'front': {
-        'x': 'y',
-        'y': 'z',
-        'z': 'x'
-    },
-    'side': {
-        'x': 'x',
-        'y': 'z',
-        'z': 'y'
-    },
-    'top': {
-        'x': 'x',
-        'y': 'y',
-        'z': 'z'
-    },
-} as { [key in THREEVIEWNAME]: { [key in AXIS]: AXIS } };
 
 export const useBoxHelper = (name: 'front' | 'side' | 'top') => {
     const NV = useThreeViewStore();
+    const { axis2d } = NV;
     const getBoxSize = (box: RBox, axis: AXIS2D) => {
         switch (axis2d[name][axis]) {
         case 'x':

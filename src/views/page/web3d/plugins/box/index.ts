@@ -13,6 +13,7 @@ import * as THREE from 'three';
 import { GroupOperation } from '@web3d/operator/Operation';
 import { ModifyCubeOperation } from './operations/ModifyCubeOperation';
 import { klona } from 'klona';
+import { useHotkeys } from './hotkeys';
 
 export const usePlugin = () => {
     const { frames, activeTool, toolbox, rightsidebar,
@@ -104,6 +105,9 @@ export const usePlugin = () => {
     });
 
     watch(focused, (value, oldValue) => {
+        if (value && oldValue && value.uuid === oldValue.uuid) {
+            return;
+        }
         if (oldValue) {
             const cube = cubes.get(oldValue.uuid);
             cube?.dispatchEvent({ type: 'blur' });
@@ -139,6 +143,8 @@ export const usePlugin = () => {
             }
         }
     });
+
+    useHotkeys();
 
     addNodeToContainer(h(ToolBox), toolbox);
     addNodeToContainer(h(InstanceDetail), rightsidebar);

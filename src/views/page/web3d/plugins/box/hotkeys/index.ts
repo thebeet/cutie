@@ -1,7 +1,7 @@
 import { useActiveElement, useMagicKeys, whenever } from '@vueuse/core';
 import { logicAnd } from '@vueuse/math';
-import { useAnswerHistoryStore } from '../stores/answer';
 import { watch, ref } from 'vue';
+import { useRemoveAction } from '../actions/remove';
 
 export const useHotkeys = () => {
     const activeElement = useActiveElement();
@@ -13,9 +13,8 @@ export const useHotkeys = () => {
             notUsingInput.value = true;
         }
     });
-    const { Ctrl_Z, Ctrl_Y } = useMagicKeys();
-    const { undo, redo } = useAnswerHistoryStore();
+    const { Backspace } = useMagicKeys();
+    const { removeFocus } = useRemoveAction();
 
-    whenever(logicAnd(Ctrl_Z, notUsingInput), undo);
-    whenever(logicAnd(Ctrl_Y, notUsingInput), redo);
+    whenever(logicAnd(Backspace, notUsingInput), removeFocus);
 };

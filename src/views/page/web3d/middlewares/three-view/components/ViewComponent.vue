@@ -2,28 +2,31 @@
     <div v-show="threeViewOuter && threeViewInner" ref="container" class="three-views-container">
         <div v-if="threeViewOuter && threeViewInner" ref="front" class="view-container">
             <ResizeableRect
+                v-if="frontCamera"
                 v-model="threeViewInner"
                 :outer="threeViewOuter"
                 name="front"
-                :camera="cameras!.front"
+                :camera="frontCamera"
                 @confirm="confirm"
             />
         </div>
         <div v-if="threeViewOuter && threeViewInner" ref="side" class="view-container">
             <ResizeableRect
+                v-if="sideCamera"
                 v-model="threeViewInner"
                 :outer="threeViewOuter"
                 name="side"
-                :camera="cameras!.side"
+                :camera="sideCamera"
                 @confirm="confirm"
             />
         </div>
         <div v-if="threeViewOuter && threeViewInner" ref="top" class="view-container">
             <ResizeableRect
+                v-if="topCamera"
                 v-model="threeViewInner"
                 :outer="threeViewOuter"
                 name="top"
-                :camera="cameras!.top"
+                :camera="topCamera"
                 @confirm="confirm"
             />
         </div>
@@ -46,7 +49,7 @@ const confirm = () => {
     threeViewRejust();
 };
 
-const { cameras } = useRender({
+const { cameras: { front: frontCamera, side: sideCamera, top: topCamera } } = useRender({
     container, front, side, top
 });
 
