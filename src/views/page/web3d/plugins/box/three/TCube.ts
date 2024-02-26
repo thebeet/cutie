@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { Cube } from '../types';
+import { ABox } from '../types';
 import { TFrame } from '@web3d/three/TFrame';
 import { rbox2Matrix } from '@web3d/utils/rbox';
 
@@ -14,18 +14,18 @@ const _edgesGeometry = /*@__PURE__*/ new THREE.EdgesGeometry(_boxGeometry);
 const _o = new THREE.Vector3(0, 0, 0);
 const _arrow = new THREE.Vector3(1, 0, 0);
 
-export interface TCubeEventMap extends THREE.Object3DEventMap {
+export interface TBoxEventMap extends THREE.Object3DEventMap {
     focus: {}
     blur: {}
 }
 
-export class TCube extends THREE.Object3D<TCubeEventMap> {
+export class TBox extends THREE.Object3D<TBoxEventMap> {
     private _label: CSS2DObject;
     private _mesh: THREE.Mesh;
     private _edge: THREE.LineSegments;
-    box: Cube;
+    box: ABox;
 
-    constructor(box: Cube) {
+    constructor(box: ABox) {
         super();
         this.matrixAutoUpdate = false;
         this.matrixWorldNeedsUpdate = false;
@@ -61,7 +61,7 @@ export class TCube extends THREE.Object3D<TCubeEventMap> {
         this.parentFrame.update();
     }
 
-    apply(newValue: Cube) {
+    apply(newValue: ABox) {
         if (this.box !== newValue) {
             this.box = newValue;
             this.matrix.identity();
@@ -71,7 +71,7 @@ export class TCube extends THREE.Object3D<TCubeEventMap> {
         }
     }
 
-    private _makeLabelDom(rect3d: Cube) {
+    private _makeLabelDom(rect3d: ABox) {
         const div = document.createElement('div');
         div.textContent = rect3d.label;
         div.style.padding = '2px';

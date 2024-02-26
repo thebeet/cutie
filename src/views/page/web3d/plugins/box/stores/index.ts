@@ -1,44 +1,60 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useDrama } from '@web3d/hooks/drama';
-import { Cube } from '../types';
+import { ABox } from '../types';
+import { TBox } from '../three/TCube';
+import { TFrame } from '@web3d/three/TFrame';
 
-export const useRectStore = defineStore('plugin::rect', () => {
-    const { answer } = useDrama();
+export const useBoxStore = defineStore('plugin::box', () => {
+    const { answer, frames } = useDrama();
 
-    //const selection
+    const boxes: Map<string, TBox> = new Map([]);
     const focusedUUID = ref<string>('');
     const focused = computed({
-        get: () => {
-            if (!focusedUUID.value) {
-                return undefined;
+        get: () => boxes.get(focusedUUID.value)?.box,
+        set: (v) => focusedUUID.value = v?.uuid ?? ''
+    });
+
+    const elements = computed(() => {
+        return answer.value.elements.filter(e => e.schema === 'cube') as ABox[];
+    });
+
+    watch(elements, (newValue) => {
+        if (newValue) {
+            const used: Map<string, boolean> = new Map([]);
+            for (const key of boxes.keys()) {
+                used.set(key, false);
             }
-            for (const e of elements.value) {
-                if (e.uuid === focusedUUID.value) {
-                    return e;
+            newValue.forEach((element) => {
+                const cube = boxes.get(element.uuid);
+                if (cube) {
+                    used.set(element.uuid, true);
+                    cube.apply(element);
+                } else {
+                    const frame = frames[element.frameIndex];
+                    const cube = new TBox(element);
+                    boxes.set(element.uuid, cube);
+                    frame!.add(cube);
+                    frame.update();
                 }
-            }
-            return undefined;
-        },
-        set: (v) => {
-            if (v) {
-                if (v.uuid) {
-                    if (focusedUUID.value !== v.uuid) {
-                        focusedUUID.value = v.uuid;
+            });
+            for (const [key, value] of used.entries()) {
+                if (!value) {
+                    const cube = boxes.get(key);
+                    if (cube) {
+                        const frame = cube.parent as TFrame;
+                        cube.removeFromParent();
+                        cube.dispose();
+                        frame.update();
+                        boxes.delete(key);
                     }
                 }
-            } else {
-                focusedUUID.value = '';
             }
         }
     });
 
-    const elements = computed(() => {
-        return answer.value.elements.filter(e => e.schema === 'cube') as Cube[];
-    });
-
     return {
         focused,
-        elements,
+        elements, boxes
     };
 });

@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { useRectStore } from '../stores';
+import { useBoxStore } from '../stores';
 
-const { focused } = storeToRefs(useRectStore());
+const { focused } = storeToRefs(useBoxStore());
 </script>

@@ -1,10 +1,4 @@
-import { Element, RBox } from '@web3d/types';
+import { AElement, RBox } from '@web3d/types';
 
-export interface BoxAnswer {
-    frames: {
-        [key: string]: Cube
-    }[]
-}
-
-export interface Cube extends Element, RBox {
+export interface ABox extends AElement, RBox {
 }

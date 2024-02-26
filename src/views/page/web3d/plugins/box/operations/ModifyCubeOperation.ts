@@ -1,11 +1,11 @@
 import { Operation } from '@web3d/operator/Operation';
 import { AnswerContent } from '@web3d/types';
-import { Cube } from '../types';
+import { ABox } from '../types';
 
 export class ModifyCubeOperation implements Operation {
-    newValue: Cube;
+    newValue: ABox;
 
-    constructor(newValue: Cube) {
+    constructor(newValue: ABox) {
         this.newValue = newValue;
     }
 

@@ -1,11 +1,11 @@
 import { Operation } from '@web3d/operator/Operation';
 import { AnswerContent } from '@web3d/types';
-import { Cube } from '../types';
+import { ABox } from '../types';
 
 export class RemoveBoxOperation implements Operation {
-    box: Cube;
+    box: ABox;
 
-    constructor(box: Cube) {
+    constructor(box: ABox) {
         this.box = box;
     }
 

@@ -2,12 +2,12 @@ import { Operation } from '@web3d/operator/Operation';
 import { AnswerContent } from '@web3d/types';
 import { TFrame } from '@web3d/three/TFrame';
 import * as THREE from 'three';
-import { Cube } from '../types';
+import { ABox } from '../types';
 
 export class AddCubeFromPointsBoundingOperation implements Operation {
     private index: number[];
     frame: TFrame;
-    result: Cube;
+    result: ABox;
 
     constructor(frame: TFrame, index: number[], euler: THREE.Euler) {
         this.frame = frame;

@@ -30,7 +30,7 @@ export interface Page {
     annotations: Annotation<any>[]
 }
 
-export interface Element {
+export interface AElement {
     readonly uuid: string
     readonly schema: string
     readonly type: string
@@ -40,7 +40,7 @@ export interface Element {
 };
 
 export interface AnswerContent {
-    elements: Element[]
+    elements: AElement[]
 }
 
 export interface Response {

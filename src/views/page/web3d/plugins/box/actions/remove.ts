@@ -1,14 +1,14 @@
 import { useDrama } from '@web3d/hooks/drama';
 import { storeToRefs } from 'pinia';
-import { useRectStore } from '../stores';
-import { Cube } from '../types';
+import { useBoxStore } from '../stores';
+import { ABox } from '../types';
 import { RemoveBoxOperation } from '../operations/RemoveBoxOperation';
 
 export const useRemoveAction = () => {
     const { applyOperation } = useDrama();
-    const { focused } = storeToRefs(useRectStore());
+    const { focused } = storeToRefs(useBoxStore());
 
-    const remove = (cube: Cube) => {
+    const remove = (cube: ABox) => {
         const op = new RemoveBoxOperation(cube);
         applyOperation(op);
     };

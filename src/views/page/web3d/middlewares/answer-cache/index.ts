@@ -4,7 +4,14 @@ import { useDrama } from '@web3d/hooks/drama';
 import { AnswerContent } from '@web3d/types';
 import { toRaw } from 'vue';
 
-export const useMiddleware = () => {
+type Config = {
+    auto: boolean
+}
+
+export const useMiddleware = (config: Partial<Config> = {}) => {
+    const {
+        auto = true,
+    } = config;
     const answerStore = useAnswerStore();
     const { page } = useDrama();
     const key = `answer-${page.response!.id}`;
@@ -19,7 +26,7 @@ export const useMiddleware = () => {
     });
 
     onApplyOperation(({ answer, save }) => {
-        if (save) {
+        if (save && auto) {
             localforage.setItem(key, toRaw(answer));
         }
     });
