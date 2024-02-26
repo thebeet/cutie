@@ -2,21 +2,20 @@ import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import { useDrama } from '@web3d/hooks/drama';
 import { ABox } from '../types';
-import { TBox } from '../three/TCube';
+import { TBox } from '../three/TBox';
 import { TFrame } from '@web3d/three/TFrame';
 
 export const useBoxStore = defineStore('plugin::box', () => {
     const { answer, frames } = useDrama();
 
+    const elements = computed(() => {
+        return answer.value.elements.filter(e => e.schema === 'box') as ABox[];
+    });
     const boxes: Map<string, TBox> = new Map([]);
     const focusedUUID = ref<string>('');
     const focused = computed({
         get: () => boxes.get(focusedUUID.value)?.box,
         set: (v) => focusedUUID.value = v?.uuid ?? ''
-    });
-
-    const elements = computed(() => {
-        return answer.value.elements.filter(e => e.schema === 'cube') as ABox[];
     });
 
     watch(elements, (newValue) => {
@@ -34,7 +33,7 @@ export const useBoxStore = defineStore('plugin::box', () => {
                     const frame = frames[element.frameIndex];
                     const cube = new TBox(element);
                     boxes.set(element.uuid, cube);
-                    frame!.add(cube);
+                    frame.add(cube);
                     frame.update();
                 }
             });

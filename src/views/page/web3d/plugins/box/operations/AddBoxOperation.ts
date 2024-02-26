@@ -4,7 +4,7 @@ import { TFrame } from '@web3d/three/TFrame';
 import * as THREE from 'three';
 import { ABox } from '../types';
 
-export class AddCubeFromPointsBoundingOperation implements Operation {
+export class AddBoxOperation implements Operation {
     private index: number[];
     frame: TFrame;
     result: ABox;
@@ -14,8 +14,8 @@ export class AddCubeFromPointsBoundingOperation implements Operation {
         this.index = index;
         this.result = {
             uuid: THREE.MathUtils.generateUUID(),
-            schema: 'cube',
-            type: 'cube',
+            schema: 'box',
+            type: 'box',
             frameIndex: frame.index,
             label: 'label',
             description: 'description',

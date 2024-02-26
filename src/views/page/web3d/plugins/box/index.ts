@@ -1,16 +1,16 @@
 import { useDrama } from '@web3d/hooks/drama';
 import { toRaw, h, watch } from 'vue';
-import { TBox } from '@web3d/plugins/box/three/TCube';
+import { TBox } from '@web3d/plugins/box/three/TBox';
 import ToolBox from './components/ToolBox.vue';
 import InstanceDetail from './components/InstanceDetail.vue';
 import { addNodeToContainer } from '..';
 import { rectAction } from './actions/rect';
-import { AddCubeFromPointsBoundingOperation } from './operations/AddCubeFromPointsBoundingOperation';
+import { AddBoxOperation } from './operations/AddBoxOperation';
 import { storeToRefs } from 'pinia';
 import { useBoxStore } from './stores';
 import * as THREE from 'three';
 import { GroupOperation } from '@web3d/operator/Operation';
-import { ModifyCubeOperation } from './operations/ModifyCubeOperation';
+import { ModifyBoxOperation } from './operations/ModifyBoxOperation';
 import { klona } from 'klona';
 import { useHotkeys } from './hotkeys';
 
@@ -25,7 +25,7 @@ export const usePlugin = () => {
 
     watch(threeViewInner, (value) => {
         if (focused.value) {
-            const op = new ModifyCubeOperation({
+            const op = new ModifyBoxOperation({
                 ...toRaw(focused.value),
                 ...toRaw(value)
             });
@@ -36,7 +36,7 @@ export const usePlugin = () => {
     onAdvanceMouseEvent((event) => {
         if (activeTool.value === 'rect' && event.type === 'rected') {
             const results = rectAction(event.points, camera);
-            const ops = results.map(([frame, index]) => new AddCubeFromPointsBoundingOperation(frame, index, new THREE.Euler(0, 0, camera.rotation.z)));
+            const ops = results.map(([frame, index]) => new AddBoxOperation(frame, index, new THREE.Euler(0, 0, camera.rotation.z)));
             if (ops.length === 1) {
                 applyOperation(ops[0]);
             } else {
@@ -87,8 +87,8 @@ export const usePlugin = () => {
     });
 
     onApplyOperation(({ operation }) => {
-        if (operation instanceof AddCubeFromPointsBoundingOperation) {
-            const o = operation as AddCubeFromPointsBoundingOperation;
+        if (operation instanceof AddBoxOperation) {
+            const o = operation as AddBoxOperation;
             const frame = o.frame;
             const center = new THREE.Vector3(o.result.position.x, o.result.position.y, o.result.position.z).applyMatrix4(frame.matrixWorld);
             threeViewInner.value = {
@@ -101,8 +101,8 @@ export const usePlugin = () => {
             };
             focused.value = o.result;
         }
-        if (operation instanceof ModifyCubeOperation) {
-            const o = operation as ModifyCubeOperation;
+        if (operation instanceof ModifyBoxOperation) {
+            const o = operation as ModifyBoxOperation;
             const cube = boxes.get(o.newValue.uuid);
             if (cube) {
                 cube.apply(o.newValue);

@@ -2,7 +2,7 @@ import { Operation } from '@web3d/operator/Operation';
 import { AnswerContent } from '@web3d/types';
 import { ABox } from '../types';
 
-export class ModifyCubeOperation implements Operation {
+export class ModifyBoxOperation implements Operation {
     newValue: ABox;
 
     constructor(newValue: ABox) {
