@@ -1,17 +1,85 @@
 import { useDrama } from '@web3d/hooks/drama';
-import * as THREE from 'three';
-import { watch } from 'vue';
+import { h } from 'vue';
 import { useLineStore } from './stores';
 import { storeToRefs } from 'pinia';
-import { TLine } from './three/TLine';
+import { addNodeToContainer } from '..';
+import ToolBox from './components/ToolBox.vue';
+import * as THREE from 'three';
 
+export const usePlugin = () => {
+    const { scene, frames, primaryFrame, camera, toolbox, onAdvanceMouseEvent } = useDrama();
+    useLineStore();
 
-export const useLine = () => {
-    const { frames } = useDrama();
-    const lines: Map<string, TLine> = new Map([]);
-    const { focused, elements } = storeToRefs(useLineStore());
-    return {
-        elements, lines,
-        focused
+    const geometry = new THREE.SphereGeometry( .2, 32, 16 ); 
+    const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } ); 
+    const sphere = new THREE.Mesh( geometry, material );
+    const l = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()] ),
+        new THREE.LineBasicMaterial( {
+            color: 0xffffff
+        }));
+        l.frustumCulled = false;
+        scene.add( l );
+
+        sphere.add(new THREE.LineSegments(
+            new THREE.CircleGeometry(1, 32),
+            new THREE.LineBasicMaterial( {
+                color: 0xffffff
+            })
+        ));
+    scene.add( sphere );
+
+    const setP = (p: THREE.Vector3) => {
+        l.geometry.attributes.position.setX(1, p.x);
+        l.geometry.attributes.position.setY(1, p.y);
+        l.geometry.attributes.position.setZ(1, p.z);
+        l.geometry.attributes.position.needsUpdate = true;
+        sphere.position.set(p.x, p.y, p.z);
+        sphere.updateMatrix();
+        sphere.updateMatrixWorld();
+        scene.update();
     };
+
+    const zeroPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+    onAdvanceMouseEvent((event) => {
+        if (event.type === 'hover') {
+            const { x, y } = event.points[0];
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(
+                new THREE.Vector2(x, y),
+                camera
+            );
+            const ps: THREE.Vector3[] = [];
+            primaryFrame.value?.intersectRay(raycaster.ray, 1, (p) => {
+                ps.push(p.clone());
+            });
+            if (ps.length >= 3) {
+                const nps = ps.map(p => ({
+                    point: p,
+                    dis: camera.position.distanceToSquared(p)
+                })).sort((a, b) => {
+                    return a.dis - b.dis;
+                }).slice(0, 3);
+
+                if (nps.length < 3) {
+                    const v = new THREE.Vector3(0, 0, 0);
+                    nps.forEach(p => v.add(p.point));
+                    v.multiplyScalar(1 / nps.length);
+                    setP(v);
+                } else {
+                    const plane = new THREE.Plane().setFromCoplanarPoints(nps[0].point, nps[1].point, nps[2].point);
+                    const target = new THREE.Vector3();
+                    raycaster.ray.intersectPlane(plane, target);
+                    setP(target);
+                }
+            } else {
+                const target = new THREE.Vector3();
+                raycaster.ray.intersectPlane(zeroPlane, target);
+                setP(target);
+            }
+        }
+    });
+
+    addNodeToContainer(h(ToolBox), toolbox);
 };

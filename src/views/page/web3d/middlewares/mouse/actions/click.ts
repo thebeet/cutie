@@ -20,21 +20,29 @@ export const click = (
         toValue(enabled) ? func(event) : null;
     };
 
+    useEventListener(dom, 'contextmenu', condition((event: MouseEvent) => {
+        event.preventDefault();
+    }));
+
     useEventListener(dom, 'mousedown', condition((event: MouseEvent) => {
-        clickInfo.expire = Date.now() + 500;
-        const { x, y } = usePos(event, toValue(dom));
-        clickInfo.x = x;
-        clickInfo.y = y;
+        if (event.button === 0) {
+            clickInfo.expire = Date.now() + 500;
+            const { x, y } = usePos(event, toValue(dom));
+            clickInfo.x = x;
+            clickInfo.y = y;
+        }
     }));
 
     useEventListener(dom, 'mouseup', condition((event: MouseEvent) => {
-        if (clickInfo.expire > Date.now()) {
-            clickInfo.expire = 0;
-            const { x, y } = usePos(event, toValue(dom));
-            if (((x - clickInfo.x ) * (x - clickInfo.x) < ESP) && ((y - clickInfo.y) * (y - clickInfo.y) < ESP)) {
-                mouseEvent.value.type = 'click';
-                mouseEvent.value.points = [{ x, y }];
-                eventHook.trigger(mouseEvent.value);
+        if (event.button === 0) {
+            if (clickInfo.expire > Date.now()) {
+                clickInfo.expire = 0;
+                const { x, y } = usePos(event, toValue(dom));
+                if (((x - clickInfo.x ) * (x - clickInfo.x) < ESP) && ((y - clickInfo.y) * (y - clickInfo.y) < ESP)) {
+                    mouseEvent.value.type = 'click';
+                    mouseEvent.value.points = [{ x, y }];
+                    eventHook.trigger(mouseEvent.value);
+                }
             }
         }
     }));

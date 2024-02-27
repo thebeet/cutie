@@ -44,7 +44,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     const { controls, scene, renderer, camera, controlMode } = useScene(container);
 
     const { page } = usePageStore();
-    const { frames, activeFrames, selectFrame } = useFrame();
+    const { frames, primaryFrame, activeFrames, selectFrame } = useFrame();
     frames.forEach(frame => {
         scene.add(frame);
     });
@@ -77,8 +77,9 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     const operations = ref<Operation<any>[]>([]);
 
     watchEffect(() => {
-        controls.enabled = mouseState.value === 'free';
+        controls.enableRotate = mouseState.value === 'free';
     });
+
     return {
         normal: {
             container: container as MaybeRefOrGetter<HTMLDivElement>,
@@ -86,7 +87,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
             footer: footer as MaybeRefOrGetter<HTMLDivElement>,
             rightsidebar: rightsidebar as MaybeRefOrGetter<HTMLDivElement>,
             mouseEvent, mouseState, onAdvanceMouseEvent: mouseEventHook.on,
-            frames, activeFrames, selectFrame,
+            frames, primaryFrame, activeFrames, selectFrame,
             activeTool,
             page,
             answer, applyOperation, onApplyOperation,

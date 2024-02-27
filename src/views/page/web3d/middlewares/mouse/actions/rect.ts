@@ -17,20 +17,26 @@ export const drawRect = (
     };
 
     useEventListener(dom, 'mousemove', condition((event: MouseEvent) => {
-        if (recting) {
-            const { x, y } = usePos(event, toValue(dom));
-            mouseEvent.value.points[1] = { x, y };
+        if (event.button === 0) {
+            if (recting) {
+                const { x, y } = usePos(event, toValue(dom));
+                mouseEvent.value.points[1] = { x, y };
+            }
+        } else {
+            recting = false;
         }
     }));
 
     useEventListener(dom, 'mousedown', condition((event: MouseEvent) => {
-        recting = true;
-        const { x, y } = usePos(event, toValue(dom));
-        mouseEvent.value.type = 'recting';
-        mouseEvent.value.points = [
-            { x, y },
-            { x, y }
-        ];
+        if (event.button === 0) {
+            recting = true;
+            const { x, y } = usePos(event, toValue(dom));
+            mouseEvent.value.type = 'recting';
+            mouseEvent.value.points = [
+                { x, y },
+                { x, y }
+            ];
+        }
     }));
 
     useEventListener(dom, 'mouseup', condition((event: MouseEvent) => {

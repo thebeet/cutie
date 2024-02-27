@@ -17,31 +17,43 @@ export const drawPolyline = (
     };
 
     useEventListener(dom, 'mousemove', condition((event: MouseEvent) => {
-        if (polyline && mouseEvent.value.points.length > 0) {
-            const { x, y } = usePos(event, toValue(dom));
-            const { x: prevX, y: prevY } = mouseEvent.value.points[mouseEvent.value.points.length - 1];
-            if (((x - prevX) * (x - prevX) > ESP) || ((y - prevY) * (y - prevY) > ESP)) {
-                mouseEvent.value.points.push({ x, y });
+        if (event.button === 0) {
+            if (polyline && mouseEvent.value.points.length > 0) {
+                const { x, y } = usePos(event, toValue(dom));
+                const { x: prevX, y: prevY } = mouseEvent.value.points[mouseEvent.value.points.length - 1];
+                if (((x - prevX) * (x - prevX) > ESP) || ((y - prevY) * (y - prevY) > ESP)) {
+                    mouseEvent.value.points.push({ x, y });
+                }
             }
+        } else {
+            polyline = false;
         }
     }));
 
     useEventListener(dom, 'mousedown', condition((event: MouseEvent) => {
-        polyline = true;
-        const { x, y } = usePos(event, toValue(dom));
-        mouseEvent.value.type = 'polylining';
-        mouseEvent.value.points = [
-            { x, y }
-        ];
+        if (event.button === 0) {
+            polyline = true;
+            const { x, y } = usePos(event, toValue(dom));
+            mouseEvent.value.type = 'polylining';
+            mouseEvent.value.points = [
+                { x, y }
+            ];
+        } else {
+            polyline = false;
+        }
     }));
 
-    useEventListener(dom, 'mouseup', condition(() => {
-        if (polyline) {
-            polyline = false;
-            if (mouseEvent.value.points.length >= 3) {
-                mouseEvent.value.type = 'polylined';
-                eventHook.trigger(mouseEvent.value);
+    useEventListener(dom, 'mouseup', condition((event: MouseEvent) => {
+        if (event.button === 0) {
+            if (polyline) {
+                polyline = false;
+                if (mouseEvent.value.points.length >= 3) {
+                    mouseEvent.value.type = 'polylined';
+                    eventHook.trigger(mouseEvent.value);
+                }
             }
+        } else {
+            polyline = false;
         }
     }));
 

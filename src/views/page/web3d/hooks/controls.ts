@@ -9,6 +9,7 @@ export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
     controls.maxDistance = 1000;
     controls.minDistance = 1;
     controls.screenSpacePanning = false;
+    controls.zoomToCursor = true;
     controls.update();
 
     const mode = ref<string>('free');

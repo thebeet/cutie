@@ -5,11 +5,13 @@ import MouseActionPreview from './components/MouseActionPreview.vue';
 import { drawRect } from './actions/rect';
 import { drawPolyline } from './actions/polyline';
 import { click } from './actions/click';
+import { hover } from './actions/hover';
 
 export const useMiddleware = () => {
     const { container, mouseState, mouseEvent, mouseEventHook } = useAdvanceDrama();
 
     click(container, true, mouseEvent, mouseEventHook);
+    hover(container, true, mouseEvent, mouseEventHook);
 
     drawRect(container, () => mouseState.value === 'rect', mouseEvent, mouseEventHook);
     drawPolyline(container, () => mouseState.value === 'polyline', mouseEvent, mouseEventHook);
