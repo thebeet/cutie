@@ -3,7 +3,7 @@
         <div class="toolbox-title">Parsing</div>
         <button type="button" class="toolbox-button" @click="click('rect')">Rect</button>
         <button type="button" class="toolbox-button" @click="click('polyline')">Polyline</button>
-        <button type="button" class="toolbox-button" @click="click('brush')">Brush</button>
+        <button type="button" class="toolbox-button" @click="click('box')">Box</button>
         <button type="button" class="toolbox-button" @click="dump()">Dump</button>
     </div>
 </template>

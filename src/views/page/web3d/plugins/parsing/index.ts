@@ -15,6 +15,7 @@ import { storeToRefs } from 'pinia';
 import { useParsingAnswerStore } from './stores/answer';
 import { ParsingOperation } from './operations/ParsingOperation';
 import { GroupOperation } from '../../operator/Operation';
+import { boxAction } from './actions/box';
 const rectAction = measure('web3d::parsing::rect', _rectAction);
 const polylineAction = measure('web3d::parsing::polyline', _polylineAction);
 
@@ -22,7 +23,7 @@ export const usePlugin = () => {
     const { toolbox, container, rightsidebar, activeTool, frames, camera,
         applyOperation, onApplyOperation, onAdvanceMouseEvent } = useDrama();
     const { pointsMaterial } = useParsingStore();
-    const { instances } = storeToRefs(useParsingStore());
+    const { instances, box, boxParsing } = storeToRefs(useParsingStore());
 
     const { answer } = storeToRefs(useParsingAnswerStore());
 
@@ -50,6 +51,9 @@ export const usePlugin = () => {
     onAdvanceMouseEvent((event) => {
         if (activeTool.value === 'parsing') {
             if (event.type === 'rected') {
+                if (boxParsing.value) {
+                    box.value = boxAction(event.points, camera);
+                }
                 const operation = rectAction(event.points, camera);
                 if (operation) {
                     applyOperation(operation);

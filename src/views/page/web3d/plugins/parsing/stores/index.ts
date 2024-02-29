@@ -5,14 +5,26 @@ import _ from 'lodash';
 import { useDrama } from '@web3d/hooks/drama';
 import * as THREE from 'three';
 import { useParsingAnswerStore } from './answer';
-import { ParsingInstance } from '../types';
+import { ParsingInstance, RBox } from '../types';
+import { rbox2Matrix } from '@web3d/utils/rbox';
 
 export const useParsingStore = defineStore('plugin::parsing', () => {
     const mainLabelID = ref(1);
     const brushRadius = ref(0.01);
+    const boxParsing = ref(false);
 
-    const { scene, frames } = useDrama();
+    const { scene, frames, threeViewInner } = useDrama();
     const { answer } = storeToRefs(useParsingAnswerStore());
+
+    const box = ref<RBox>();
+
+    watchEffect(() => {
+        if (threeViewInner.value) {
+            box.value = threeViewInner.value;
+        } else {
+            box.value = undefined;
+        }
+    });
 
     const pointsMaterial = new PointsLabelInstanceColorMaterial({ size: 1.0 });
 
@@ -52,12 +64,20 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
             const color = new THREE.Color(c.color);
             return [color.r, color.g, color.b, c.visible ? 1.0 : 0.0];
         }));
+        if (box.value) {
+            pointsMaterial.uniforms.previewBox.value = true;
+            const color = new THREE.Color(instances.value[mainLabelID.value].color);
+            pointsMaterial.uniforms.previewColor.value = [color.r, color.g, color.b, instances.value[mainLabelID.value].visible ? 1.0 : 0.0];
+            pointsMaterial.uniforms.previewBoxMatrix.value = rbox2Matrix(box.value).invert();
+        } else {
+            pointsMaterial.uniforms.previewBox.value = false;
+        }
         pointsMaterial.uniformsNeedUpdate = true;
         scene.update();
     });
 
     return {
-        mainLabelID, brushRadius,
+        mainLabelID, brushRadius, box, boxParsing,
         instances,
         pointsMaterial
     } as const;

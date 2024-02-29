@@ -5,13 +5,13 @@ import * as THREE from 'three';
 import { ABox } from '../types';
 
 export class AddBoxOperation implements Operation {
-    private index: number[];
+    private points: [TFrame, number[]][];
     frame: TFrame;
     result: ABox;
 
-    constructor(frame: TFrame, index: number[], euler: THREE.Euler) {
+    constructor(frame: TFrame, points: [TFrame, number[]][], euler: THREE.Euler) {
         this.frame = frame;
-        this.index = index;
+        this.points = points;
         this.result = {
             uuid: THREE.MathUtils.generateUUID(),
             schema: 'box',
@@ -44,32 +44,40 @@ export class AddBoxOperation implements Operation {
     /**
      * 计算边界框
      */
-    computeBoundingBox() {
+    computeBoundingBox(frame: TFrame, index: number[]) {
         const box = new THREE.Box3(
             new THREE.Vector3(Infinity, Infinity, Infinity),
             new THREE.Vector3(-Infinity, -Infinity, -Infinity)
         );
-        const position = this.frame.points!.geometry.getAttribute('position');
+        const position = frame.points!.geometry.getAttribute('position');
         const _v = new THREE.Vector3();
         const quaternion = new THREE.Quaternion().setFromEuler(
             new THREE.Euler(this.result.rotation.x, this.result.rotation.y, this.result.rotation.z));
         const invertQuaternion = quaternion.clone().invert();
-        this.index.forEach(i => {
+        index.forEach(i => {
             _v.fromBufferAttribute(position, i).applyQuaternion(invertQuaternion);
             box.min.min(_v);
             box.max.max(_v);
         });
-        const center = new THREE.Vector3();
-        const size = new THREE.Vector3();
-        box.getCenter(center);
-        box.getSize(size);
-        center.applyQuaternion(quaternion);
-        center.applyMatrix4(this.frame.matrixWorld.clone().invert());
-        return { box, center, size };
+        return box;
     }
 
     apply(answer: AnswerContent): void {
-        const { center, size } = this.computeBoundingBox();
+        const boxes = this.points.map(([frame, points]) => {
+            return this.computeBoundingBox(frame, points);
+        });
+        const unionBox = boxes.reduce((acc, box) => acc.union(box), new THREE.Box3(
+            new THREE.Vector3(Infinity, Infinity, Infinity),
+            new THREE.Vector3(-Infinity, -Infinity, -Infinity)
+        ));
+        const center = new THREE.Vector3();
+        const size = new THREE.Vector3();
+        unionBox.getCenter(center);
+        unionBox.getSize(size);
+        const quaternion = new THREE.Quaternion().setFromEuler(
+            new THREE.Euler(this.result.rotation.x, this.result.rotation.y, this.result.rotation.z));
+        center.applyQuaternion(quaternion);
+        center.applyMatrix4(this.frame.matrixWorld.clone().invert());
         this.result.position.x = center.x;
         this.result.position.y = center.y;
         this.result.position.z = center.z;
@@ -78,5 +86,4 @@ export class AddBoxOperation implements Operation {
         this.result.size.z = size.z;
         answer.elements.push(this.result);
     }
-
 }

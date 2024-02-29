@@ -16,7 +16,7 @@ import { useHotkeys } from './hotkeys';
 
 export const usePlugin = () => {
     const { activeTool, toolbox, rightsidebar,
-        threeViewInner, camera,
+        threeViewInner, camera, primaryFrame,
         onAdvanceMouseEvent,
         applyOperation, onApplyOperation } = useDrama();
     const boxesStore = useBoxStore();
@@ -35,12 +35,9 @@ export const usePlugin = () => {
 
     onAdvanceMouseEvent((event) => {
         if (activeTool.value === 'rect' && event.type === 'rected') {
-            const results = rectAction(event.points, camera);
-            const ops = results.map(([frame, index]) => new AddBoxOperation(frame, index, new THREE.Euler(0, 0, camera.rotation.z)));
-            if (ops.length === 1) {
-                applyOperation(ops[0]);
-            } else {
-                applyOperation(new GroupOperation(ops));
+            if (primaryFrame.value) {
+                const results = rectAction(event.points, camera);
+                applyOperation(new AddBoxOperation(primaryFrame.value, results, camera.rotation));
             }
         }
         if (event.type === 'click') {

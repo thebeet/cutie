@@ -3,8 +3,8 @@ import { ParsingOperation } from '../operations/ParsingOperation';
 import { useDrama } from '@web3d/hooks/drama';
 import { storeToRefs } from 'pinia';
 import { useParsingStore } from '../stores';
-import { GroupOperation, Operation } from '@web3d/operator/Operation';
-import { toValue } from 'vue';
+import { Operation } from '@web3d/operator/Operation';
+import { TFrame } from '@web3d/three/TFrame';
 
 const getPlane = (points: THREE.Vector2[], camera: THREE.Camera): THREE.Plane[] => {
     return points.map(point => {
@@ -42,7 +42,7 @@ export const rectAction = (points: readonly {x:  number, y:  number}[], camera: 
         new THREE.Plane(new THREE.Vector3(0, 0, 1), 10000),
         new THREE.Plane(new THREE.Vector3(0, 0, -1), 10000),
     );
-    const operations: ParsingOperation[] = [];
+    const intersectPoints: [TFrame, number[]][] = [];
     activeFrames.value.forEach(frame => {
         const result: number[] = [];
         const matInv = frame.points!.matrixWorld.clone().invert();
@@ -55,15 +55,11 @@ export const rectAction = (points: readonly {x:  number, y:  number}[], camera: 
             result.push(index);
         });
         if (result.length > 0) {
-            const operation = new ParsingOperation(frame, mainLabelID.value, result, toValue(instances));
-            operations.push(operation);
+            intersectPoints.push([frame, result]);
         }
     });
-    if (operations.length === 0) {
+    if (intersectPoints.length === 0) {
         return null;
     }
-    if (operations.length === 1) {
-        return operations[0];
-    }
-    return new GroupOperation(operations);
+    return new ParsingOperation(mainLabelID.value, intersectPoints, instances.value);
 };

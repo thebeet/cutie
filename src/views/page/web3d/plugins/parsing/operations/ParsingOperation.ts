@@ -3,18 +3,16 @@ import { AnswerContent, ParsingInstance } from '../types';
 import { klona } from 'klona';
 
 export class ParsingOperation {
-    private readonly frame: TFrame;
     private readonly labelID: number;
-    private readonly points: number[];
+    private readonly points: [TFrame, number[]][];
     private readonly instances: ParsingInstance[]; // snapshot
-    private change: number[][] = [];
+    private change: number[][][] = [];
 
-    constructor(frame: TFrame, labelID: number, points: number[], instances: ParsingInstance[]) {
-        this.frame = frame;
+    constructor(labelID: number, points: [TFrame, number[]][], instances: ParsingInstance[]) {
         this.labelID = labelID;
         this.points = points;
         this.instances = klona(instances);
-        this.change = this.instances.map(() => [] as number[]);
+        this.change = points.map(() => this.instances.map(() => [] as number[]));
     }
 
     get description() {
@@ -22,32 +20,38 @@ export class ParsingOperation {
     }
 
     apply(answer: AnswerContent) {
-        const label = answer.parsing.frames[this.frame.index].label;
-        this.points.forEach((pid) => {
-            const c = label[pid];
-            if (!this.instances[c].lock && (c !== this.labelID)) {
-                this.change[c].push(pid);
-                label[pid] = this.labelID;
+        this.points.forEach(([frame, points], index) => {
+            const label = answer.parsing.frames[frame.index].label;
+            points.forEach((pid) => {
+                const c = label[pid];
+                if (!this.instances[c].lock && (c !== this.labelID)) {
+                    this.change[index][c].push(pid);
+                    label[pid] = this.labelID;
+                }
+            });
+            const labelAttr = frame.points?.geometry?.getAttribute('label');
+            if (labelAttr) {
+                labelAttr.needsUpdate = true;
             }
+            frame.update();
         });
-        const labelAttr = this.frame.points?.geometry?.getAttribute('label');
-        if (labelAttr) {
-            labelAttr.needsUpdate = true;
-        }
-        this.frame.update();
     }
 
     effect(instances: ParsingInstance[]) {
-        let sum = 0;
-        this.change.forEach((value, index) => {
-            sum += value.length;
-            instances[index].counts[this.frame.index] -= value.length;
+        this.points.forEach(([frame], index) => {
+            let sum = 0;
+            this.change[index].forEach((value, i) => {
+                sum += value.length;
+                instances[i].counts[frame.index] -= value.length;
+            });
+            instances[this.labelID].counts[frame.index] += sum;
         });
-        instances[this.labelID].counts[this.frame.index] += sum;
     }
 
     undo(answer: AnswerContent) {
-        const label = answer.parsing.frames[this.frame.index].label;
-        this.change.forEach((value, index) => value.forEach(pid => label[pid] = index));
+        this.points.forEach(([frame], index) => {
+            const label = answer.parsing.frames[frame.index].label;
+            this.change[index].forEach((value, i) => value.forEach(pid => label[pid] = i));
+        });
     }
 }

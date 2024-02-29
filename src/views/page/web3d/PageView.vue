@@ -36,7 +36,7 @@ onMounted(async () => {
     const middlewares = [
         { name: 'camera-control' },
         { name: 'frame-pagination' },
-        { name: 'answer-cache' },
+        { name: 'answer-cache', params: { auto: false } },
         { name: 'answer-history' },
         { name: 'render-sampling' },
         { name: 'spatial-indexing', params: { impl: 'octree' } },

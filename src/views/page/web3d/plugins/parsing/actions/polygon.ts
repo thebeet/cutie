@@ -3,10 +3,10 @@ import { ParsingOperation } from '../operations/ParsingOperation';
 import { useDrama } from '@web3d/hooks/drama';
 import { storeToRefs } from 'pinia';
 import { useParsingStore } from '../stores';
-import { GroupOperation, Operation } from '@web3d/operator/Operation';
+import { Operation } from '@web3d/operator/Operation';
 import { convexHull2D, pointInPolygon, pointsBox2DBounding } from '../libs/ConvexHull2D';
 import { DouglasPeucker } from '../libs/DouglasPeucker';
-import { toValue } from 'vue';
+import { TFrame } from '@web3d/three/TFrame';
 
 const getPlane = (points: THREE.Vector2[], camera: THREE.Camera): THREE.Plane[] => {
     return points.map(point => {
@@ -45,11 +45,11 @@ export const polylineAction = (points: readonly {x: number, y: number}[], camera
 
     const _p2 = new THREE.Vector2();
     const _p3 = new THREE.Vector3();
-    const operations: Operation[] = [];
+    const intersectPoints: [TFrame, number[]][] = [];
     activeFrames.value.forEach(frame => {
         const result: number[] = [];
         const frameProjScreenMatrix = cameraProjScreenMatrix.clone().multiply(frame.matrixWorld);
-        const matInv = frame.points!.matrixWorld.clone().invert();
+        const matInv = frame.matrixWorld.clone().invert();
         const frustumForFrame = frustum.clone();
         frustumForFrame.planes.forEach(p => {
             p.applyMatrix4(matInv);
@@ -61,8 +61,12 @@ export const polylineAction = (points: readonly {x: number, y: number}[], camera
                 result.push(index);
             }
         });
-        const operation = new ParsingOperation(frame, mainLabelID.value, result, toValue(instances));
-        operations.push(operation);
+        if (result.length > 0) {
+            intersectPoints.push([frame, result]);
+        }
     });
-    return new GroupOperation(operations);
+    if (intersectPoints.length === 0) {
+        return null;
+    }
+    return new ParsingOperation(mainLabelID.value, intersectPoints, instances.value);
 };
