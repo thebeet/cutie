@@ -3,7 +3,7 @@ import { AnswerContent } from '@web3d/types';
 import { ABox } from '../types';
 
 export class RemoveBoxOperation implements Operation {
-    box: ABox;
+    readonly box: ABox;
 
     constructor(box: ABox) {
         this.box = box;

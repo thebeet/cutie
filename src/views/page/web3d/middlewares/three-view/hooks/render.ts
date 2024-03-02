@@ -2,8 +2,11 @@ import * as THREE from 'three';
 import { useDrama } from '@web3d/hooks/drama';
 import { MaybeRefOrGetter, computed, ref, toValue, watch, watchEffect } from 'vue';
 import { useElementSize, useEventListener, useRafFn, useResizeObserver } from '@vueuse/core';
-import { useThreeViewStore } from '../stores';
 import { RBox } from '@web3d/types';
+
+import { axis2d, views } from '../constants';
+import { useThreeViewStore } from '../stores';
+import { storeToRefs } from 'pinia';
 
 type Containers = {
     container: MaybeRefOrGetter<HTMLDivElement | undefined>;
@@ -13,7 +16,8 @@ type Containers = {
 }
 
 export const useRender = (containers: Containers) => {
-    const { scene, threeViewOuter } = useDrama();
+    const { scene } = useDrama();
+    const { outer } = storeToRefs(useThreeViewStore());
     const renderer = new THREE.WebGLRenderer({
         powerPreference: 'high-performance',
         antialias: false,
@@ -33,8 +37,6 @@ export const useRender = (containers: Containers) => {
         top: 1,
     });
 
-    const config = useThreeViewStore();
-
     const canvasSize = {
         front: useElementSize(containers.front),
         side: useElementSize(containers.side),
@@ -49,16 +51,16 @@ export const useRender = (containers: Containers) => {
         if (box && containerSize.width > 0 && containerSize.height > 0) {
             const aspect = containerSize.width / containerSize.height;
             const center = new THREE.Vector3(box.position.x, box.position.y, box.position.z);
-            const width = box.size[config.axis2d[name].x];
-            const height = box.size[config.axis2d[name].y];
-            const deep = box.size[config.axis2d[name].z];
+            const width = box.size[axis2d[name].x];
+            const height = box.size[axis2d[name].y];
+            const deep = box.size[axis2d[name].z];
             const xSize = Math.max(width, height * aspect);
             const ySize = Math.max(height, width / aspect);
             const rotation = new THREE.Quaternion().setFromEuler(
                 new THREE.Euler(box.rotation.x, box.rotation.y, box.rotation.z));
             const camera = new THREE.OrthographicCamera(-xSize / 2, xSize / 2, ySize / 2, -ySize / 2, 0, deep);
-            camera.up.set(...config[name].UP.clone().applyQuaternion(rotation).toArray());
-            camera.position.set(...center.clone().add(config[name].z.clone().applyQuaternion(rotation).multiplyScalar(deep / 2)).toArray());
+            camera.up.set(...views[name].UP.clone().applyQuaternion(rotation).toArray());
+            camera.position.set(...center.clone().add(views[name].z.clone().applyQuaternion(rotation).multiplyScalar(deep / 2)).toArray());
             camera.lookAt(...center.toArray());
             camera.zoom = zooms.value[name];
             camera.updateMatrixWorld();
@@ -68,9 +70,9 @@ export const useRender = (containers: Containers) => {
     };
 
     const cameras = {
-        front: computed(() => getCamera('front', threeViewOuter)),
-        side: computed(() => getCamera('side', threeViewOuter)),
-        top: computed(() => getCamera('top', threeViewOuter)),
+        front: computed(() => getCamera('front', outer)),
+        side: computed(() => getCamera('side', outer)),
+        top: computed(() => getCamera('top', outer)),
     };
 
     const zoomCameraHandler = (name: 'front' | 'side' | 'top') => {
@@ -86,7 +88,7 @@ export const useRender = (containers: Containers) => {
     useEventListener(containers.top, 'wheel', zoomCameraHandler('top'), { passive: false });
 
     scene.addEventListener('change', () => { dirty = true; });
-    watch(threeViewOuter, () => { dirty = true; });
+    watch(outer, () => { dirty = true; });
 
     const renderTo = (cameraRef: MaybeRefOrGetter<THREE.Camera | undefined>, container: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
         const dom = toValue(container);

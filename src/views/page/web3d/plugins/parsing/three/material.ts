@@ -41,7 +41,7 @@ export class PointsLabelInstanceColorMaterial extends RawShaderMaterial {
                 gl_PointSize = pointSize;
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 if (previewBox) {
-                    vec4 p_inbox = vec4(position, 1.0) * previewBoxMatrix;
+                    vec4 p_inbox = previewBoxMatrix * modelViewMatrix * vec4(position, 1.0);
                     bool inBox = p_inbox.x <= 1. && p_inbox.y <= 1. && p_inbox.z <= 1.
                         && p_inbox.x >= -1. && p_inbox.y >= -1. && p_inbox.z >= -1.;
                     v_color = inBox ? previewColor : instanceColor[clamp(label, 0, 255)];

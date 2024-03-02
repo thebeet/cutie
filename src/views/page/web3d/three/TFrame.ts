@@ -10,6 +10,10 @@ export interface PointsIntersect {
     intersectRay(obj: THREE.Ray, d: number, callback: (point: THREE.Vector3, i: number) => void): void;
 }
 
+const _infSphere = new THREE.Sphere(
+    new THREE.Vector3(0, 0, 0), Infinity
+);
+
 interface ITFrame extends PointsIntersect {
     readonly index: number;
     readonly frame: THREE.Object3D;
@@ -50,6 +54,8 @@ export class TFrame extends THREE.Object3D implements ITFrame {
         }
         this._points = obj;
         if (this._points !== undefined) {
+            this._points.frustumCulled = false;
+            this._points.geometry.boundingSphere = _infSphere;
             this.add(this._points);
             if (this.frame.visible) {
                 this.update();

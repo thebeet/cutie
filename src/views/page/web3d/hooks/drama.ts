@@ -53,7 +53,11 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     const { answer } = storeToRefs(answerStore);
     const { setupAnswer, applyOperation, onApplyOperation } = answerStore;
 
-    const { inner: threeViewInner, outer: threeViewOuter, confirm: threeViewRejust } = useThreeView();
+    const {
+        setup: setupThreeView,
+        onChange: onThreeViewChange, onConfirm: onThreeViewConfirm,
+        confirmEvent: threeViewConfirmEventHook, changeEvent: threeViewChangeEventHook
+    } = useThreeView();
 
     const launch = async () => {
         const tAnswer: AnswerContent = {
@@ -97,11 +101,12 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
             scene,
 
             launch,
-            threeViewInner, threeViewOuter, threeViewRejust
+            setupThreeView, onThreeViewChange, onThreeViewConfirm
         } as const,
 
         advance: {
             controls, renderer, controlMode, mouseEventHook,
+            threeViewConfirmEventHook, threeViewChangeEventHook
         } as const
     } as const;
 };

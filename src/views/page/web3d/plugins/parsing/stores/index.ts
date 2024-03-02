@@ -7,24 +7,34 @@ import * as THREE from 'three';
 import { useParsingAnswerStore } from './answer';
 import { ParsingInstance, RBox } from '../types';
 import { rbox2Matrix } from '@web3d/utils/rbox';
+import { TBox } from '../three/TBox';
 
 export const useParsingStore = defineStore('plugin::parsing', () => {
     const mainLabelID = ref(1);
     const brushRadius = ref(0.01);
     const boxParsing = ref(false);
 
-    const { scene, frames, threeViewInner } = useDrama();
+    const { scene, frames } = useDrama();
     const { answer } = storeToRefs(useParsingAnswerStore());
 
     const box = ref<RBox>();
+    let tbox: TBox;
 
-    watchEffect(() => {
-        if (threeViewInner.value) {
-            box.value = threeViewInner.value;
-        } else {
-            box.value = undefined;
+    watch(box, (value) => {
+        if (value) {
+            if (!tbox) {
+                tbox = new TBox(value);
+            } else {
+                tbox.apply(value);
+                scene.update();
+            }
+            if (!tbox.parent) {
+                frames[1].add(tbox);
+            }
         }
-    });
+    }, { deep: true });
+
+
 
     const pointsMaterial = new PointsLabelInstanceColorMaterial({ size: 1.0 });
 

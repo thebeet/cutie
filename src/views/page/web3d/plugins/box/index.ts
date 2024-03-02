@@ -1,5 +1,5 @@
 import { useDrama } from '@web3d/hooks/drama';
-import { toRaw, h, watch } from 'vue';
+import { h } from 'vue';
 import { TBox } from '@web3d/plugins/box/three/TBox';
 import ToolBox from './components/ToolBox.vue';
 import InstanceDetail from './components/InstanceDetail.vue';
@@ -9,29 +9,28 @@ import { AddBoxOperation } from './operations/AddBoxOperation';
 import { storeToRefs } from 'pinia';
 import { useBoxStore } from './stores';
 import * as THREE from 'three';
-import { GroupOperation } from '@web3d/operator/Operation';
 import { ModifyBoxOperation } from './operations/ModifyBoxOperation';
-import { klona } from 'klona';
 import { useHotkeys } from './hotkeys';
+import { RBox } from '../../types';
 
 export const usePlugin = () => {
     const { activeTool, toolbox, rightsidebar,
-        threeViewInner, camera, primaryFrame,
+        camera, primaryFrame,
+        setupThreeView, onThreeViewChange, onThreeViewConfirm,
         onAdvanceMouseEvent,
         applyOperation, onApplyOperation } = useDrama();
     const boxesStore = useBoxStore();
     const { focused } = storeToRefs(boxesStore);
     const { boxes } = boxesStore;
 
-    watch(threeViewInner, (value) => {
-        if (focused.value) {
-            const op = new ModifyBoxOperation({
-                ...toRaw(focused.value),
-                ...toRaw(value)
-            });
-            applyOperation(op, false);
+    const onThreeViewModify = (isConfirm: boolean) => (value: RBox) => {
+        if (focused.value && value) {
+            const op = new ModifyBoxOperation(focused.value.uuid, value);
+            applyOperation(op, isConfirm);
         }
-    }, { deep: true });
+    };
+    onThreeViewChange(onThreeViewModify(false));
+    onThreeViewConfirm(onThreeViewModify(false));
 
     onAdvanceMouseEvent((event) => {
         if (activeTool.value === 'rect' && event.type === 'rected') {
@@ -59,51 +58,19 @@ export const usePlugin = () => {
                     }
                 }
                 const cube = intersect.object as TBox;
-                threeViewInner.value = klona(cube.box);
                 focused.value = cube.box;
+                setupThreeView({ position: focused.value.position, rotation: focused.value.rotation, size: focused.value.size });
             } else {
                 focused.value = undefined;
             }
         }
     });
 
-    watch(focused, (value, oldValue) => {
-        if (value && oldValue && value.uuid === oldValue.uuid) {
-            return;
-        }
-        if (oldValue) {
-            const cube = boxes.get(oldValue.uuid);
-            cube?.dispatchEvent({ type: 'blur' });
-        }
-        if (value) {
-            const cube = boxes.get(value.uuid);
-            cube?.dispatchEvent({ type: 'focus' });
-        } else {
-            threeViewInner.value = undefined;
-        }
-    });
-
     onApplyOperation(({ operation }) => {
         if (operation instanceof AddBoxOperation) {
             const o = operation as AddBoxOperation;
-            const frame = o.frame;
-            const center = new THREE.Vector3(o.result.position.x, o.result.position.y, o.result.position.z).applyMatrix4(frame.matrixWorld);
-            threeViewInner.value = {
-                ...o.result,
-                position: {
-                    x: center.x,
-                    y: center.y,
-                    z: center.z,
-                },
-            };
             focused.value = o.result;
-        }
-        if (operation instanceof ModifyBoxOperation) {
-            const o = operation as ModifyBoxOperation;
-            const cube = boxes.get(o.newValue.uuid);
-            if (cube) {
-                cube.apply(o.newValue);
-            }
+            setupThreeView({ position: focused.value.position, rotation: focused.value.rotation, size: focused.value.size });
         }
     });
 

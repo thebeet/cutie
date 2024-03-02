@@ -6,7 +6,7 @@ import { ABox } from '../types';
 
 export class AddBoxOperation implements Operation {
     private points: [TFrame, number[]][];
-    frame: TFrame;
+    readonly frame: TFrame;
     result: ABox;
 
     constructor(frame: TFrame, points: [TFrame, number[]][], euler: THREE.Euler) {
@@ -78,12 +78,20 @@ export class AddBoxOperation implements Operation {
             new THREE.Euler(this.result.rotation.x, this.result.rotation.y, this.result.rotation.z));
         center.applyQuaternion(quaternion);
         center.applyMatrix4(this.frame.matrixWorld.clone().invert());
-        this.result.position.x = center.x;
-        this.result.position.y = center.y;
-        this.result.position.z = center.z;
-        this.result.size.x = size.x;
-        this.result.size.y = size.y;
-        this.result.size.z = size.z;
+
+        this.result = {
+            ...this.result,
+            position: {
+                x: center.x,
+                y: center.y,
+                z: center.z,
+            },
+            size: {
+                x: size.x,
+                y: size.y,
+                z: size.z,
+            }
+        };
         answer.elements.push(this.result);
     }
 }

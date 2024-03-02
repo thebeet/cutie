@@ -3,7 +3,7 @@
         <div class="toolbox-title">Parsing</div>
         <button type="button" class="toolbox-button" @click="click('rect')">Rect</button>
         <button type="button" class="toolbox-button" @click="click('polyline')">Polyline</button>
-        <button type="button" class="toolbox-button" @click="click('box')">Box</button>
+        <button type="button" class="toolbox-button" @click="box()">Box</button>
         <button type="button" class="toolbox-button" @click="dump()">Dump</button>
     </div>
 </template>
@@ -15,11 +15,18 @@ import { storeToRefs } from 'pinia';
 import * as THREE from 'three';
 
 const { activeTool, mouseState, frames } = useDrama();
-const { instances } = storeToRefs(useParsingStore());
+const { instances, boxParsing } = storeToRefs(useParsingStore());
 
 const click = (mode: string) => {
     activeTool.value = 'parsing';
     mouseState.value = mode;
+    boxParsing.value = false;
+};
+
+const box = () => {
+    activeTool.value = 'parsing';
+    mouseState.value = 'rect';
+    boxParsing.value = true;
 };
 
 const dump = () => {

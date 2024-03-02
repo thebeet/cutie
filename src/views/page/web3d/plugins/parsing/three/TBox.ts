@@ -25,7 +25,7 @@ export class TBox extends THREE.Object3D<TBoxEventMap> {
         this.box = box;
         this.applyMatrix4(rbox2Matrix(box));
         this._mesh = new THREE.Mesh(_boxGeometry, _rectMaterial);
-        this.add(this._mesh);
+        //this.add(this._mesh);
         this._edge = new THREE.LineSegments(_edgesGeometry, _edgeMaterial);
         this.add(this._edge);
     }

@@ -1,17 +1,17 @@
-export interface RBox {
-    position: {
-        x: number
-        y: number
-        z: number
+export type RBox = {
+    readonly position: {
+        readonly x: number
+        readonly y: number
+        readonly z: number
     }
-    rotation: {
-        x: number
-        y: number
-        z: number
+    readonly rotation: {
+        readonly x: number
+        readonly y: number
+        readonly z: number
     }
-    size: {
-        x: number
-        y: number
-        z: number
+    readonly size: {
+        readonly x: number
+        readonly y: number
+        readonly z: number
     }
 }

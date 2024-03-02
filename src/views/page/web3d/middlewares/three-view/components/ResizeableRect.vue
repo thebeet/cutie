@@ -68,30 +68,17 @@ const emits = defineEmits<{
     (e: 'confirm', value: RBox): void
 }>();
 
-const { getBoxSize, getBoxPosition, setBoxSize, setBoxPosition, setBoxRotation, getControlPoints, getRotateControlPoint } = useBoxHelper(props.name);
+const { getBoxSize, getBoxPosition, setBoxRotation, getControlPoints, getRotateControlPoint, setBoxPositionAndSize } = useBoxHelper(props.name);
 
-const innerBoxX = computed({
-    get: () => getBoxPosition(modelValue.value, 'x'),
-    set: (value) => setBoxPosition(modelValue.value, 'x', value),
-});
-const innerBoxY = computed({
-    get: () => getBoxPosition(modelValue.value, 'y'),
-    set: (value) => setBoxPosition(modelValue.value, 'y', value),
-});
-const innerBoxWidth = computed({
-    get: () => getBoxSize(modelValue.value, 'x'),
-    set: (value) => setBoxSize(modelValue.value, 'x', value),
-});
-const innerBoxHeight = computed({
-    get: () => getBoxSize(modelValue.value, 'y'),
-    set: (value) => setBoxSize(modelValue.value, 'y', value),
-});
+const innerBoxX = computed(() => getBoxPosition(modelValue.value, 'x'));
+const innerBoxY = computed(() => getBoxPosition(modelValue.value, 'y'));
+const innerBoxWidth = computed(() => getBoxSize(modelValue.value, 'x'));
+const innerBoxHeight = computed(() => getBoxSize(modelValue.value, 'y'));
 
 const container = ref<SVGElement>();
 const { width, height } = useElementSize(container);
 
 const hasView = computed(() => width.value > 0 && height.value > 0 && props.camera);
-
 const aspect = computed(() => height.value > 0 ? width.value / height.value : 1);
 
 const outerBoxWidth = computed(() => Math.max(getBoxSize(props.outer, 'x'), getBoxSize(props.outer, 'y') * aspect.value));
@@ -143,7 +130,7 @@ const rotatePointMouseMove = (event: MouseEvent) => {
         const before = new THREE.Vector2(0, height.value / 2);
         const current = new THREE.Vector2(event.clientX - initialRotatePosition.value.x, event.clientY - initialRotatePosition.value.y + height.value / 2);
         const angle = Math.atan2(current.y, current.x) - Math.atan2(before.y, before.x);
-        setBoxRotation(modelValue.value, angle);
+        modelValue.value = setBoxRotation(modelValue.value, angle);
         initialRotatePosition.value = { x: event.clientX, y: event.clientY };
     }
 };
@@ -202,16 +189,25 @@ const mouseMove = (event: MouseEvent) => {
             break;
         }
         const controlPointSize = 10 * outerBoxHeight.value / height.value;
-        if (current.width >= controlPointSize) {
-            innerBoxX.value = current.x;
-            innerBoxWidth.value = current.width;
+        if (current.width < controlPointSize) {
+            current.x = innerBoxX.value;
+            current.width = innerBoxWidth.value;
+        } else {
             initialMousePosition.value.x = event.clientX;
         }
-        if (current.height >= controlPointSize) {
-            innerBoxY.value = current.y;
-            innerBoxHeight.value = current.height;
+        if (current.height < controlPointSize) {
+            current.y = innerBoxY.value;
+            current.height = innerBoxHeight.value;
+        } else {
             initialMousePosition.value.y = event.clientY;
         }
+        const delta = {
+            x: current.x - innerBoxX.value,
+            y: current.y - innerBoxY.value,
+            width: current.width - innerBoxWidth.value,
+            height: current.height - innerBoxHeight.value,
+        };
+        modelValue.value = setBoxPositionAndSize(modelValue.value, delta);
     }
 };
 </script>

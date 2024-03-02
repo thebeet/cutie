@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { useDrama } from '@web3d/hooks/drama';
+import { TFrame } from '@web3d/three/TFrame';
 
 const getPlane = (points: THREE.Vector2[], camera: THREE.Camera): THREE.Plane[] => {
     return points.map(point => {
@@ -17,7 +18,7 @@ const getPlane = (points: THREE.Vector2[], camera: THREE.Camera): THREE.Plane[] 
     });
 };
 
-export const boxAction = (points: readonly {x: number, y: number}[], camera: THREE.Camera): RBox => {
+const rectAction = (points: readonly {x: number, y: number}[], camera: THREE.Camera) => {
     const { activeFrames } = useDrama();
 
     const minx = Math.min(points[0].x, points[1].x);
@@ -36,31 +37,76 @@ export const boxAction = (points: readonly {x: number, y: number}[], camera: THR
         new THREE.Plane(new THREE.Vector3(0, 0, 1), 10000),
         new THREE.Plane(new THREE.Vector3(0, 0, -1), 10000),
     );
-
-    const bBox = new THREE.Box3(
-        new THREE.Vector3(Infinity, Infinity, Infinity),
-        new THREE.Vector3(-Infinity, -Infinity, -Infinity)
-    );
-
+    const results: [TFrame, number[]][] = [];
     activeFrames.value.forEach(frame => {
-        const matInv = frame.matrixWorld.clone().invert();
+        const result: number[] = [];
+        const matInv = frame.points!.matrixWorld.clone().invert();
         const frustumForFrame = frustum.clone();
 
         frustumForFrame.planes.forEach(p => {
             p.applyMatrix4(matInv);
         });
-        const frameBBox = new THREE.Box3(
-            new THREE.Vector3(Infinity, Infinity, Infinity),
-            new THREE.Vector3(-Infinity, -Infinity, -Infinity)
-        );
-        frame.intersect(frustumForFrame, (point) => {
-            frameBBox.min.min(point);
-            frameBBox.max.max(point);
+        frame.intersect(frustumForFrame, (_, index) => {
+            result.push(index);
         });
-        frameBBox.applyMatrix4(frame.matrixWorld);
-        bBox.min.min(frameBBox.min);
-        bBox.max.max(frameBBox.max);
+        if (result.length > 0) {
+            results.push([frame, result]);
+        }
     });
+    return results;
+};
 
+const computeBoundingBox = (frame: TFrame, index: number[], rotation: THREE.Euler) => {
+    const box = new THREE.Box3(
+        new THREE.Vector3(Infinity, Infinity, Infinity),
+        new THREE.Vector3(-Infinity, -Infinity, -Infinity)
+    );
+    const position = frame.points!.geometry.getAttribute('position');
+    const _v = new THREE.Vector3();
+    const quaternion = new THREE.Quaternion().setFromEuler(rotation);
+    const invertQuaternion = quaternion.clone().invert();
+    index.forEach(i => {
+        _v.fromBufferAttribute(position, i).applyQuaternion(invertQuaternion);
+        box.min.min(_v);
+        box.max.max(_v);
+    });
+    return box;
+};
+
+export const boxAction = (points: readonly {x: number, y: number}[], camera: THREE.Camera): RBox => {
+    const { primaryFrame } = useDrama();
+    const rotation = new THREE.Euler(0, 0, camera.rotation.z);
+    const intersect = rectAction(points, camera);
+    const boxes = intersect.map(([frame, points]) => {
+        return computeBoundingBox(frame, points, rotation);
+    });
+    const unionBox = boxes.reduce((acc, box) => acc.union(box), new THREE.Box3(
+        new THREE.Vector3(Infinity, Infinity, Infinity),
+        new THREE.Vector3(-Infinity, -Infinity, -Infinity)
+    ));
+    const center = new THREE.Vector3();
+    const size = new THREE.Vector3();
+    unionBox.getCenter(center);
+    unionBox.getSize(size);
+    const quaternion = new THREE.Quaternion().setFromEuler(rotation);
+    center.applyQuaternion(quaternion);
+    center.applyMatrix4(primaryFrame.value.matrixWorld.clone().invert());
+    const bBox = {
+        position: {
+            x: center.x,
+            y: center.y,
+            z: center.z
+        },
+        size: {
+            x: size.x,
+            y: size.y,
+            z: size.z
+        },
+        rotation: {
+            x: rotation.x,
+            y: rotation.y,
+            z: rotation.z
+        }
+    };
     return bBox;
 };

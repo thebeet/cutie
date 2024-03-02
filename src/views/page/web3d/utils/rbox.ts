@@ -11,6 +11,27 @@ export const rbox2Matrix = (rbox: RBox): Matrix4 => {
     );
 };
 
+export const rboxApplyMatrix = (box: RBox, mat: Matrix4): RBox => {
+    const center = new Vector3(box.position.x, box.position.y, box.position.z).applyMatrix4(mat);
+    const quaternion = new Quaternion().setFromEuler(
+        new Euler(box.rotation.x, box.rotation.y, box.rotation.z))
+        .multiply(new Quaternion().setFromRotationMatrix(mat));
+    const euler = new Euler().setFromQuaternion(quaternion);
+    return {
+        ...box,
+        rotation: {
+            x: euler.x,
+            y: euler.y,
+            z: euler.z
+        },
+        position: {
+            x: center.x,
+            y: center.y,
+            z: center.z,
+        },
+    };
+};
+
 export const rboxIOUBruteforce = (rbox1: RBox, rbox2: RBox): number => {
     const m1 = rbox2Matrix(rbox1).invert();
     const m2 = rbox2Matrix(rbox2);

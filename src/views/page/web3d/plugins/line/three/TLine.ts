@@ -7,30 +7,6 @@ const _lineMaterial = new THREE.LineBasicMaterial({
     linewidth: 1000
 });
 
-const _lineM = new THREE.RawShaderMaterial( {
-    glslVersion: THREE.GLSL3,
-    uniforms: {
-        color: { value: [1, 1, 0, 1] }
-    },
-    vertexShader: `
-    precision lowp float;
-    in vec3 position;
-    uniform mat4 projectionMatrix;
-    uniform mat4 modelViewMatrix;
-    void main() {
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }`,
-    linewidth: 1000,
-    fragmentShader: `
-    precision lowp float;
-    uniform vec4 color;
-    out vec4 o_FragColor;
-    void main() {
-        o_FragColor = color;
-    }`,
-
-} );
-
 export interface TLineEventMap extends THREE.Object3DEventMap {
     focus: {}
     blur: {}
@@ -53,7 +29,6 @@ export class TLine extends THREE.Object3D<TLineEventMap> {
         this.lines = new THREE.Line(geometry, _lineMaterial);
         this.add(this.lines);
 
-        console.log(this.lines)
         this.matrixAutoUpdate = false;
         this.matrixWorldNeedsUpdate = false;
         this._bindEvent();

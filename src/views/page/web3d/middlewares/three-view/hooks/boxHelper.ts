@@ -1,54 +1,46 @@
 import { RBox } from '@web3d/types';
 import * as THREE from 'three';
-import { useThreeViewStore } from '../stores';
+import { axis2d, views } from '../constants';
 
 type AXIS2D = 'x' | 'y';
+type Rect = {
+    x: number
+    y: number
+    width: number
+    height: number
+}
 
 export const useBoxHelper = (name: 'front' | 'side' | 'top') => {
-    const NV = useThreeViewStore();
-    const { axis2d } = NV;
     const getBoxSize = (box: RBox, axis: AXIS2D) => {
-        switch (axis2d[name][axis]) {
-        case 'x':
-            return box.size.x;
-        case 'y':
-            return box.size.y;
-        case 'z':
-            return box.size.z;
-        default:
-            throw new Error('Invalid axis');
-        };
+        return box.size[axis2d[name][axis]];
     };
     const getBoxPosition = (box: RBox, axis: AXIS2D) => {
-        const vector = NV[name][axis].clone().applyEuler(
+        const vector = views[name][axis].clone().applyEuler(
             new THREE.Euler(box.rotation.x, box.rotation.y, box.rotation.z)
         );
         return vector.dot(box.position);
     };
-    const setBoxSize = (box: RBox, axis: AXIS2D, value: number) => {
-        switch (axis2d[name][axis]) {
-        case 'x':
-            return box.size.x = value;
-        case 'y':
-            return box.size.y = value;
-        case 'z':
-            return box.size.z = value;
-        default:
-            throw new Error('Invalid axis');
+
+    const setBoxPositionAndSize = (box: RBox, delta: Rect): RBox => {
+        const size = { ...box.size };
+        size[axis2d[name].x] += delta.width;
+        size[axis2d[name].y] += delta.height;
+        const v = new THREE.Vector3();
+        v[axis2d[name].x] = delta.x;
+        v[axis2d[name].y] = -delta.y;
+        v.applyEuler(new THREE.Euler(box.rotation.x, box.rotation.y, box.rotation.z));
+        return {
+            ...box,
+            position: {
+                x: box.position.x + v.x,
+                y: box.position.y + v.y,
+                z: box.position.z + v.z,
+            },
+            size,
         };
     };
-    const setBoxPosition = (box: RBox, axis: AXIS2D, value: number) => {
-        const vector = NV[name][axis].clone().applyEuler(
-            new THREE.Euler(box.rotation.x, box.rotation.y, box.rotation.z)
-        );
-        const old = vector.dot(box.position);
-        vector.multiplyScalar(value - old);
-        box.position.x += vector.x;
-        box.position.y += vector.y;
-        box.position.z += vector.z;
-    };
 
-    const setBoxRotation = (box: RBox, angle: number) => {
+    const setBoxRotation = (box: RBox, angle: number): RBox => {
         const euler = new THREE.Euler(box.rotation.x, box.rotation.y, box.rotation.z);
         const rotate = new THREE.Euler(
             name === 'front' ? angle : 0,
@@ -59,9 +51,14 @@ export const useBoxHelper = (name: 'front' | 'side' | 'top') => {
         const quaternionB = new THREE.Quaternion().setFromEuler(rotate);
         quaternionA.multiply(quaternionB);
         const combinedEuler = new THREE.Euler().setFromQuaternion(quaternionA);
-        box.rotation.x = combinedEuler.x;
-        box.rotation.y = combinedEuler.y;
-        box.rotation.z = combinedEuler.z;
+        return {
+            ...box,
+            rotation: {
+                x: combinedEuler.x,
+                y: combinedEuler.y,
+                z: combinedEuler.z
+            }
+        };
     };
 
     const getAxis = (box: RBox) => {
@@ -106,8 +103,8 @@ export const useBoxHelper = (name: 'front' | 'side' | 'top') => {
 
     return {
         getBoxSize, getBoxPosition,
-        setBoxSize, setBoxPosition,
         setBoxRotation,
+        setBoxPositionAndSize,
         getControlPoints, getRotateControlPoint
     };
 };

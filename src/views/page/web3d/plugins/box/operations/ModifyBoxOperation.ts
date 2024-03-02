@@ -1,11 +1,12 @@
 import { Operation } from '@web3d/operator/Operation';
-import { AnswerContent } from '@web3d/types';
-import { ABox } from '../types';
+import { AnswerContent, RBox } from '@web3d/types';
 
 export class ModifyBoxOperation implements Operation {
-    newValue: ABox;
+    readonly uuid: string;
+    readonly newValue: RBox;
 
-    constructor(newValue: ABox) {
+    constructor(uuid: string, newValue: RBox) {
+        this.uuid = uuid;
         this.newValue = newValue;
     }
 
@@ -15,8 +16,11 @@ export class ModifyBoxOperation implements Operation {
 
     apply(answer: AnswerContent): void {
         for (let i = 0; i < answer.elements.length; i++) {
-            if (answer.elements[i].uuid === this.newValue.uuid) {
-                answer.elements[i] = this.newValue;
+            if (answer.elements[i].uuid === this.uuid) {
+                answer.elements[i] = {
+                    ...answer.elements[i],
+                    ...this.newValue
+                };
                 break;
             }
         }

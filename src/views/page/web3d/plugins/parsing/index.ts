@@ -53,6 +53,7 @@ export const usePlugin = () => {
             if (event.type === 'rected') {
                 if (boxParsing.value) {
                     box.value = boxAction(event.points, camera);
+                    return;
                 }
                 const operation = rectAction(event.points, camera);
                 if (operation) {

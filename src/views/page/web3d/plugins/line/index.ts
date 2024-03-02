@@ -1,13 +1,12 @@
 import { useDrama } from '@web3d/hooks/drama';
 import { h } from 'vue';
 import { useLineStore } from './stores';
-import { storeToRefs } from 'pinia';
 import { addNodeToContainer } from '..';
 import ToolBox from './components/ToolBox.vue';
 import * as THREE from 'three';
 
 export const usePlugin = () => {
-    const { scene, frames, primaryFrame, camera, toolbox, onAdvanceMouseEvent } = useDrama();
+    const { scene, primaryFrame, camera, toolbox, onAdvanceMouseEvent } = useDrama();
     useLineStore();
 
     const geometry = new THREE.SphereGeometry( .2, 32, 16 );
