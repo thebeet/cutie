@@ -13,7 +13,8 @@ export class ParsingInstanceModifyColorOperation {
         return `Modify color of instance[${this.id}] to ${this.color}`;
     }
 
-    apply(answer: AnswerContent) {
+    apply(answer: AnswerContent): AnswerContent {
         answer.parsing.instances[this.id].color = this.color;
+        return answer;
     }
 }

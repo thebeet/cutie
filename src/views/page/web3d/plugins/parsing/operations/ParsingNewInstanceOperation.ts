@@ -13,7 +13,7 @@ export class ParsingNewInstanceOperation {
         this.color = color;
     }
 
-    apply(answer: AnswerContent) {
+    apply(answer: AnswerContent): AnswerContent {
         const id = answer.parsing.instances.length;
         answer.parsing!.instances.push({
             id,
@@ -22,5 +22,6 @@ export class ParsingNewInstanceOperation {
             description: this.description,
             color: this.color,
         });
+        return answer;
     }
 }

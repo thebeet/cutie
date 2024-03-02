@@ -46,12 +46,12 @@ onMounted(async () => {
     ];
     for (const middleware of middlewares) {
         await import(`./middlewares/${middleware.name}/index.ts`).then(({ useMiddleware }) => {
-            useMiddleware(middleware);
+            useMiddleware(middleware.params);
         });
     };
     for (const plugin of props.page.template.plugins) {
         await import(`./plugins/${plugin.name}/index.ts`).then(({ usePlugin }) => {
-            usePlugin(plugin);
+            usePlugin(plugin.params);
         });
     }
     launch();

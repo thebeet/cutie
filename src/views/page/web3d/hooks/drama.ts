@@ -44,10 +44,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     const { controls, scene, renderer, camera, controlMode } = useScene(container);
 
     const { page } = usePageStore();
-    const { frames, primaryFrame, activeFrames, selectFrame } = useFrame();
-    frames.forEach(frame => {
-        scene.add(frame);
-    });
+    const { frames, primaryFrame, activeFrames, selectFrame } = useFrame(scene);
 
     const answerStore = useAnswerStore();
     const { answer } = storeToRefs(answerStore);
@@ -55,7 +52,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
 
     const {
         setup: setupThreeView,
-        onChange: onThreeViewChange, onConfirm: onThreeViewConfirm,
+        onSetup: onThreeViewSetup, onChange: onThreeViewChange, onConfirm: onThreeViewConfirm,
         confirmEvent: threeViewConfirmEventHook, changeEvent: threeViewChangeEventHook
     } = useThreeView();
 
@@ -93,15 +90,12 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
             mouseEvent, mouseState, onAdvanceMouseEvent: mouseEventHook.on,
             frames, primaryFrame, activeFrames, selectFrame,
             activeTool,
-            page,
-            answer, applyOperation, onApplyOperation,
-            annotations,
-            operations,
-            camera,
-            scene,
+            page, answer, applyOperation, onApplyOperation,
+            operations, annotations,
+            scene, camera,
 
             launch,
-            setupThreeView, onThreeViewChange, onThreeViewConfirm
+            setupThreeView, onThreeViewSetup, onThreeViewChange, onThreeViewConfirm
         } as const,
 
         advance: {

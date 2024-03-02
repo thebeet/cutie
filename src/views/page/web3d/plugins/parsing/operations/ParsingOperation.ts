@@ -19,7 +19,7 @@ export class ParsingOperation {
         return `ParsingOperation: ${this.points.length} points to label ${this.labelID}`;
     }
 
-    apply(answer: AnswerContent) {
+    apply(answer: AnswerContent): AnswerContent {
         this.points.forEach(([frame, points], index) => {
             const label = answer.parsing.frames[frame.index].label;
             points.forEach((pid) => {
@@ -35,6 +35,7 @@ export class ParsingOperation {
             }
             frame.update();
         });
+        return answer;
     }
 
     effect(instances: ParsingInstance[]) {

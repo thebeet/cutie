@@ -13,7 +13,8 @@ export class RemoveBoxOperation implements Operation {
         return 'RemoveBox';
     }
 
-    apply(answer: AnswerContent): void {
+    apply(answer: AnswerContent): AnswerContent {
         answer.elements = answer.elements.filter(element => element.uuid !== this.box.uuid);
+        return answer;
     }
 }

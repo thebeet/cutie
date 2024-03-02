@@ -14,7 +14,7 @@ export class ModifyBoxOperation implements Operation {
         return 'ModifyCube';
     }
 
-    apply(answer: AnswerContent): void {
+    apply(answer: AnswerContent): AnswerContent {
         for (let i = 0; i < answer.elements.length; i++) {
             if (answer.elements[i].uuid === this.uuid) {
                 answer.elements[i] = {
@@ -24,5 +24,6 @@ export class ModifyBoxOperation implements Operation {
                 break;
             }
         }
+        return answer;
     }
 }

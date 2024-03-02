@@ -14,13 +14,13 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
     const brushRadius = ref(0.01);
     const boxParsing = ref(false);
 
-    const { scene, frames } = useDrama();
+    const { scene, frames, setupThreeView, onThreeViewChange } = useDrama();
     const { answer } = storeToRefs(useParsingAnswerStore());
 
     const box = ref<RBox>();
     let tbox: TBox;
 
-    watch(box, (value) => {
+    watch(box, (value, oldValue) => {
         if (value) {
             if (!tbox) {
                 tbox = new TBox(value);
@@ -31,9 +31,17 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
             if (!tbox.parent) {
                 frames[1].add(tbox);
             }
+            if (oldValue === undefined) {
+                setupThreeView(value);
+            }
         }
-    }, { deep: true });
+    });
 
+    onThreeViewChange((newValue) => {
+        if (box.value) {
+            box.value = newValue;
+        }
+    });
 
 
     const pointsMaterial = new PointsLabelInstanceColorMaterial({ size: 1.0 });

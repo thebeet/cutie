@@ -17,8 +17,5 @@ import { Ref } from 'vue';
 
 const { container } = useDrama();
 
-const { enter } = useFullscreen(container as Ref<HTMLElement>);
-const fullscreen = () => {
-    enter();
-};
+const { enter: fullscreen } = useFullscreen(container as Ref<HTMLElement>);
 </script>

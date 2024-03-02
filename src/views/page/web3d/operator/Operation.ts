@@ -3,7 +3,7 @@ import { AnswerContent } from '../types';
 export interface Operation {
     description: string;
     save?: boolean;
-    apply(answer: AnswerContent): void;
+    apply(answer: AnswerContent): AnswerContent;
 }
 
 export class GroupOperation implements Operation {
@@ -18,8 +18,9 @@ export class GroupOperation implements Operation {
         return 'xxxx';
     }
 
-    apply(answer: AnswerContent): void {
-        this.group.forEach(op => op.apply(answer));
+    apply(answer: AnswerContent): AnswerContent {
+        this.group.forEach(op => answer = op.apply(answer));
+        return answer;
     }
 
     forEach(callback: (operation: Operation) => void) {

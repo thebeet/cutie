@@ -3,7 +3,7 @@ import { TFrame } from '@web3d/three/TFrame';
 import * as THREE from 'three';
 import { shallowRef } from 'vue';
 
-export const useFrame = () => {
+export const useFrame = (scene: THREE.Scene) => {
     const { page } = usePageStore();
     const frame0 = new TFrame(0);
     frame0.visible = false;
@@ -18,6 +18,7 @@ export const useFrame = () => {
         frame.updateMatrixWorld();
         return frame;
     })];
+    frames.forEach(frame => scene.add(frame));
     const activeFrames = shallowRef<TFrame[]>([]);
     const primaryFrame = shallowRef<TFrame>(frame0);
     const selectFrame = (id: number | number[]) => {

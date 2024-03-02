@@ -1,5 +1,5 @@
 import { useDrama } from '@web3d/hooks/drama';
-import { h } from 'vue';
+import { h, watch } from 'vue';
 import { TBox } from '@web3d/plugins/box/three/TBox';
 import ToolBox from './components/ToolBox.vue';
 import InstanceDetail from './components/InstanceDetail.vue';
@@ -30,7 +30,15 @@ export const usePlugin = () => {
         }
     };
     onThreeViewChange(onThreeViewModify(false));
-    onThreeViewConfirm(onThreeViewModify(false));
+    onThreeViewConfirm(onThreeViewModify(true));
+
+    watch(() => focused.value?.uuid, () => {
+        if (focused.value) {
+            setupThreeView({ position: focused.value.position, rotation: focused.value.rotation, size: focused.value.size });
+        } else {
+            setupThreeView();
+        }
+    });
 
     onAdvanceMouseEvent((event) => {
         if (activeTool.value === 'rect' && event.type === 'rected') {
@@ -59,7 +67,6 @@ export const usePlugin = () => {
                 }
                 const cube = intersect.object as TBox;
                 focused.value = cube.box;
-                setupThreeView({ position: focused.value.position, rotation: focused.value.rotation, size: focused.value.size });
             } else {
                 focused.value = undefined;
             }
@@ -70,7 +77,6 @@ export const usePlugin = () => {
         if (operation instanceof AddBoxOperation) {
             const o = operation as AddBoxOperation;
             focused.value = o.result;
-            setupThreeView({ position: focused.value.position, rotation: focused.value.rotation, size: focused.value.size });
         }
     });
 

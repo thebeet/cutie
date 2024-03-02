@@ -77,7 +77,7 @@ export const useRender = (containers: Containers) => {
 
     const zoomCameraHandler = (name: 'front' | 'side' | 'top') => {
         return (event: WheelEvent) => {
-            zooms.value[name] = Math.max(Math.min(zooms.value[name] - event.deltaY / 200, 2), .25);
+            zooms.value[name] = Math.max(Math.min(zooms.value[name] - event.deltaY / 400, 3), .25);
             dirty = true;
             event.preventDefault();
             event.stopPropagation();

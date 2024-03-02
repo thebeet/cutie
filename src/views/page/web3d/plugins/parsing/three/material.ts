@@ -22,7 +22,7 @@ export class PointsLabelInstanceColorMaterial extends RawShaderMaterial {
                     value: new Matrix4(),
                 },
                 previewColor: {
-                    value: new Float32Array(4).fill(1.0)
+                    value: [1.0, 1.0, 1.0, 1.0]
                 }
             },
             vertexShader: `
@@ -40,15 +40,16 @@ export class PointsLabelInstanceColorMaterial extends RawShaderMaterial {
             void main() {
                 gl_PointSize = pointSize;
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                v_color = instanceColor[clamp(label, 0, 255)];
                 if (previewBox) {
-                    vec4 p_inbox = previewBoxMatrix * modelViewMatrix * vec4(position, 1.0);
-                    bool inBox = p_inbox.x <= 1. && p_inbox.y <= 1. && p_inbox.z <= 1.
-                        && p_inbox.x >= -1. && p_inbox.y >= -1. && p_inbox.z >= -1.;
-                    v_color = inBox ? previewColor : instanceColor[clamp(label, 0, 255)];
-                } else {
-                    v_color = instanceColor[clamp(label, 0, 255)];
+                    vec4 p_inbox = previewBoxMatrix * vec4(position, 1.0);
+                    bool inBox = p_inbox.x <= .5 && p_inbox.y <= .5 && p_inbox.z <= .5
+                        && p_inbox.x >= -.5 && p_inbox.y >= -.5 && p_inbox.z >= -.5;
+                    if (inBox) {
+                        gl_PointSize = pointSize * 2.;
+                        v_color = previewColor;
+                    }
                 }
-
             }`,
             fragmentShader: `
             precision lowp float;

@@ -18,5 +18,5 @@ export const useBoxStore = defineStore('plugin::box', () => {
     return {
         focused,
         elements, boxes
-    };
+    } as const;
 });

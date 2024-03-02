@@ -8,30 +8,37 @@ export const useThreeViewStore = defineStore('plugin::three-view', () => {
     const outer = ref<RBox>();
 
     const padding = 0.2;
+    const scale = 1 + padding * 2;
 
-    const { threeViewConfirmEventHook: confirmEventHook, threeViewChangeEventHook: changeEventHook } = useAdvanceDrama();
+    const { onThreeViewSetup, threeViewConfirmEventHook: confirmEventHook, threeViewChangeEventHook: changeEventHook } = useAdvanceDrama();
 
     watch(inner, (newValue) => {
         changeEventHook.trigger(newValue);
     });
 
-    confirmEventHook.on((value) => {
+    const calcOuter = (innerBox: RBox): RBox => {
+        return {
+            ...innerBox,
+            size: {
+                x: innerBox.size.x * scale,
+                y: innerBox.size.y * scale,
+                z: innerBox.size.z * scale,
+            }
+        };
+    };
+
+    onThreeViewSetup((value) => {
         inner.value = value;
         if (inner.value) {
-            const scale = 1 + padding * 2;
-            outer.value = {
-                ...inner.value,
-                size: {
-                    x: inner.value.size.x * scale,
-                    y: inner.value.size.y * scale,
-                    z: inner.value.size.z * scale,
-                }
-            };
+            outer.value = calcOuter(inner.value);
         }
     });
 
     const confirm = () => {
-        confirmEventHook.trigger(inner.value);
+        if (inner.value) {
+            outer.value = calcOuter(inner.value);
+            confirmEventHook.trigger(inner.value);
+        }
     };
 
     return {

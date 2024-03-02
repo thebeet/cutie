@@ -7,6 +7,16 @@ export interface TFocusableEventMap extends THREE.Object3DEventMap {
     blur: {}
 }
 
+/**
+ * Custom hook for managing focus on elements.
+ * @template A - Type of the answer element
+ * @template T - Type of the threejs object
+ * @param {Ref<A[]>} elements - Ref to the array of elements in answer
+ * @param {Map<string, T>} objs - Map of threejs objects
+ * @returns {Object} - Object containing the focused element and a function to stop watching focus changes.
+ * @property {ComputedRef<A | undefined>} focused - Computed property representing the currently focused element.
+ * @property {WatchStopHandle} stop - Function to stop watching focus changes.
+ */
 export const useFocus = <A extends AElement, T extends THREE.Object3D<TFocusableEventMap> & { apply: (t: A) => void, dispose: () => void }>(
     elements: Ref<A[]>, objs: Map<string, T>) => {
 

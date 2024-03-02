@@ -62,7 +62,7 @@ export class AddBoxOperation implements Operation {
         return box;
     }
 
-    apply(answer: AnswerContent): void {
+    apply(answer: AnswerContent): AnswerContent {
         const boxes = this.points.map(([frame, points]) => {
             return this.computeBoundingBox(frame, points);
         });
@@ -93,5 +93,6 @@ export class AddBoxOperation implements Operation {
             }
         };
         answer.elements.push(this.result);
+        return answer;
     }
 }

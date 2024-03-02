@@ -35,8 +35,8 @@ export interface AElement {
     readonly schema: string
     readonly type: string
     readonly frameIndex: number
-    label: string
-    description: string
+    readonly label: string
+    readonly description: string
 };
 
 export interface AnswerContent {
