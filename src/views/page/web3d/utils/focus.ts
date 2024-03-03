@@ -1,4 +1,4 @@
-import { watch, Ref, ref, computed, nextTick } from 'vue';
+import { watch, Ref, computed, nextTick } from 'vue';
 import { AElement, RBox } from '@web3d/types';
 import * as THREE from 'three';
 import { useDrama } from '../hooks/drama';
@@ -28,16 +28,15 @@ export const useFocus = <A extends AElement, T extends THREE.Object3D<TFocusable
     });
 
     const stop = watch(focused, (value, oldValue) => {
-        if (value?.uuid === oldValue?.uuid) {
-            return;
-        }
-        if (oldValue) {
-            const cube = objs.get(oldValue.uuid);
-            cube?.dispatchEvent({ type: 'blur' });
-        }
-        if (value) {
-            const cube = objs.get(value.uuid);
-            cube?.dispatchEvent({ type: 'focus' });
+        if (value?.uuid !== oldValue?.uuid) {
+            if (oldValue) {
+                const cube = objs.get(oldValue.uuid);
+                cube?.dispatchEvent({ type: 'blur' });
+            }
+            if (value) {
+                const cube = objs.get(value.uuid);
+                cube?.dispatchEvent({ type: 'focus' });
+            }
         }
     });
 

@@ -1,5 +1,5 @@
 import { useDrama } from '@web3d/hooks/drama';
-import { h, nextTick, watch } from 'vue';
+import { h } from 'vue';
 import ToolBox from './components/ToolBox.vue';
 import InstanceDetail from './components/InstanceDetail.vue';
 import { addNodeToContainer } from '..';
@@ -19,7 +19,7 @@ export const usePlugin = () => {
         frames, camera, primaryFrame,
         onThreeViewChange, onThreeViewConfirm,
         onAdvanceMouseEvent,
-        applyOperation, onApplyOperation } = useDrama();
+        applyOperation } = useDrama();
     const boxesStore = useBoxStore();
     const { elements, focused } = storeToRefs(boxesStore);
     const { boxes } = boxesStore;

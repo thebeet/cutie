@@ -5,7 +5,6 @@ import { useControls } from './controls';
 import { TScene } from '@web3d/three/TScene';
 import { useCamera } from './camera';
 import { measure } from '@/stores/performance';
-
 import { CSS2DRenderer } from '../three/CSS2DRenderer';
 
 export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
@@ -23,9 +22,7 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
     labelRenderer.render = measure('web3d::2drenderer::render', labelRenderer.render.bind(labelRenderer));
 
     const { controls, controlMode } = useControls(camera, renderer);
-
     const scene = new TScene();
-
     let dirty = true;
     controls.addEventListener('change', () => { dirty = true; });
     scene.addEventListener('change', () => { dirty = true; });

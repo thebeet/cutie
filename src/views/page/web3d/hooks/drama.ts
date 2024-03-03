@@ -48,7 +48,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
 
     const answerStore = useAnswerStore();
     const { answer } = storeToRefs(answerStore);
-    const { setupAnswer, applyOperation, onApplyOperation } = answerStore;
+    const { setupAnswer, applyOperation, onApplyOperation, useSetupAnswer } = answerStore;
 
     const {
         setup: setupThreeView,
@@ -102,7 +102,8 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
 
         advance: {
             controls, renderer, controlMode, mouseEventHook,
-            threeViewConfirmEventHook, threeViewChangeEventHook
+            threeViewConfirmEventHook, threeViewChangeEventHook,
+            useSetupAnswer,
         } as const
     } as const;
 };

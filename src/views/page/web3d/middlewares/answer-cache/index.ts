@@ -1,8 +1,11 @@
-import { useAnswerStore } from '@web3d/stores/answer';
 import localforage from 'localforage';
-import { useDrama } from '@web3d/hooks/drama';
+import { useAdvanceDrama, useDrama } from '@web3d/hooks/drama';
 import { AnswerContent } from '@web3d/types';
-import { klona } from 'klona';
+import { useAnswerCacheStore } from './stores';
+import { addNodeToContainer } from '@web3d/plugins';
+import { h } from 'vue';
+import ToolBox from './components/ToolBox.vue';
+import { storeToRefs } from 'pinia';
 
 type Config = {
     auto: boolean
@@ -12,10 +15,12 @@ export const useMiddleware = (config: Partial<Config> = {}) => {
     const {
         auto = true,
     } = config;
-    const answerStore = useAnswerStore();
-    const { page } = useDrama();
-    const key = `answer-${page.response!.id}`;
-    const { useSetupAnswer, onApplyOperation } = answerStore;
+    const { toolbox } = useDrama();
+    const { autoSave } = storeToRefs(useAnswerCacheStore());
+    const { key } = useAnswerCacheStore();
+    const { useSetupAnswer } = useAdvanceDrama();
+
+    autoSave.value = auto;
 
     useSetupAnswer(async (ctx, next) => {
         const value = await localforage.getItem<AnswerContent>(key);
@@ -25,9 +30,5 @@ export const useMiddleware = (config: Partial<Config> = {}) => {
         await next();
     });
 
-    onApplyOperation(({ answer, save }) => {
-        if (save && auto) {
-            localforage.setItem(key, klona(answer));
-        }
-    });
+    addNodeToContainer(h(ToolBox), toolbox);
 };
