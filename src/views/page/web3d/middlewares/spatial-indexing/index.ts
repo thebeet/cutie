@@ -6,7 +6,7 @@ import { injectPerformance } from './performance';
 import { measure } from '@/stores/performance';
 import { Points } from 'three';
 
-const useOctree = (points: Points) => {
+const buildOctree = (points: Points) => {
     const key = 'octree-' + points.geometry.uuid;
     return localforage.getItem<OctreeSerialization>(key).then((data) => {
         if (data) {
@@ -33,7 +33,7 @@ export const useMiddleware = () => {
     frames.forEach((frame) => {
         frame.onPointsLoaded.then(({ points }) => {
             frame.intersectDelegate = Bruteforce.fromPoints(points);
-            useOctree(points).then(octree => frame.intersectDelegate = octree);
+            buildOctree(points).then(octree => frame.intersectDelegate = octree);
         });
     });
 };

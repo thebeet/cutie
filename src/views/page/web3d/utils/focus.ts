@@ -1,5 +1,5 @@
 import { watch, Ref, ref, computed, nextTick } from 'vue';
-import { AElement } from '@web3d/types';
+import { AElement, RBox } from '@web3d/types';
 import * as THREE from 'three';
 import { useDrama } from '../hooks/drama';
 
@@ -21,14 +21,14 @@ export interface TFocusableEventMap extends THREE.Object3DEventMap {
 export const useFocus = <A extends AElement, T extends THREE.Object3D<TFocusableEventMap> & { apply: (t: A) => void, dispose: () => void }>(
     elements: Ref<A[]>, objs: Map<string, T>) => {
 
-    const focusedUUID = ref<string>();
+    const { focusedUUID } = useDrama();
     const focused = computed({
         get: () => elements.value.find(item => item.uuid === focusedUUID.value),
         set: (v) => focusedUUID.value = v?.uuid
     });
 
     const stop = watch(focused, (value, oldValue) => {
-        if (value && oldValue && value.uuid === oldValue.uuid) {
+        if (value?.uuid === oldValue?.uuid) {
             return;
         }
         if (oldValue) {
@@ -109,4 +109,20 @@ export const useSetFocusOnClick = <A extends AElement, T extends THREE.Object3D<
     return {
         stop
     } as const;
+};
+
+export const useSetThreeViewOnFocus = (focused: Ref<AElement & RBox | undefined>) => {
+    const { setupThreeView } = useDrama();
+    watch(() => focused.value?.uuid, () => {
+        if (focused.value) {
+            setupThreeView({
+                uuid: focused.value.uuid,
+                position: focused.value.position,
+                size: focused.value.size,
+                rotation: focused.value.rotation,
+            });
+        } else {
+            setupThreeView();
+        }
+    });
 };

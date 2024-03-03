@@ -3,8 +3,10 @@ import { RBox } from '@web3d/types';
 import { ref, watch } from 'vue';
 import { useAdvanceDrama } from '@web3d/hooks/drama';
 
+type RBoxWithUUID = RBox & { uuid: string };
+
 export const useThreeViewStore = defineStore('plugin::three-view', () => {
-    const inner = ref<RBox>();
+    const inner = ref<RBoxWithUUID>();
     const outer = ref<RBox>();
 
     const padding = 0.2;
@@ -13,12 +15,15 @@ export const useThreeViewStore = defineStore('plugin::three-view', () => {
     const { onThreeViewSetup, threeViewConfirmEventHook: confirmEventHook, threeViewChangeEventHook: changeEventHook } = useAdvanceDrama();
 
     watch(inner, (newValue) => {
-        changeEventHook.trigger(newValue);
+        if (newValue) {
+            changeEventHook.trigger(newValue);
+        }
     });
 
     const calcOuter = (innerBox: RBox): RBox => {
         return {
-            ...innerBox,
+            position: innerBox.position,
+            rotation: innerBox.rotation,
             size: {
                 x: innerBox.size.x * scale,
                 y: innerBox.size.y * scale,

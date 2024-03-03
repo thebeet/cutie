@@ -77,6 +77,8 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     const annotations = ref<Annotation<any>[]>([]);
     const operations = ref<Operation<any>[]>([]);
 
+    const focusedUUID = ref();
+
     watchEffect(() => {
         controls.enableRotate = mouseState.value === 'free';
     });
@@ -89,7 +91,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
             rightsidebar: rightsidebar as MaybeRefOrGetter<HTMLDivElement>,
             mouseEvent, mouseState, onAdvanceMouseEvent: mouseEventHook.on,
             frames, primaryFrame, activeFrames, selectFrame,
-            activeTool,
+            activeTool, focusedUUID,
             page, answer, applyOperation, onApplyOperation,
             operations, annotations,
             scene, camera,

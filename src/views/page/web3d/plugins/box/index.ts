@@ -1,5 +1,5 @@
 import { useDrama } from '@web3d/hooks/drama';
-import { h } from 'vue';
+import { h, nextTick, watch } from 'vue';
 import ToolBox from './components/ToolBox.vue';
 import InstanceDetail from './components/InstanceDetail.vue';
 import { addNodeToContainer } from '..';
@@ -10,7 +10,7 @@ import { useBoxStore } from './stores';
 import { ModifyBoxOperation } from './operations/ModifyBoxOperation';
 import { useHotkeys } from './hotkeys';
 import { useSync } from '@web3d/utils/sync';
-import { useSetFocusOnClick } from '@web3d/utils/focus';
+import { useSetFocusOnClick, useSetThreeViewOnFocus } from '@web3d/utils/focus';
 import { RBox } from '../../types';
 import { TBox } from './three/TBox';
 
@@ -26,6 +26,7 @@ export const usePlugin = () => {
 
     useSync(frames, elements, boxes, el => new TBox(el));
     useSetFocusOnClick(focused, boxes, (box: Readonly<TBox>) => box.box);
+    useSetThreeViewOnFocus(focused);
 
     const onThreeViewModify = (isConfirm: boolean) => (value: RBox) => {
         if (focused.value && value) {
@@ -45,12 +46,12 @@ export const usePlugin = () => {
         }
     });
 
-    onApplyOperation(({ operation }) => {
+    /*onApplyOperation(({ operation }) => {
         if (operation instanceof AddBoxOperation) {
             const o = operation as AddBoxOperation;
             focused.value = o.result;
         }
-    });
+    });*/
 
     useHotkeys();
 

@@ -18,8 +18,9 @@ import { GroupOperation } from '../../operator/Operation';
 import { boxAction } from './actions/box';
 import { useHotkeys } from './hotkeys';
 import { useSync } from '@web3d/utils/sync';
-import { useSetFocusOnClick } from '@web3d/utils/focus';
+import { useSetFocusOnClick, useSetThreeViewOnFocus } from '@web3d/utils/focus';
 import { TBox } from './three/TBox';
+import { RBox } from './types';
 
 const rectAction = measure('web3d::parsing::rect', _rectAction);
 const polylineAction = measure('web3d::parsing::polyline', _polylineAction);
@@ -28,15 +29,25 @@ export const usePlugin = () => {
     const {
         toolbox, container, rightsidebar, activeTool, frames, camera,
         applyOperation, onApplyOperation, onAdvanceMouseEvent,
+        onThreeViewChange, onThreeViewConfirm
     } = useDrama();
 
     const parsingStore = useParsingStore();
-    const { pointsMaterial, tboxes } = parsingStore;
+    const { pointsMaterial, tboxes, updateBox } = parsingStore;
     const { instances, boxes, focused, boxParsing } = storeToRefs(parsingStore);
     const { answer } = storeToRefs(useParsingAnswerStore());
 
     useSync(frames, boxes, tboxes, box => new TBox(box));
     useSetFocusOnClick(focused, tboxes, (box: Readonly<TBox>) => box.box);
+    useSetThreeViewOnFocus(focused);
+
+    const onThreeViewModify = (value: RBox & { uuid: string }) => {
+        if (focused.value?.uuid === value.uuid) {
+            updateBox(value);
+        }
+    };
+    onThreeViewChange(onThreeViewModify);
+    onThreeViewConfirm(onThreeViewModify);
 
     frames.forEach(frame => {
         frame.onPointsLoaded.then(({ points }) => {

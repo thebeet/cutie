@@ -29,6 +29,10 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
     const tboxes = new Map<string, TBox>([]);
     const { focused } = useFocus(boxes, tboxes);
 
+    const updateBox = (newBox: Partial<ParsingBox>) => {
+        boxes.value = boxes.value.map(box => (box.uuid === newBox.uuid) ? { ...box, ...newBox } : box);
+    };
+
     const pointsMaterial = new PointsLabelInstanceColorMaterial({ size: 1.0 });
 
     watch(() => answer.value.parsing?.instances, (answerInstances) => {
@@ -77,7 +81,7 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
 
     return {
         mainLabelID, brushRadius, boxParsing,
-        boxes, tboxes, focused,
+        boxes, tboxes, focused, updateBox,
         instances,
         pointsMaterial
     } as const;

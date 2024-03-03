@@ -1,13 +1,22 @@
+import { nextTick } from 'vue';
 import { RBox } from '../types';
 import { createEventHook } from '@vueuse/core';
 
 export const useThreeView = () => {
-    const setupEvent = createEventHook<RBox | undefined>();
-    const confirmEvent = createEventHook<RBox>();
-    const changeEvent = createEventHook<RBox>();
+    type RBoxWithUUID = RBox & { uuid: string };
 
-    const setup = (box?: RBox) => {
-        setupEvent.trigger(box);
+    const setupEvent = createEventHook<RBoxWithUUID | undefined>();
+    const confirmEvent = createEventHook<RBoxWithUUID>();
+    const changeEvent = createEventHook<RBoxWithUUID>();
+
+    const pending: Array<RBoxWithUUID | undefined> = [];
+    const setup = (box?: RBoxWithUUID) => {
+        pending.push(box);
+        nextTick(() => {
+            const box = pending.find(b => b !== undefined);
+            pending.splice(0, pending.length);
+            setupEvent.trigger(box);
+        });
     };
 
     return {
