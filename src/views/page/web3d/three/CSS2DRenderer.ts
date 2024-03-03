@@ -89,7 +89,7 @@ class CSS2DRenderer {
             css2dObject.element.style.display = visible ? '' : 'none';
 
             if (visible) {
-                css2dObject.element.style.transform = `translate(-50%,-50%) translate(${(this._vector.x * this._widthHalf) + this._widthHalf}px,${(-this._vector.y * this._heightHalf) + this._heightHalf}px)`;
+                css2dObject.element.style.transform = `translate(${-100 * css2dObject.center.x}%, ${-100 * css2dObject.center.y}%) translate(${(this._vector.x * this._widthHalf) + this._widthHalf}px,${(-this._vector.y * this._heightHalf) + this._heightHalf}px)`;
                 css2dObject.element.setAttribute('data-frame', frame);
 
                 if (!css2dObject.element.parentNode || css2dObject.element.parentNode !== this.domElement) {

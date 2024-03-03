@@ -16,16 +16,27 @@ import { useParsingAnswerStore } from './stores/answer';
 import { ParsingOperation } from './operations/ParsingOperation';
 import { GroupOperation } from '../../operator/Operation';
 import { boxAction } from './actions/box';
+import { useHotkeys } from './hotkeys';
+import { useSync } from '@web3d/utils/sync';
+import { useSetFocusOnClick } from '@web3d/utils/focus';
+import { TBox } from './three/TBox';
+
 const rectAction = measure('web3d::parsing::rect', _rectAction);
 const polylineAction = measure('web3d::parsing::polyline', _polylineAction);
 
 export const usePlugin = () => {
-    const { toolbox, container, rightsidebar, activeTool, frames, camera,
-        applyOperation, onApplyOperation, onAdvanceMouseEvent } = useDrama();
-    const { pointsMaterial } = useParsingStore();
-    const { instances, box, boxParsing } = storeToRefs(useParsingStore());
+    const {
+        toolbox, container, rightsidebar, activeTool, frames, camera,
+        applyOperation, onApplyOperation, onAdvanceMouseEvent,
+    } = useDrama();
 
+    const parsingStore = useParsingStore();
+    const { pointsMaterial, tboxes } = parsingStore;
+    const { instances, boxes, focused, boxParsing } = storeToRefs(parsingStore);
     const { answer } = storeToRefs(useParsingAnswerStore());
+
+    useSync(frames, boxes, tboxes, box => new TBox(box));
+    useSetFocusOnClick(focused, tboxes, (box: Readonly<TBox>) => box.box);
 
     frames.forEach(frame => {
         frame.onPointsLoaded.then(({ points }) => {
@@ -52,7 +63,10 @@ export const usePlugin = () => {
         if (activeTool.value === 'parsing') {
             if (event.type === 'rected') {
                 if (boxParsing.value) {
-                    box.value = boxAction(event.points, camera);
+                    const newBox = boxAction(event.points, camera);
+                    if (newBox) {
+                        boxes.value = [...boxes.value, newBox];
+                    }
                     return;
                 }
                 const operation = rectAction(event.points, camera);
@@ -77,6 +91,8 @@ export const usePlugin = () => {
             (operation as GroupOperation).forEach((op) => (op as ParsingOperation).effect(instances.value));
         }
     });
+
+    useHotkeys();
 
     addNodeToContainer(h(ToolBox), toolbox);
     addNodeToContainer(h(MouseActionDebugView), container);

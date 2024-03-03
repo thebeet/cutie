@@ -4,6 +4,8 @@ import { TFrame } from '@web3d/three/TFrame';
 import * as THREE from 'three';
 import { ABox } from '../types';
 
+const ESP = 1e-6;
+
 export class AddBoxOperation implements Operation {
     private points: [TFrame, number[]][];
     readonly frame: TFrame;
@@ -87,9 +89,9 @@ export class AddBoxOperation implements Operation {
                 z: center.z,
             },
             size: {
-                x: size.x,
-                y: size.y,
-                z: size.z,
+                x: size.x + ESP,
+                y: size.y + ESP,
+                z: size.z + ESP,
             }
         };
         answer.elements.push(this.result);

@@ -1,12 +1,11 @@
+import * as BaseType from '@web3d/types';
 export * from '@web3d/types';
-import { AnswerContent as BaseAnswerContent } from '@web3d/types';
 
 export type ParsingInstance = ParsingAnswerInstance & {
     visible: boolean
     lock: boolean
     counts: number[]
 };
-
 
 export type ParsingAnswerInstance = {
     readonly id: number
@@ -24,6 +23,8 @@ export type ParsingAnswerResult = {
     }[]
 }
 
-export interface AnswerContent extends BaseAnswerContent {
+export interface AnswerContent extends BaseType.AnswerContent {
     parsing: ParsingAnswerResult
 }
+
+export type ParsingBox = BaseType.AElement & BaseType.RBox;

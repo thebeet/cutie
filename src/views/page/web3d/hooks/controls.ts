@@ -6,7 +6,7 @@ export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.minPolarAngle = 0;
     controls.maxPolarAngle = Math.PI / 2;
-    controls.maxDistance = 1000;
+    controls.maxDistance = 2000;
     controls.minDistance = 1;
     controls.screenSpacePanning = false;
     controls.zoomToCursor = true;

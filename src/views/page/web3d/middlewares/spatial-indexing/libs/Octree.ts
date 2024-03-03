@@ -81,17 +81,18 @@ export class Octree {
     /**
      * 通过回调函数返回当前节点下所有在box范围内的点
      *
-     * @param {THREE.Box3} obj - 待判断的box对象，包含min和max属性
+     * @param {IntersectAbleObject} obj - 待判断的box对象，包含min和max属性
      * @param {Function} callback - 回调函数，接收参数为点
      */
     intersect(obj: IntersectAbleObject, callback: (point: Vector3, i: number) => void) {
         if (!obj.intersectsBox(this.box)) {
             return;
         }
-        if ((obj as Box3).isBox3 && (obj as Box3).containsBox(this.box)) {
+        if (this.inside(obj)) {
             this.forEachPoint(callback);
             return;
         }
+
         if (this.subTrees.length === 0) {
             this.forEachPoint((point: Vector3, i: number) => {
                 if (obj.containsPoint(point)) {
@@ -105,6 +106,22 @@ export class Octree {
         }
     }
 
+    /**
+     * 判断当前节点的包围盒全部在给定对象内
+     *
+     * @param {IntersectAbleObject} obj 给定的对象，必须是凸对象
+     * @returns 如果当前节点的包围盒全部在给定对象内，则返回true；否则返回false
+     */
+    inside(obj: IntersectAbleObject) {
+        for (let i = 0; i < 8; i++) {
+            _v1.copy(this.box.min);
+            if (i & 1) _v1.x = this.box.max.x;
+            if (i & 2) _v1.y = this.box.max.y;
+            if (i & 4) _v1.z = this.box.max.z;
+            if (!obj.containsPoint(_v1)) return false;
+        }
+        return true;
+    }
 
     /**
      * 通过回调函数返回所有与射线距离小于d的点

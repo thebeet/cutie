@@ -1,14 +1,12 @@
 import { useDrama } from '@web3d/hooks/drama';
-
 import localforage from 'localforage';
 import { Octree, OctreeSerialization } from './libs/Octree';
-
 import { Bruteforce } from './libs/Bruteforce';
-
 import { injectPerformance } from './performance';
 import { measure } from '@/stores/performance';
+import { Points } from 'three';
 
-const useOctree = (points: THREE.Points) => {
+const useOctree = (points: Points) => {
     const key = 'octree-' + points.geometry.uuid;
     return localforage.getItem<OctreeSerialization>(key).then((data) => {
         if (data) {

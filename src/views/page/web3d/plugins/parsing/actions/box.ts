@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import { useDrama } from '@web3d/hooks/drama';
 import { TFrame } from '@web3d/three/TFrame';
+import { ParsingBox, ParsingInstance } from '../types';
+import { frustumFromRBox } from '@web3d/utils/frustum';
+import { ParsingOperation } from '../operations/ParsingOperation';
+
+const ESP = 1e-6;
 
 const getPlane = (points: THREE.Vector2[], camera: THREE.Camera): THREE.Plane[] => {
     return points.map(point => {
@@ -40,7 +45,7 @@ const rectAction = (points: readonly {x: number, y: number}[], camera: THREE.Cam
     const results: [TFrame, number[]][] = [];
     activeFrames.value.forEach(frame => {
         const result: number[] = [];
-        const matInv = frame.points!.matrixWorld.clone().invert();
+        const matInv = frame.matrixWorld.clone().invert();
         const frustumForFrame = frustum.clone();
 
         frustumForFrame.planes.forEach(p => {
@@ -73,7 +78,7 @@ const computeBoundingBox = (frame: TFrame, index: number[], rotation: THREE.Eule
     return box;
 };
 
-export const boxAction = (points: readonly {x: number, y: number}[], camera: THREE.Camera): RBox => {
+export const boxAction = (points: readonly {x: number, y: number}[], camera: THREE.Camera): ParsingBox | null => {
     const { primaryFrame } = useDrama();
     const rotation = new THREE.Euler(0, 0, camera.rotation.z);
     const intersect = rectAction(points, camera);
@@ -84,6 +89,9 @@ export const boxAction = (points: readonly {x: number, y: number}[], camera: THR
         new THREE.Vector3(Infinity, Infinity, Infinity),
         new THREE.Vector3(-Infinity, -Infinity, -Infinity)
     ));
+    if (unionBox.min.x === Infinity) {
+        return null;
+    }
     const center = new THREE.Vector3();
     const size = new THREE.Vector3();
     unionBox.getCenter(center);
@@ -92,15 +100,21 @@ export const boxAction = (points: readonly {x: number, y: number}[], camera: THR
     center.applyQuaternion(quaternion);
     center.applyMatrix4(primaryFrame.value.matrixWorld.clone().invert());
     const bBox = {
+        uuid: THREE.MathUtils.generateUUID(),
+        type: 'box',
+        schema: 'box',
+        frameIndex: 0,
+        label: '',
+        description: '',
         position: {
             x: center.x,
             y: center.y,
             z: center.z
         },
         size: {
-            x: size.x,
-            y: size.y,
-            z: size.z
+            x: size.x + ESP,
+            y: size.y + ESP,
+            z: size.z + ESP
         },
         rotation: {
             x: rotation.x,
@@ -109,4 +123,30 @@ export const boxAction = (points: readonly {x: number, y: number}[], camera: THR
         }
     };
     return bBox;
+};
+
+export const makeOperationFromBoxes = (frames: TFrame[], boxes: ParsingBox[], mainLabelID: number, instances: ParsingInstance[]) => {
+    const intersectPoints: [TFrame, number[]][] = [];
+    boxes.forEach(box => {
+        const frustum = frustumFromRBox(box);
+        frames.forEach(frame => {
+            const result: number[] = [];
+            const matInv = frame.matrixWorld.clone().invert();
+            const frustumForFrame = frustum.clone();
+
+            frustumForFrame.planes.forEach(p => {
+                p.applyMatrix4(matInv);
+            });
+            frame.intersect(frustumForFrame, (_, index) => {
+                result.push(index);
+            });
+            if (result.length > 0) {
+                intersectPoints.push([frame, result]);
+            }
+        });
+    });
+    if (intersectPoints.length === 0) {
+        return null;
+    }
+    return new ParsingOperation(mainLabelID, intersectPoints, instances);
 };

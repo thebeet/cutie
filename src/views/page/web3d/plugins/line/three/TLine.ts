@@ -57,6 +57,7 @@ export class TLine extends THREE.Object3D<TLineEventMap> {
 
     raycast(raycaster: THREE.Raycaster, intersects: THREE.Intersection[]) {
         const innerIntersect = [] as THREE.Intersection[];
+        this.lines.raycast(raycaster, innerIntersect);
         if (innerIntersect.length > 0) {
             innerIntersect[0].object = this;
             intersects.push(innerIntersect[0]);

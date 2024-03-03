@@ -6,7 +6,7 @@ import { shallowRef } from 'vue';
 export const useFrame = (scene: THREE.Scene) => {
     const { page } = usePageStore();
     const frame0 = new TFrame(0);
-    frame0.visible = false;
+    frame0.visible = true;
     const frames = [frame0, ...page!.data.frames.map(frameData => {
         const frame = new TFrame(frameData.index);
         frame.visible = false;
@@ -22,8 +22,8 @@ export const useFrame = (scene: THREE.Scene) => {
     const activeFrames = shallowRef<TFrame[]>([]);
     const primaryFrame = shallowRef<TFrame>(frame0);
     const selectFrame = (id: number | number[]) => {
-        for (const frame of frames) {
-            frame.visible = false;
+        for (let i = 1; i < frames.length; i++) {
+            frames[i].visible = false;
         }
         if (id instanceof Array) {
             const ids = id as number[];

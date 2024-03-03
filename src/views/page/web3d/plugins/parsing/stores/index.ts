@@ -5,46 +5,18 @@ import _ from 'lodash';
 import { useDrama } from '@web3d/hooks/drama';
 import * as THREE from 'three';
 import { useParsingAnswerStore } from './answer';
-import { ParsingInstance, RBox } from '../types';
+import { ParsingBox, ParsingInstance } from '../types';
 import { rbox2Matrix } from '@web3d/utils/rbox';
 import { TBox } from '../three/TBox';
+import { useFocus } from '@web3d/utils/focus';
 
 export const useParsingStore = defineStore('plugin::parsing', () => {
     const mainLabelID = ref(1);
     const brushRadius = ref(0.01);
     const boxParsing = ref(false);
 
-    const { scene, frames, setupThreeView, onThreeViewChange } = useDrama();
+    const { scene, frames } = useDrama();
     const { answer } = storeToRefs(useParsingAnswerStore());
-
-    const box = ref<RBox>();
-    let tbox: TBox;
-
-    watch(box, (value, oldValue) => {
-        if (value) {
-            if (!tbox) {
-                tbox = new TBox(value);
-            } else {
-                tbox.apply(value);
-                scene.update();
-            }
-            if (!tbox.parent) {
-                frames[1].add(tbox);
-            }
-            if (oldValue === undefined) {
-                setupThreeView(value);
-            }
-        }
-    });
-
-    onThreeViewChange((newValue) => {
-        if (box.value) {
-            box.value = newValue;
-        }
-    });
-
-
-    const pointsMaterial = new PointsLabelInstanceColorMaterial({ size: 1.0 });
 
     const instanceStates = ref<{
         lock: boolean
@@ -52,6 +24,12 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
     }[]>([]);
     const instanceCounts = ref<number[][]>([]);
     const instances = ref<ParsingInstance[]>([]);
+
+    const boxes = ref<ParsingBox[]>([]);
+    const tboxes = new Map<string, TBox>([]);
+    const { focused } = useFocus(boxes, tboxes);
+
+    const pointsMaterial = new PointsLabelInstanceColorMaterial({ size: 1.0 });
 
     watch(() => answer.value.parsing?.instances, (answerInstances) => {
         if (instanceCounts.value.length === 0) {
@@ -82,20 +60,24 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
             const color = new THREE.Color(c.color);
             return [color.r, color.g, color.b, c.visible ? 1.0 : 0.0];
         }));
-        if (box.value) {
-            pointsMaterial.uniforms.previewBox.value = true;
+        pointsMaterial.uniforms.previewBoxCount.value = Math.min(boxes.value.length, 64);
+        if (boxes.value.length > 0) {
             const color = new THREE.Color(instances.value[mainLabelID.value].color);
             pointsMaterial.uniforms.previewColor.value = [color.r, color.g, color.b, instances.value[mainLabelID.value].visible ? 1.0 : 0.0];
-            pointsMaterial.uniforms.previewBoxMatrix.value = rbox2Matrix(box.value).invert();
-        } else {
-            pointsMaterial.uniforms.previewBox.value = false;
+            const mats = boxes.value.map(box => rbox2Matrix(box).invert());
+            for (let i = mats.length; i < 64; i++) {
+                mats.push(new THREE.Matrix4());
+            }
+            pointsMaterial.uniforms.previewBoxMatrixs.value = mats.slice(0, 64);
+            pointsMaterial.uniforms.instanceLock.value = instances.value.map(i => i.lock ? 1 : 0);
         }
         pointsMaterial.uniformsNeedUpdate = true;
         scene.update();
     });
 
     return {
-        mainLabelID, brushRadius, box, boxParsing,
+        mainLabelID, brushRadius, boxParsing,
+        boxes, tboxes, focused,
         instances,
         pointsMaterial
     } as const;

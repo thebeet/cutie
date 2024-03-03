@@ -42,14 +42,16 @@ export const drawRect = (
     useEventListener(dom, 'mouseup', condition((event: MouseEvent) => {
         if (recting) {
             recting = false;
-            const { x, y } = usePos(event, toValue(dom));
-            const { x: prevX, y: prevY } = mouseEvent.value.points[0];
-            if (((x - prevX) * (x - prevX) > ESP) && ((y - prevY) * (y - prevY) > ESP)) {
-                mouseEvent.value.type = 'rected';
-                mouseEvent.value.points[1] = { x, y };
-                eventHook.trigger(mouseEvent.value);
+            if (event.button === 0) {
+                const { x, y } = usePos(event, toValue(dom));
+                const { x: prevX, y: prevY } = mouseEvent.value.points[0];
+                if (((x - prevX) * (x - prevX) > ESP) && ((y - prevY) * (y - prevY) > ESP)) {
+                    mouseEvent.value.type = 'rected';
+                    mouseEvent.value.points[1] = { x, y };
+                    eventHook.trigger(mouseEvent.value);
+                }
             } else {
-                recting = false;
+                mouseEvent.value.type = 'deprecated';
             }
         }
     }));

@@ -96,8 +96,14 @@ export class TBox extends THREE.Object3D<TBoxEventMap> {
         const innerIntersect = [] as THREE.Intersection[];
         this._mesh.raycast(raycaster, innerIntersect);
         if (innerIntersect.length > 0) {
-            innerIntersect[0].object = this;
-            intersects.push(innerIntersect[0]);
+            let intersect = innerIntersect[0];
+            for (let i = 1; i < innerIntersect.length; i++) {
+                if (innerIntersect[i].distance < intersect.distance) {
+                    intersect = innerIntersect[i];
+                }
+            }
+            intersect.object = this;
+            intersects.push(intersect);
         }
     }
 

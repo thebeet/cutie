@@ -28,6 +28,9 @@ export const usePerformanceStore = defineStore('performance', () => {
                 spans: []
             };
         }
+        if (performances.value[key].spans.length >= 20) {
+            performances.value[key].spans.splice(0, performances.value[key].spans.length - 19);
+        }
         performances.value[key].spans.push(span);
         return {
             done: () => {

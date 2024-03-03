@@ -15,7 +15,6 @@ import { TFrame } from '@web3d/three/TFrame';
  */
 export const useSync = <A extends AElement, T extends THREE.Object3D & { apply: (t: A) => void, dispose: () => void }>(
     frames: TFrame[], elements: Ref<A[]>, objs: Map<string, T>, create: (a: A) => T) => {
-
     const stop = watch(elements, (newValue) => {
         if (newValue) {
             const used: Map<string, boolean> = new Map([]);
