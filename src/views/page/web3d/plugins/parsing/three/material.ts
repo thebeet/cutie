@@ -47,7 +47,7 @@ export class PointsLabelInstanceColorMaterial extends RawShaderMaterial {
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 v_color = instanceColor[clamp(label, 0, 255)];
                 if (previewBoxCount > 0) {
-                    bool inBox = instanceLock[clamp(label, 0, 255)] != 0;
+                    bool inBox = false;
                     vec4 p_inbox;
                     int n = clamp(previewBoxCount, 0, 64);
                     for (int i = 0; i < n; i++) {
@@ -55,7 +55,7 @@ export class PointsLabelInstanceColorMaterial extends RawShaderMaterial {
                         inBox = inBox || (p_inbox.x <= .5 && p_inbox.y <= .5 && p_inbox.z <= .5
                             && p_inbox.x >= -.5 && p_inbox.y >= -.5 && p_inbox.z >= -.5);
                     }
-                    if (inBox) {
+                    if (inBox && (instanceLock[clamp(label, 0, 255)] == 0)) {
                         gl_PointSize = pointSize * 2.;
                         v_color = previewColor;
                     }
