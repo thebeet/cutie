@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite';
-import glob from 'glob';
 import { URL, fileURLToPath } from 'node:url';
 import vue from '@vitejs/plugin-vue';
 
@@ -26,33 +25,18 @@ export default defineConfig({
         }
     },
     build: {
+        chunkSizeWarningLimit: 1024,
         rollupOptions: {
+            cache: false,
+            input: 'index.html',
             output: {
-                manualChunks: {
-                    'index': ['index.html'],
-                    ...Object.fromEntries(glob.sync('src/views/page/*/PageView.vue').map((file: string) => {
-                        const template = file.slice('src/views/page/'.length, -'/PageView.vue'.length);
-                        return [
-                            'page-' + template,
-                            [file]
-                        ];
-                    })),
-                    ...Object.fromEntries(glob.sync('src/views/page/web3d/plugins/*/index.ts').map((file: string) => {
-                        const template = file.slice('src/views/page/web3d/plugins/'.length, -'/index.ts'.length);
-                        return [
-                            'web3d-plugin-' + template,
-                            [file]
-                        ];
-                    })),
-                    ...Object.fromEntries(glob.sync('src/views/page/web3d/middlewares/*/index.ts').map((file: string) => {
-                        const template = file.slice('src/views/page/web3d/middlewares/'.length, -'/index.ts'.length);
-                        return [
-                            'web3d-middleware-' + template,
-                            [file]
-                        ];
-                    }))
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        return 'vendor';
+                    }
+                    return 'index';
                 }
-            }
+            },
         }
     }
 });

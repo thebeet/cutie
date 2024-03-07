@@ -1,4 +1,4 @@
-import { ref, readonly, nextTick } from 'vue';
+import { shallowRef, readonly, nextTick } from 'vue';
 import { AnswerContent } from '../types';
 import { GroupOperation, Operation } from '../operator/Operation';
 import { defineStore } from 'pinia';
@@ -6,7 +6,7 @@ import { Composer } from 'middleware-io';
 import { createEventHook } from '@vueuse/core';
 
 export const useAnswerStore = defineStore('answer', () => {
-    const answer = ref<AnswerContent>({
+    const answer = shallowRef<AnswerContent>({
         elements: []
     });
 
@@ -28,6 +28,7 @@ export const useAnswerStore = defineStore('answer', () => {
     composedApplyOperation.use(async (ctx, next) => {
         await next();
         ctx.answer = ctx.operation.apply(ctx.answer);
+        answer.value = ctx.answer;
         applyOperationEvent.trigger({ answer: ctx.answer, operation: ctx.operation, save: ctx.save });
     });
     const ops: Operation[] = [];

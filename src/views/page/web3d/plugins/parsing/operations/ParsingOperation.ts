@@ -20,22 +20,29 @@ export class ParsingOperation {
     }
 
     apply(answer: AnswerContent): AnswerContent {
-        this.points.forEach(([frame, points], index) => {
-            const label = answer.parsing.frames[frame.index].label;
-            points.forEach((pid) => {
-                const c = label[pid];
-                if (!this.instances[c].lock && (c !== this.labelID)) {
-                    this.change[index][c].push(pid);
-                    label[pid] = this.labelID;
-                }
-            });
-            const labelAttr = frame.points?.geometry?.getAttribute('label');
-            if (labelAttr) {
-                labelAttr.needsUpdate = true;
+        const frameMap = new Map(this.points.map(([frame, points], oid) => [frame.index, [frame, oid, points] as const]));
+        return { ...answer,
+            parsing: {
+                ...answer.parsing,
+                frames: answer.parsing.frames.map(({ index, label }) => {
+                    const [frame, oid, points] = frameMap.get(index) ?? [undefined, 0, [] as number[]];
+                    if (frame) {
+                        const newLabel = new Int32Array(label);
+                        points.forEach(pid => {
+                            const c = newLabel[pid];
+                            if (!this.instances[c].lock && (c !== this.labelID)) {
+                                this.change[oid][c].push(pid);
+                                newLabel[pid] = this.labelID;
+                            }
+                        });
+                        frame.update();
+                        return { index, label: newLabel };
+                    } else {
+                        return { index, label };
+                    }
+                }),
             }
-            frame.update();
-        });
-        return answer;
+        };
     }
 
     effect(instances: ParsingInstance[]) {

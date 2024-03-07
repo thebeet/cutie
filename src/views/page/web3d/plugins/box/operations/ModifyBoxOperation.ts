@@ -15,15 +15,8 @@ export class ModifyBoxOperation implements Operation {
     }
 
     apply(answer: AnswerContent): AnswerContent {
-        for (let i = 0; i < answer.elements.length; i++) {
-            if (answer.elements[i].uuid === this.uuid) {
-                answer.elements[i] = {
-                    ...answer.elements[i],
-                    ...this.newValue
-                };
-                break;
-            }
-        }
-        return answer;
+        const elements = answer.elements.map(item =>
+            (item.uuid === this.uuid) ? { ...item, ...this.newValue } : item);
+        return { ...answer, elements };
     }
 }

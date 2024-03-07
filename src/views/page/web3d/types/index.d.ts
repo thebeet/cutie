@@ -40,11 +40,11 @@ export interface AElement {
 };
 
 export interface AnswerContent {
-    elements: AElement[]
+    readonly elements: readonly AElement[]
 }
 
 export interface Response {
     readonly id: number
-    expire: number
-    createdAt: Date
+    readonly expire: number
+    readonly createdAt: Date
 }

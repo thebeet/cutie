@@ -2,7 +2,6 @@ import { defineStore, storeToRefs } from 'pinia';
 import { useAnswerStore } from '@web3d/stores/answer';
 import { useManualRefHistory } from '@vueuse/core';
 import { AnswerContent } from '@web3d/types';
-import { klona } from 'klona';
 import { shallowRef } from 'vue';
 import { Operation } from '@web3d/operator/Operation';
 
@@ -14,7 +13,6 @@ export const useAnswerHistoryStore = defineStore('plugin::answer-history', () =>
     const { onSetupAnswer, onApplyOperation } = answerStore;
     const { history, commit, undo, redo, clear, canUndo, canRedo } = useManualRefHistory<AnswerContent>(originAnswer, {
         capacity: MAX_HISTORY_COUNT,
-        clone: klona
     });
     const operations = shallowRef<Operation[]>([]);
 
@@ -31,7 +29,10 @@ export const useAnswerHistoryStore = defineStore('plugin::answer-history', () =>
     });
 
     const reset = () => {
-        originAnswer.value.elements = [];
+        originAnswer.value = {
+            ...originAnswer.value,
+            elements: []
+        };
         clear();
     };
 

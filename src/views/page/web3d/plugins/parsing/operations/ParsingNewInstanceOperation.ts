@@ -15,13 +15,18 @@ export class ParsingNewInstanceOperation {
 
     apply(answer: AnswerContent): AnswerContent {
         const id = answer.parsing.instances.length;
-        answer.parsing!.instances.push({
-            id,
-            kind: this.kind,
-            name: this.name,
-            description: this.description,
-            color: this.color,
-        });
-        return answer;
+        return {
+            ...answer,
+            parsing: {
+                ...answer.parsing,
+                instances: [...answer.parsing.instances, {
+                    id,
+                    kind: this.kind,
+                    name: this.name,
+                    description: this.description,
+                    color: this.color,
+                }],
+            }
+        };
     }
 }

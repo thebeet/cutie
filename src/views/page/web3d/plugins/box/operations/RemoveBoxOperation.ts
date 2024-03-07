@@ -14,7 +14,9 @@ export class RemoveBoxOperation implements Operation {
     }
 
     apply(answer: AnswerContent): AnswerContent {
-        answer.elements = answer.elements.filter(element => element.uuid !== this.box.uuid);
-        return answer;
+        return {
+            ...answer,
+            elements: answer.elements.filter(element => element.uuid !== this.box.uuid)
+        };
     }
 }

@@ -4,27 +4,27 @@ export * from '@web3d/types';
 export type ParsingInstance = ParsingAnswerInstance & {
     visible: boolean
     lock: boolean
-    counts: number[]
+    readonly counts: number[]
 };
 
 export type ParsingAnswerInstance = {
     readonly id: number
-    kind: string
-    name: string
-    description: string
-    color: string
+    readonly kind: string
+    readonly name: string
+    readonly description: string
+    readonly color: string
 }
 
 export type ParsingAnswerResult = {
-    instances: ParsingAnswerInstance[]
-    frames: {
-        index: number
-        label: Int32Array
+    readonly instances: readonly ParsingAnswerInstance[]
+    readonly frames: {
+        readonly index: number
+        readonly label: Int32Array
     }[]
 }
 
 export interface AnswerContent extends BaseType.AnswerContent {
-    parsing: ParsingAnswerResult
+    readonly parsing: ParsingAnswerResult
 }
 
 export type ParsingBox = BaseType.AElement & BaseType.RBox;

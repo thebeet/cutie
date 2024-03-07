@@ -94,7 +94,9 @@ export class AddBoxOperation implements Operation {
                 z: size.z + ESP,
             }
         };
-        answer.elements.push(this.result);
-        return answer;
+        return {
+            ...answer,
+            elements: [...answer.elements, this.result]
+        };
     }
 }

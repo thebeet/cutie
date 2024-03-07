@@ -14,7 +14,13 @@ export class ParsingInstanceModifyColorOperation {
     }
 
     apply(answer: AnswerContent): AnswerContent {
-        answer.parsing.instances[this.id].color = this.color;
-        return answer;
+        return {
+            ...answer,
+            parsing: {
+                ...answer.parsing,
+                instances: answer.parsing.instances.map(instance => instance.id === this.id ?
+                    { ...instance, color: this.color } : instance),
+            }
+        };
     }
 }

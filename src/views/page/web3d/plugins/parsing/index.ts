@@ -27,6 +27,7 @@ const polylineAction = measure('web3d::parsing::polyline', _polylineAction);
 
 export const usePlugin = () => {
     const {
+        scene,
         toolbox, container, rightsidebar, activeTool, frames, camera,
         applyOperation, onApplyOperation, onAdvanceMouseEvent,
         onThreeViewChange, onThreeViewConfirm
@@ -65,6 +66,7 @@ export const usePlugin = () => {
                 const labelAttribute = geometry.getAttribute('label');
                 if (labelAttribute.array !== frame.label) {
                     geometry.setAttribute('label', new THREE.BufferAttribute(frame.label, 1));
+                    scene.update();
                 }
             }
         });
