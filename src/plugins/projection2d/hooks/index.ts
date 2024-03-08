@@ -4,7 +4,7 @@ import PinholeCamera from '../libs/PinholeCamera';
 import { FisheyeDistortionShader as FisheyeDistortionShaderPreCalc, computeFisheyeLUT, FisheyeCoefficients } from '../libs/FisheyeDistortionPreCalc';
 import { FisheyeDistortionShader } from '../libs/FisheyeDistortion';
 import { PinholeDistortionShader } from '../libs/PinholeDistortion';
-import { CameraParams } from '@web3d/types/camera';
+import { CameraParams } from '@web3d/types';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';

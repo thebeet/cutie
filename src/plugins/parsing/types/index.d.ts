@@ -1,6 +1,5 @@
 import * as BaseType from '@web3d/types';
 export type * from '@web3d/types';
-export type * from '@web3d/types/shape';
 
 export type ParsingInstance = ParsingAnswerInstance & {
     visible: boolean
