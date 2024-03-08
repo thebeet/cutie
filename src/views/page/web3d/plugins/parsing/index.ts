@@ -1,4 +1,4 @@
-import { watchEffect, h } from 'vue';
+import { watchEffect, h, watch } from 'vue';
 import { useDrama } from '@web3d/hooks/drama';
 import { measure } from '@/stores/performance';
 import { useParsingStore } from './stores';
@@ -18,7 +18,7 @@ import { GroupOperation } from '../../operator/Operation';
 import { boxAction } from './actions/box';
 import { useHotkeys } from './hotkeys';
 import { useSync } from '@web3d/utils/sync';
-import { useSetFocusOnClick, useSetThreeViewOnFocus } from '@web3d/utils/focus';
+import { useSetFocusOnClick } from '@web3d/utils/focus';
 import { TBox } from './three/TBox';
 import { RBox } from './types';
 
@@ -30,7 +30,7 @@ export const usePlugin = () => {
         scene,
         toolbox, container, rightsidebar, activeTool, frames, camera,
         applyOperation, onApplyOperation, onAdvanceMouseEvent,
-        onThreeViewChange, onThreeViewConfirm
+        setupThreeView, onThreeViewChange, onThreeViewConfirm
     } = useDrama();
 
     const parsingStore = useParsingStore();
@@ -38,9 +38,9 @@ export const usePlugin = () => {
     const { instances, boxes, focused, boxParsing } = storeToRefs(parsingStore);
     const { answer } = storeToRefs(useParsingAnswerStore());
 
-    useSync(frames, boxes, tboxes, box => new TBox(box));
+    useSync(frames, boxes, tboxes, box => new TBox(box), (box, el) => box.apply(el), box => box.dispose());
     useSetFocusOnClick(focused, tboxes, (box: Readonly<TBox>) => box.box);
-    useSetThreeViewOnFocus(focused);
+    watch(focused, setupThreeView);
 
     const onThreeViewModify = (value: RBox & { uuid: string }) => {
         if (focused.value?.uuid === value.uuid) {

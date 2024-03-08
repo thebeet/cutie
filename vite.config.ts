@@ -3,7 +3,7 @@ import { URL, fileURLToPath } from 'node:url';
 import vue from '@vitejs/plugin-vue';
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
     plugins: [vue({
         template: {
             compilerOptions: {
@@ -24,6 +24,7 @@ export default defineConfig({
         proxy: {
         }
     },
+    publicDir: command === 'serve' ? 'public' : false,
     build: {
         chunkSizeWarningLimit: 1024,
         rollupOptions: {
@@ -39,4 +40,4 @@ export default defineConfig({
             },
         }
     }
-});
+}));

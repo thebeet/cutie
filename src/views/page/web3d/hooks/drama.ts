@@ -1,5 +1,5 @@
 import { ref, watchEffect, MaybeRefOrGetter } from 'vue';
-import { Annotation, AnswerContent, Operation } from '@web3d/types';
+import { AnswerContent } from '@web3d/types';
 import { useScene } from '@web3d/hooks/scene';
 import { usePCDCachedLoader } from '@web3d/hooks/loader';
 import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';

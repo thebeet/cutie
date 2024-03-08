@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { RBox } from '@web3d/types';
 import { useBoxHelper } from '../hooks/boxHelper';
 import * as THREE from 'three';
@@ -124,10 +124,12 @@ const rotateControlPoint = (event: MouseEvent) => {
 };
 
 const deselectControlPoint = () => {
-    isChanging.value[props.name] = false;
-    selectedControlPoint.value = undefined;
-    initialRotatePosition.value = undefined;
-    emits('confirm', modelValue.value);
+    if (isChanging.value[props.name]) {
+        isChanging.value[props.name] = false;
+        selectedControlPoint.value = undefined;
+        initialRotatePosition.value = undefined;
+        emits('confirm', modelValue.value);
+    }
 };
 
 const rotatePointMouseMove = (event: MouseEvent) => {
@@ -217,6 +219,10 @@ const mouseMove = (event: MouseEvent) => {
         modelValue.value = setBoxPositionAndSize(modelValue.value, delta);
     }
 };
+
+onMounted(() => {
+    isChanging.value[props.name] = false;
+});
 </script>
 
 <style scope>

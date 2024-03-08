@@ -1,5 +1,5 @@
 import { useDrama } from '@web3d/hooks/drama';
-import { h } from 'vue';
+import { h, watch } from 'vue';
 import ToolBox from './components/ToolBox.vue';
 import InstanceDetail from './components/InstanceDetail.vue';
 import { addNodeToContainer } from '..';
@@ -9,33 +9,37 @@ import { storeToRefs } from 'pinia';
 import { useBoxStore } from './stores';
 import { ModifyBoxOperation } from './operations/ModifyBoxOperation';
 import { useHotkeys } from './hotkeys';
-import { useSync } from '@web3d/utils/sync';
-import { useSetFocusOnClick, useSetThreeViewOnFocus } from '@web3d/utils/focus';
+import { useSetFocusOnClick } from '@web3d/utils/focus';
 import { RBox } from '../../types';
 import { TBox } from './three/TBox';
 
 export const usePlugin = () => {
     const { activeTool, toolbox, rightsidebar,
-        frames, camera, primaryFrame,
-        onThreeViewChange, onThreeViewConfirm,
+        camera, primaryFrame,
+        setupThreeView, onThreeViewChange, onThreeViewConfirm,
         onAdvanceMouseEvent,
         applyOperation } = useDrama();
     const boxesStore = useBoxStore();
-    const { elements, focused } = storeToRefs(boxesStore);
+    const { focused, draft } = storeToRefs(boxesStore);
     const { boxes } = boxesStore;
 
-    useSync(frames, elements, boxes, el => new TBox(el));
     useSetFocusOnClick(focused, boxes, (box: Readonly<TBox>) => box.box);
-    useSetThreeViewOnFocus(focused);
+    watch(focused, setupThreeView);
 
-    const onThreeViewModify = (isConfirm: boolean) => (value: RBox) => {
-        if (focused.value && value) {
-            const op = new ModifyBoxOperation(focused.value.uuid, value);
-            applyOperation(op, isConfirm);
+    onThreeViewChange((value: RBox) => {
+        if (focused.value) {
+            draft.value = {
+                ...focused.value,
+                ...value
+            };
         }
-    };
-    onThreeViewChange(onThreeViewModify(false));
-    onThreeViewConfirm(onThreeViewModify(true));
+    });
+    onThreeViewConfirm((value: RBox) => {
+        if (focused.value) {
+            const op = new ModifyBoxOperation(focused.value.uuid, value);
+            applyOperation(op);
+        }
+    });
 
     onAdvanceMouseEvent((event) => {
         if (activeTool.value === 'rect' && event.type === 'rected') {

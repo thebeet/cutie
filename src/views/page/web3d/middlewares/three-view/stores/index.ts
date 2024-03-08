@@ -39,6 +39,11 @@ export const useThreeViewStore = defineStore('plugin::three-view', () => {
 
     onThreeViewSetup((value) => {
         inner.value = value;
+        isChanging.value = {
+            front: false,
+            side: false,
+            top: false,
+        };
         if (inner.value) {
             outer.value = calcOuter(inner.value);
         }

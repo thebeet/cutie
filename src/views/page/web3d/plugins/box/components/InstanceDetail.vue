@@ -4,7 +4,7 @@
             Box Detail
         </div>
         <div class="content">
-            {{ focused }}
+            {{ draft }}
         </div>
     </div>
 </template>
@@ -13,5 +13,5 @@
 import { storeToRefs } from 'pinia';
 import { useBoxStore } from '../stores';
 
-const { focused } = storeToRefs(useBoxStore());
+const { draft } = storeToRefs(useBoxStore());
 </script>

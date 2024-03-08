@@ -47,7 +47,7 @@ export const useRender = (containers: Containers) => {
         if (!vbox) return;
         const box = isChanging.value[name] ? vbox : {
             ...vbox,
-            rotation: inner.value!.rotation
+            rotation: inner.value?.rotation ?? { x: 0, y: 0, z: 0 }
         };
         const containerSize = {
             width: canvasSize[name].width.value,
