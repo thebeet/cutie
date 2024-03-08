@@ -20,9 +20,7 @@ import { useDrama } from '@web3d/hooks/drama';
 import { usePageStore } from '@web3d/stores/page';
 import { mdiCar } from '@mdi/js';
 
-const props = defineProps<{
-    page: Page
-}>();
+const props = defineProps<{ page: Page }>();
 
 const container = ref<HTMLDivElement>();
 const toolbox = ref<HTMLDivElement>();
