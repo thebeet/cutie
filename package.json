@@ -23,8 +23,7 @@
     "pinia": "^2.1.7",
     "three": "^0.162.0",
     "vue": "^3.4.21",
-    "vue-i18n": "^9.9.1",
-    "vue-router": "^4.3.0"
+    "vue-i18n": "^9.9.1"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.202",

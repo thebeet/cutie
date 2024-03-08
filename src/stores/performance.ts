@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
 
 type PerformanceSpan = {
     start: number
@@ -14,31 +13,32 @@ type PerformanceStatistic = {
 }
 
 export const usePerformanceStore = defineStore('performance', () => {
-    const performances = ref<Record<string, PerformanceStatistic>>({});
+    const MAX_SPAN_COUNT = 20;
+    const performances: Record<string, PerformanceStatistic> = {};
     const begin = (key: string) => {
         const span = {
             start: Date.now(),
             end: -1
         };
-        if (!(key in performances.value)) {
-            performances.value[key] = {
+        if (!(key in performances)) {
+            performances[key] = {
                 count: 0,
                 avg: 0,
                 total: 0,
                 spans: []
             };
         }
-        if (performances.value[key].spans.length >= 20) {
-            performances.value[key].spans.splice(0, performances.value[key].spans.length - 19);
+        if (performances[key].spans.length >= MAX_SPAN_COUNT) {
+            performances[key].spans.splice(0, performances[key].spans.length - MAX_SPAN_COUNT + 1);
         }
-        performances.value[key].spans.push(span);
+        performances[key].spans.push(span);
         return {
             done: () => {
                 span.end = Date.now();
                 const duration = span.end - span.start;
-                performances.value[key].total += duration;
-                performances.value[key].count++;
-                performances.value[key].avg = performances.value[key].total / performances.value[key].count;
+                performances[key].total += duration;
+                performances[key].count++;
+                performances[key].avg = performances[key].total / performances[key].count;
                 return span.end - span.start;
             }
         };
@@ -58,15 +58,5 @@ export const usePerformanceStore = defineStore('performance', () => {
         performances,
         begin,
         measure
-    };
+    } as const;
 });
-
-const {
-    begin,
-    measure
-} = usePerformanceStore();
-
-export {
-    begin,
-    measure
-};

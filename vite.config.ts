@@ -13,8 +13,7 @@ export default defineConfig(({ command }) => ({
     })],
     resolve: {
         alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url)),
-            '@web3d': fileURLToPath(new URL('./src/views/page/web3d', import.meta.url))
+            '@web3d': fileURLToPath(new URL('./src', import.meta.url))
         }
     },
     server: {
