@@ -17,7 +17,7 @@ type Containers = {
 
 export const useRender = (containers: Containers) => {
     const { scene } = useDrama();
-    const { outer } = storeToRefs(useThreeViewStore());
+    const { inner, outer, isChanging } = storeToRefs(useThreeViewStore());
     const renderer = new THREE.WebGLRenderer({
         powerPreference: 'high-performance',
         antialias: false,
@@ -43,7 +43,12 @@ export const useRender = (containers: Containers) => {
         top: useElementSize(containers.top),
     };
     const getCamera = (name: 'front' | 'side' | 'top', rbox: MaybeRefOrGetter<RBox | undefined>) => {
-        const box = toValue(rbox);
+        const vbox = toValue(rbox);
+        if (!vbox) return;
+        const box = isChanging.value[name] ? vbox : {
+            ...vbox,
+            rotation: inner.value!.rotation
+        };
         const containerSize = {
             width: canvasSize[name].width.value,
             height: canvasSize[name].height.value,

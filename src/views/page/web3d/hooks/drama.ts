@@ -74,8 +74,6 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
 
     const { mouseEvent, state: mouseState, eventHook: mouseEventHook } = useMouse();
     const activeTool = ref('');
-    const annotations = ref<Annotation<any>[]>([]);
-    const operations = ref<Operation<any>[]>([]);
 
     const focusedUUID = ref();
 
@@ -93,7 +91,6 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
             frames, primaryFrame, activeFrames, selectFrame,
             activeTool, focusedUUID,
             page, answer, applyOperation, onApplyOperation,
-            operations, annotations,
             scene, camera,
 
             launch,

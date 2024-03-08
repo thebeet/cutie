@@ -60,5 +60,5 @@ export const useAnswerStore = defineStore('answer', () => {
         applyOperation, useApplyOperation: composedApplyOperation.use.bind(composedApplyOperation), onApplyOperation: applyOperationEvent.on,
 
         originAnswer: answer,
-    };
+    } as const;
 });

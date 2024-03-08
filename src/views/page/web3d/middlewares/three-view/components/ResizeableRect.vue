@@ -47,6 +47,8 @@ import { computed, ref } from 'vue';
 import { RBox } from '@web3d/types';
 import { useBoxHelper } from '../hooks/boxHelper';
 import * as THREE from 'three';
+import { storeToRefs } from 'pinia';
+import { useThreeViewStore } from '../stores';
 
 const controlPointSize = 10;
 type ControlPoint = {
@@ -67,6 +69,8 @@ const modelValue = defineModel<RBox>({
 const emits = defineEmits<{
     (e: 'confirm', value: RBox): void
 }>();
+
+const { isChanging } = storeToRefs(useThreeViewStore());
 
 const { getBoxSize, getBoxPosition, setBoxRotation, getControlPoints, getRotateControlPoint, setBoxPositionAndSize } = useBoxHelper(props.name);
 
@@ -120,6 +124,7 @@ const rotateControlPoint = (event: MouseEvent) => {
 };
 
 const deselectControlPoint = () => {
+    isChanging.value[props.name] = false;
     selectedControlPoint.value = undefined;
     initialRotatePosition.value = undefined;
     emits('confirm', modelValue.value);
@@ -127,6 +132,7 @@ const deselectControlPoint = () => {
 
 const rotatePointMouseMove = (event: MouseEvent) => {
     if (initialRotatePosition.value) {
+        isChanging.value[props.name] = true;
         const before = new THREE.Vector2(0, height.value / 2);
         const current = new THREE.Vector2(event.clientX - initialRotatePosition.value.x, event.clientY - initialRotatePosition.value.y + height.value / 2);
         const angle = Math.atan2(current.y, current.x) - Math.atan2(before.y, before.x);
@@ -138,6 +144,7 @@ const rotatePointMouseMove = (event: MouseEvent) => {
 const mouseMove = (event: MouseEvent) => {
     rotatePointMouseMove(event);
     if (selectedControlPoint.value && props.camera) {
+        isChanging.value[props.name] = true;
         const dx = (event.clientX - initialMousePosition.value.x) * outerBoxWidth.value / width.value / props.camera.zoom;
         const dy = (event.clientY - initialMousePosition.value.y) * outerBoxHeight.value / height.value / props.camera.zoom;
         const current = {

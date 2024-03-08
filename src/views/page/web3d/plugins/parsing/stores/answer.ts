@@ -50,5 +50,5 @@ export const useParsingAnswerStore = defineStore('plugin::parsing-answer', () =>
 
     return {
         answer: answer as ShallowRef<AnswerContent>,
-    };
+    } as const;
 });

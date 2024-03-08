@@ -46,13 +46,6 @@ export const usePlugin = () => {
         }
     });
 
-    /*onApplyOperation(({ operation }) => {
-        if (operation instanceof AddBoxOperation) {
-            const o = operation as AddBoxOperation;
-            focused.value = o.result;
-        }
-    });*/
-
     useHotkeys();
 
     addNodeToContainer(h(ToolBox), toolbox);

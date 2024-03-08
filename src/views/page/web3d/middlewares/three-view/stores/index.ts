@@ -1,13 +1,19 @@
 import { defineStore } from 'pinia';
 import { RBox } from '@web3d/types';
-import { ref, watch } from 'vue';
+import { ref, shallowRef, watch } from 'vue';
 import { useAdvanceDrama } from '@web3d/hooks/drama';
 
 type RBoxWithUUID = RBox & { uuid: string };
 
 export const useThreeViewStore = defineStore('plugin::three-view', () => {
-    const inner = ref<RBoxWithUUID>();
-    const outer = ref<RBox>();
+    const inner = shallowRef<RBoxWithUUID>();
+    const outer = shallowRef<RBox>();
+
+    const isChanging = ref({
+        front: false,
+        side: false,
+        top: false,
+    });
 
     const padding = 0.2;
     const scale = 1 + padding * 2;
@@ -22,8 +28,7 @@ export const useThreeViewStore = defineStore('plugin::three-view', () => {
 
     const calcOuter = (innerBox: RBox): RBox => {
         return {
-            position: innerBox.position,
-            rotation: innerBox.rotation,
+            ...innerBox,
             size: {
                 x: innerBox.size.x * scale,
                 y: innerBox.size.y * scale,
@@ -47,7 +52,7 @@ export const useThreeViewStore = defineStore('plugin::three-view', () => {
     };
 
     return {
-        inner, outer,
+        inner, outer, isChanging,
         confirm
     } as const;
 });

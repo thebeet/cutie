@@ -7,6 +7,6 @@ export const usePageStore = (initPage?: Page) => {
         const page = shallowRef<Page>(initPage!);
         return {
             page: readonly(page)
-        };
+        } as const;
     })();
 };
