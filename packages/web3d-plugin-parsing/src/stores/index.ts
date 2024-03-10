@@ -2,13 +2,11 @@ import { defineStore, storeToRefs } from 'pinia';
 import { ref, watch, watchEffect } from 'vue';
 import { PointsLabelInstanceColorMaterial } from '../three/material';
 import _ from 'lodash';
-import { useDrama } from '@cutie/web3d';
+import { useDrama, rbox2Matrix, useFocus } from '@cutie/web3d';
 import * as THREE from 'three';
 import { useParsingAnswerStore } from './answer';
 import { ParsingBox, ParsingInstance } from '../types';
-import { rbox2Matrix } from '@cutie/web3d';
 import { TBox } from '../three/TBox';
-import { useFocus } from '@cutie/web3d';
 
 export const useParsingStore = defineStore('plugin::parsing', () => {
     const mainLabelID = ref(1);

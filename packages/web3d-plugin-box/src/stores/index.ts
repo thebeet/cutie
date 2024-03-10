@@ -1,10 +1,8 @@
 import { defineStore } from 'pinia';
 import { computed, watch } from 'vue';
-import { useDrama } from '@cutie/web3d';
 import { TBox } from '../three/TBox';
 import { ABox } from '../types';
-import { useFocus } from '@cutie/web3d';
-import { useSync } from '@cutie/web3d';
+import { useDrama, useFocus, useSync } from '@cutie/web3d';
 
 export const useBoxStore = defineStore('plugin::box', () => {
     const { frames, answer } = useDrama();

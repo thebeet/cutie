@@ -26,6 +26,7 @@ module.exports = {
         'comma-spacing': 'warn',
         'array-bracket-spacing': 'warn',
         'object-curly-spacing': ['warn', 'always'],
+        'no-duplicate-imports': ['warn'],
         'vue/html-closing-bracket-spacing': ['warn', {
             'selfClosingTag': 'never'
         }],

@@ -1,8 +1,6 @@
 import * as THREE from 'three';
-import { useDrama } from '@cutie/web3d';
-import { TFrame } from '@cutie/web3d';
 import { ParsingBox, ParsingInstance } from '../types';
-import { frustumFromRBox } from '@cutie/web3d';
+import { useDrama, frustumFromRBox, TFrame } from '@cutie/web3d';
 import { ParsingOperation } from '../operations/ParsingOperation';
 
 const ESP = 1e-6;

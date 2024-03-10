@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
-import { RBox } from '@cutie/web3d';
+import { useAdvanceDrama, RBox } from '@cutie/web3d';
 import { ref, shallowRef, watch } from 'vue';
-import { useAdvanceDrama } from '@cutie/web3d';
 
 type RBoxWithUUID = RBox & { uuid: string };
 

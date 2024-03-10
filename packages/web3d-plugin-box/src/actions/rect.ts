@@ -1,6 +1,5 @@
 import * as THREE from 'three';
-import { useDrama } from '@cutie/web3d';
-import { TFrame } from '@cutie/web3d';
+import { useDrama, TFrame } from '@cutie/web3d';
 
 const getPlane = (points: THREE.Vector2[], camera: THREE.Camera): THREE.Plane[] => {
     return points.map(point => {

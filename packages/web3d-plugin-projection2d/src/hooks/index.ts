@@ -4,13 +4,12 @@ import PinholeCamera from '../libs/PinholeCamera';
 import { FisheyeDistortionShader as FisheyeDistortionShaderPreCalc, computeFisheyeLUT, FisheyeCoefficients } from '../libs/FisheyeDistortionPreCalc';
 import { FisheyeDistortionShader } from '../libs/FisheyeDistortion';
 import { PinholeDistortionShader } from '../libs/PinholeDistortion';
-import { CameraParams } from '@cutie/web3d';
+import { usePerformanceStore, CameraParams } from '@cutie/web3d';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { useRafFn, useToggle, useResizeObserver, useElementVisibility } from '@vueuse/core';
-import { usePerformanceStore } from '@cutie/web3d';
 
 const width = 384;
 const height = 216;

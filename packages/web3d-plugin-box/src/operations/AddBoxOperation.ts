@@ -1,6 +1,4 @@
-import { Operation } from '@cutie/web3d';
-import { AnswerContent } from '@cutie/web3d';
-import { TFrame } from '@cutie/web3d';
+import { AnswerContent, Operation, TFrame } from '@cutie/web3d';
 import * as THREE from 'three';
 import { ABox } from '../types';
 

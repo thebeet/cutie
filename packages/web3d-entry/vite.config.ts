@@ -19,5 +19,19 @@ export default defineConfig(({ command }) => ({
         proxy: {
         }
     },
-    publicDir: command === 'serve' ? '../../public' : false
+    publicDir: command === 'serve' ? '../../public' : false,
+    build: {
+        chunkSizeWarningLimit: 1024,
+        rollupOptions: {
+            input: 'index.html',
+            output: {
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        return 'vendor';
+                    }
+                    return 'index';
+                }
+            },
+        }
+    }
 }));

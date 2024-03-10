@@ -1,16 +1,13 @@
-import { useDrama } from '@cutie/web3d';
 import { h, watch } from 'vue';
 import ToolBox from './components/ToolBox.vue';
 import InstanceDetail from './components/InstanceDetail.vue';
-import { addNodeToContainer } from '@cutie/web3d';
+import { useDrama, addNodeToContainer, useSetFocusOnClick, RBox } from '@cutie/web3d';
 import { rectAction } from './actions/rect';
 import { AddBoxOperation } from './operations/AddBoxOperation';
 import { storeToRefs } from 'pinia';
 import { useBoxStore } from './stores';
 import { ModifyBoxOperation } from './operations/ModifyBoxOperation';
 import { useHotkeys } from './hotkeys';
-import { useSetFocusOnClick } from '@cutie/web3d';
-import { RBox } from '@cutie/web3d';
 import { TBox } from './three/TBox';
 
 export const usePlugin = () => {

@@ -1,23 +1,19 @@
 import { watchEffect, h, watch } from 'vue';
-import { useDrama } from '@cutie/web3d';
+import { useDrama, addNodeToContainer, GroupOperation, useSync, useSetFocusOnClick } from '@cutie/web3d';
 import { useParsingStore } from './stores';
 import * as THREE from 'three';
 import ToolBox from './components/ToolBox.vue';
 import MouseActionDebugView from './components/MouseActionDebugView.vue';
 import MouseActionPreview from './components/MouseActionPreview.vue';
 import InstanceListView from './components/InstanceListView.vue';
-import { addNodeToContainer } from '@cutie/web3d';
 
 import { rectAction } from './actions/rect';
 import { polylineAction } from './actions/polygon';
 import { storeToRefs } from 'pinia';
 import { useParsingAnswerStore } from './stores/answer';
 import { ParsingOperation } from './operations/ParsingOperation';
-import { GroupOperation } from '@cutie/web3d';
 import { boxAction } from './actions/box';
 import { useHotkeys } from './hotkeys';
-import { useSync } from '@cutie/web3d';
-import { useSetFocusOnClick } from '@cutie/web3d';
 import { TBox } from './three/TBox';
 import { RBox } from './types';
 

@@ -1,11 +1,8 @@
-import { defineStore } from 'pinia';
+import { defineStore, storeToRefs } from 'pinia';
 import { ref, computed } from 'vue';
-import { usePageStore } from '@cutie/web3d';
-import { useDrama } from '@cutie/web3d';
-import { storeToRefs } from 'pinia';
+import { useDrama, usePageStore, Camera2D } from '@cutie/web3d';
 import * as THREE from 'three';
 import _ from 'lodash';
-import { Camera2D } from '@cutie/web3d';
 
 export const useProjection2DStore = defineStore('plugin::projection2d', () => {
     const panelVisible = ref(false);

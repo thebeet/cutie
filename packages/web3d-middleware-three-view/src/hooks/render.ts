@@ -1,8 +1,7 @@
 import * as THREE from 'three';
-import { useDrama } from '@cutie/web3d';
+import { useDrama, RBox } from '@cutie/web3d';
 import { MaybeRefOrGetter, computed, ref, toValue, watch, watchEffect } from 'vue';
 import { useElementSize, useEventListener, useRafFn, useResizeObserver } from '@vueuse/core';
-import { RBox } from '@cutie/web3d';
 
 import { axis2d, views } from '../constants';
 import { useThreeViewStore } from '../stores';

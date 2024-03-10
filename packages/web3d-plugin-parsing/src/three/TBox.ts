@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { ParsingBox } from '../types';
-import { TFrame } from '@cutie/web3d';
-import { rbox2Matrix } from '@cutie/web3d';
+import { TFrame, rbox2Matrix } from '@cutie/web3d';
 
 const _rectMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0, transparent: true });
 const _edgeMaterial = /*@__PURE__*/ new THREE.LineBasicMaterial({ color: 0xffffff });

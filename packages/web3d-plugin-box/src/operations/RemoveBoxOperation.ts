@@ -1,5 +1,4 @@
-import { Operation } from '@cutie/web3d';
-import { AnswerContent } from '@cutie/web3d';
+import { AnswerContent, Operation } from '@cutie/web3d';
 import { ABox } from '../types';
 
 export class RemoveBoxOperation implements Operation {

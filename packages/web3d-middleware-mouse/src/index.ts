@@ -1,5 +1,4 @@
-import { useAdvanceDrama } from '@cutie/web3d';
-import { addNodeToContainer } from '@cutie/web3d';
+import { useAdvanceDrama, addNodeToContainer } from '@cutie/web3d';
 import { h, watch } from 'vue';
 import MouseActionPreview from './components/MouseActionPreview.vue';
 import { drawRect } from './actions/rect';

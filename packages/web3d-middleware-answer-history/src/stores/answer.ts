@@ -1,9 +1,7 @@
 import { defineStore, storeToRefs } from 'pinia';
-import { useAnswerStore } from '@cutie/web3d';
+import { useAnswerStore, AnswerContent, Operation } from '@cutie/web3d';
 import { useManualRefHistory } from '@vueuse/core';
-import { AnswerContent } from '@cutie/web3d';
 import { shallowRef } from 'vue';
-import { Operation } from '@cutie/web3d';
 
 const MAX_HISTORY_COUNT = 10;
 

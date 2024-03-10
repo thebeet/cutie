@@ -1,12 +1,10 @@
 import * as THREE from 'three';
 import { ParsingOperation } from '../operations/ParsingOperation';
-import { useDrama } from '@cutie/web3d';
+import { useDrama, Operation, TFrame } from '@cutie/web3d';
 import { storeToRefs } from 'pinia';
 import { useParsingStore } from '../stores';
-import { Operation } from '@cutie/web3d';
 import { convexHull2D, pointInPolygon, pointsBox2DBounding } from '../libs/ConvexHull2D';
 import { DouglasPeucker } from '../libs/DouglasPeucker';
-import { TFrame } from '@cutie/web3d';
 
 const getPlane = (points: THREE.Vector2[], camera: THREE.Camera): THREE.Plane[] => {
     return points.map(point => {

@@ -1,8 +1,6 @@
 import localforage from 'localforage';
-import { useAdvanceDrama, useDrama } from '@cutie/web3d';
-import { AnswerContent } from '@cutie/web3d';
+import { useAdvanceDrama, useDrama, AnswerContent, addNodeToContainer } from '@cutie/web3d';
 import { useAnswerCacheStore } from './stores';
-import { addNodeToContainer } from '@cutie/web3d';
 import { h } from 'vue';
 import ToolBox from './components/ToolBox.vue';
 import { storeToRefs } from 'pinia';
