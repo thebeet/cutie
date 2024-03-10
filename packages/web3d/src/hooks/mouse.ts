@@ -1,6 +1,6 @@
 import { createEventHook } from '@vueuse/core';
 import { ref } from 'vue';
-import { AdvanceMouseEvent } from '@web3d/types';
+import { AdvanceMouseEvent } from '../types';
 
 export const useMouse = () => {
     const eventHook = createEventHook<AdvanceMouseEvent>();

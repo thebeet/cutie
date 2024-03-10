@@ -1,5 +1,5 @@
-import { usePageStore } from '@web3d/stores/page';
-import { TFrame } from '@web3d/three/TFrame';
+import { usePageStore } from '../stores/page';
+import { TFrame } from '../three/TFrame';
 import * as THREE from 'three';
 import { shallowRef } from 'vue';
 

@@ -2,9 +2,9 @@ import * as THREE from 'three';
 import { watchEffect } from 'vue';
 import { MaybeRefOrGetter, toValue, useResizeObserver } from '@vueuse/core';
 import { useControls } from './controls';
-import { TScene } from '@web3d/three/TScene';
+import { TScene } from '../three/TScene';
 import { useCamera } from './camera';
-import { usePerformanceStore } from '@web3d/stores/performance';
+import { usePerformanceStore } from '../stores/performance';
 import { CSS2DRenderer } from '../three/CSS2DRenderer';
 
 export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>) => {

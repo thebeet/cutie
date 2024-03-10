@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "yarn workspace @cutie/web3d dev",
-    "lint": "yarn workspace @cutie/web3d lint"
+    "dev": "yarn workspace @cutie/web3d-entry dev",
+    "build": "yarn workspace @cutie/web3d-entry build"
   },
   "workspaces": [
     "packages/*"

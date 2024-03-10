@@ -1,5 +1,5 @@
 import { watch, Ref, computed, nextTick } from 'vue';
-import { AElement } from '@web3d/types';
+import { AElement } from '../types';
 import * as THREE from 'three';
 import { useDrama } from '../hooks/drama';
 

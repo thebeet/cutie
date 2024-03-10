@@ -13,8 +13,7 @@ export default defineConfig(({ command }) => ({
     })],
     resolve: {
         alias: {
-            '@web3d': fileURLToPath(new URL('./src', import.meta.url)),
-            '@web3d-plugin-': fileURLToPath(new URL('./src/plugins/', import.meta.url)),
+            '@cutie/web3d': fileURLToPath(new URL('./index.ts', import.meta.url)),
         }
     },
     server: {
@@ -28,7 +27,7 @@ export default defineConfig(({ command }) => ({
     build: {
         chunkSizeWarningLimit: 1024,
         rollupOptions: {
-            input: 'index.html',
+            input: 'index.ts',
             output: {
                 manualChunks(id) {
                     if (id.includes('node_modules')) {

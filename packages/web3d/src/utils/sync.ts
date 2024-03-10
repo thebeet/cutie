@@ -1,7 +1,7 @@
 import { watch, Ref, ref } from 'vue';
-import { AElement } from '@web3d/types';
+import { AElement } from '../types';
 import * as THREE from 'three';
-import { TFrame } from '@web3d/three/TFrame';
+import { TFrame } from '../three/TFrame';
 
 /**
  * Synchronizes elements with objects in a 3D scene.

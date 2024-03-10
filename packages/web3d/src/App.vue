@@ -2,7 +2,7 @@
     <PageView v-if="page" :page="page"/>
 </template>
 <script lang="ts" setup>
-import { Page } from '@web3d/types';
+import { Page } from './types';
 import PageView from './views/PageView.vue';
 import { ref } from 'vue';
 
@@ -12,5 +12,3 @@ fetch('/200/page.json').then((response) => response.json() as Promise<Page>).the
     page.value = data;
 });
 </script>
-<style scoped>
-</style>

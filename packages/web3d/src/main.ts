@@ -4,4 +4,7 @@ import './svg-icon';
 import App from './App.vue';
 import './index.css';
 
-createApp(App).use(createPinia()).mount('#app');
+export const bootstrap = () => {
+    createApp(App).use(createPinia()).mount('#app');
+};
+

@@ -1,13 +1,13 @@
 import { ref, watchEffect, MaybeRefOrGetter } from 'vue';
-import { AnswerContent } from '@web3d/types';
-import { useScene } from '@web3d/hooks/scene';
-import { usePCDCachedLoader } from '@web3d/hooks/loader';
+import { AnswerContent } from '../types';
+import { useScene } from './scene';
+import { usePCDCachedLoader } from './loader';
 import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
-import { useAnswerStore } from '@web3d/stores/answer';
-import { useMouse } from '@web3d/hooks/mouse';
+import { useAnswerStore } from '../stores/answer';
+import { useMouse } from './mouse';
 import { storeToRefs } from 'pinia';
-import { usePageStore } from '@web3d/stores/page';
-import { Frame } from '@web3d/types';
+import { usePageStore } from '../stores/page';
+import { Frame } from '../types';
 import { useFrame } from './frame';
 import { useThreeView } from './threeview';
 

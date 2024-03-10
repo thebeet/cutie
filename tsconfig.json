@@ -20,10 +20,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "paths": {
-      "@web3d/*": ["./packages/web3d/src/*"],
-    }
   },
-  "include": ["src/**/*.ts", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.vue", "packages/*/src/**/*.ts", "packages/*/src/**/*.vue", ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

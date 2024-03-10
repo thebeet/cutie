@@ -1,7 +1,7 @@
 import localforage from 'localforage';
 
 import * as THREE from 'three';
-import { PointsMaterial } from '@web3d/three/PointsMaterial';
+import { PointsMaterial } from '../three/PointsMaterial';
 
 const _pointsMaterial = new PointsMaterial({ size: 1.0 });
 

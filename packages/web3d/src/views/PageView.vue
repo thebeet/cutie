@@ -15,12 +15,15 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { Page } from '@web3d/types';
-import { useDrama } from '@web3d/hooks/drama';
-import { usePageStore } from '@web3d/stores/page';
+import { Page } from '../types';
+import { useDrama } from '../hooks/drama';
+import { usePageStore } from '../stores/page';
 import { mdiCar } from '@mdi/js';
+import { runPlugin } from '../plugins';
 
-const props = defineProps<{ page: Page }>();
+const props = defineProps<{
+    page: Page
+}>();
 
 const container = ref<HTMLDivElement>();
 const toolbox = ref<HTMLDivElement>();
@@ -42,14 +45,19 @@ onMounted(async () => {
         { name: 'fullscreen' },
         { name: 'mouse' },
     ];
+
     for (const middleware of middlewares) {
-        await import(`../middlewares/${middleware.name}/index.ts`).then(({ useMiddleware }) => {
-            useMiddleware(middleware.params);
+        await runPlugin(middleware.name).then(({ useMiddleware }) => {
+            useMiddleware && useMiddleware(middleware.params);
+        }).catch(e => {
+            console.log(e);
         });
-    };
+    }
     for (const plugin of props.page.template.plugins) {
-        await import(`../plugins/${plugin.name}/index.ts`).then(({ usePlugin }) => {
-            usePlugin(plugin.params);
+        await runPlugin(plugin.name).then(({ usePlugin }) => {
+            usePlugin && usePlugin(plugin.params);
+        }).catch(e => {
+            console.log(e);
         });
     }
     launch();
