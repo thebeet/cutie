@@ -10,6 +10,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@cutie/web3d": "0.0.1"
+    "@cutie/web3d": "0.0.1",
+    "localforage": "^1.10.0"
   }
 }
