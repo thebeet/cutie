@@ -3,7 +3,12 @@ import { TFrame } from '@cutie/web3d';
 import { ALine } from '../types';
 
 const _lineMaterial = new THREE.LineBasicMaterial({
-    color: 0xff0000,
+    color: 0xdddd00,
+    linewidth: 1000
+});
+
+const _lineFocusMaterial = new THREE.LineBasicMaterial({
+    color: 0xff3300,
     linewidth: 1000
 });
 
@@ -16,18 +21,18 @@ const _sphereGeometry = new THREE.SphereGeometry(0.25, 16, 16);
 const _sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
 export class TLine extends THREE.Object3D<TLineEventMap> {
-    line: ALine;
+    element: ALine;
 
     private points: THREE.InstancedMesh;
     private lines: THREE.Line;
 
     constructor(line: ALine) {
         super();
-        this.line = line;
+        this.element = line;
 
         const p = [];
-        for (let i = 0; i < this.line.points.length; i += 3) {
-            p.push(new THREE.Vector3(this.line.points[i], this.line.points[i + 1], this.line.points[i + 2]));
+        for (let i = 0; i < this.element.points.length; i += 3) {
+            p.push(new THREE.Vector3(this.element.points[i], this.element.points[i + 1], this.element.points[i + 2]));
         }
         const geometry = new THREE.BufferGeometry().setFromPoints(p);
         this.lines = new THREE.Line(geometry, _lineMaterial);
@@ -41,19 +46,18 @@ export class TLine extends THREE.Object3D<TLineEventMap> {
         this._bindEvent();
     }
 
-    private init() {
-    }
-
     private _bindEvent() {
         this.addEventListener('focus', this._onFocus.bind(this));
         this.addEventListener('blur', this._onBlur.bind(this));
     };
 
     private _onFocus() {
+        this.lines.material = _lineFocusMaterial;
         this.parentFrame.update();
     }
 
     private _onBlur() {
+        this.lines.material = _lineMaterial;
         this.parentFrame.update();
     }
 
@@ -75,12 +79,12 @@ export class TLine extends THREE.Object3D<TLineEventMap> {
     }
 
     apply(line: ALine) {
-        if (line !== this.line) {
-            this.line = line;
+        if (line !== this.element) {
+            this.element = line;
 
             const p = [];
-            for (let i = 0; i < this.line.points.length; i += 3) {
-                p.push(new THREE.Vector3(this.line.points[i], this.line.points[i + 1], this.line.points[i + 2]));
+            for (let i = 0; i < this.element.points.length; i += 3) {
+                p.push(new THREE.Vector3(this.element.points[i], this.element.points[i + 1], this.element.points[i + 2]));
             }
             this.lines.geometry.dispose();
             const geometry = new THREE.BufferGeometry().setFromPoints(p);

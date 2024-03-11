@@ -22,13 +22,13 @@ export class TBox extends THREE.Object3D<TBoxEventMap> {
     private _label: CSS2DObject;
     private _mesh: THREE.Mesh;
     private _edge: THREE.LineSegments;
-    box: ABox;
+    element: ABox;
 
     constructor(box: ABox) {
         super();
         this.matrixAutoUpdate = false;
         this.matrixWorldNeedsUpdate = false;
-        this.box = box;
+        this.element = box;
         this.applyMatrix4(rbox2Matrix(box));
         this._mesh = new THREE.Mesh(_boxGeometry, _rectMaterial);
         this.add(this._mesh);
@@ -61,8 +61,8 @@ export class TBox extends THREE.Object3D<TBoxEventMap> {
     }
 
     apply(newValue: ABox) {
-        if (this.box !== newValue) {
-            this.box = newValue;
+        if (this.element !== newValue) {
+            this.element = newValue;
             this.matrix.identity();
             this.applyMatrix4(rbox2Matrix(newValue));
             this.updateMatrixWorld(true);

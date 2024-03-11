@@ -2,7 +2,7 @@ import { defineStore, storeToRefs } from 'pinia';
 import { ref, watch, watchEffect } from 'vue';
 import { PointsLabelInstanceColorMaterial } from '../three/material';
 import _ from 'lodash';
-import { useDrama, rbox2Matrix, useFocus } from '@cutie/web3d';
+import { useDrama, useFocus } from '@cutie/web3d';
 import * as THREE from 'three';
 import { useParsingAnswerStore } from './answer';
 import { ParsingBox, ParsingInstance } from '../types';
@@ -62,17 +62,6 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
             const color = new THREE.Color(c.color);
             return [color.r, color.g, color.b, c.visible ? 1.0 : 0.0];
         }));
-        pointsMaterial.uniforms.previewBoxCount.value = Math.min(boxes.value.length, 64);
-        if (boxes.value.length > 0) {
-            const color = new THREE.Color(instances.value[mainLabelID.value].color);
-            pointsMaterial.uniforms.previewColor.value = [color.r, color.g, color.b, instances.value[mainLabelID.value].visible ? 1.0 : 0.0];
-            const mats = boxes.value.map(box => rbox2Matrix(box).invert());
-            for (let i = mats.length; i < 64; i++) {
-                mats.push(new THREE.Matrix4());
-            }
-            pointsMaterial.uniforms.previewBoxMatrixs.value = mats.slice(0, 64);
-            pointsMaterial.uniforms.instanceLock.value = instances.value.map(i => i.lock ? 1 : 0);
-        }
         pointsMaterial.uniformsNeedUpdate = true;
         scene.update();
     });

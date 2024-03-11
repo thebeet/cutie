@@ -1,4 +1,4 @@
-import { GLSL3, RawShaderMaterial, Matrix4 } from 'three';
+import { GLSL3, RawShaderMaterial } from 'three';
 
 type PointsLabelInstanceColorMaterialParam = {
     size: number
@@ -42,10 +42,10 @@ export class PointsLabelInstanceColorMaterial extends RawShaderMaterial {
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 if (mode == 0) {
                     float vIntensity = intensity / 256.;
-                    if (vIntensity < 0.333) {
-                        v_color = vec4(0, vIntensity*3., 1.-vIntensity*3., 1.);
-                    } else if (vIntensity < 0.666) {
-                        v_color = vec4(vIntensity*3.-1., 2.-vIntensity*3., 0, 1.);
+                    if (vIntensity < 0.25) {
+                        v_color = vec4(0, vIntensity*4., 1.-vIntensity*4., 1.);
+                    } else if (vIntensity < 0.5) {
+                        v_color = vec4(vIntensity*4.-1., 2.-vIntensity*4., 0, 1.);
                     } else {
                         v_color = vec4(1, vIntensity, vIntensity, 1);
                     }

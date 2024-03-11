@@ -6,7 +6,8 @@ import ToolBox from './components/ToolBox.vue';
 import { point2dToPoint3d } from './hooks/currentPoint';
 import * as THREE from 'three';
 import { whenever } from '@vueuse/core';
-import { AddLineOperation } from './operations/AddBoxOperation';
+import { AddLineOperation } from './operations/AddLineOperation';
+import { useHotkeys } from './hotkeys';
 
 export const usePlugin = () => {
     const { camera, primaryFrame, activeTool, toolbox,
@@ -46,6 +47,8 @@ export const usePlugin = () => {
             }
         }
     });
+
+    useHotkeys();
 
     addNodeToContainer(h(ToolBox), toolbox);
 };

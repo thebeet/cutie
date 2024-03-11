@@ -19,7 +19,7 @@ export const usePlugin = () => {
     const { focused, draft } = storeToRefs(boxesStore);
     const { boxes } = boxesStore;
 
-    useSetFocusOnClick(focused, boxes, (box: Readonly<TBox>) => box.box);
+    useSetFocusOnClick(focused, boxes, (box: Readonly<TBox>) => box.element);
     watch(focused, setupThreeView);
 
     onThreeViewChange((value: RBox) => {

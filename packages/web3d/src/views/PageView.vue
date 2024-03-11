@@ -76,6 +76,7 @@ onMounted(async () => {
 }
 .leftsidebar {
     width: 160px;
+    flex-shrink: 0;
 }
 .main {
     flex-grow: 1;
@@ -91,6 +92,7 @@ onMounted(async () => {
 
 .rightsidebar {
     width: 320px;
+    flex-shrink: 0;
 }
 
 .statusbar {
