@@ -1,8 +1,7 @@
 import { MaybeRefOrGetter, Ref, toValue } from 'vue';
 import { usePos } from '../hooks/pos';
-import { EventHook, useEventListener, whenever } from '@vueuse/core';
+import { EventHook, useEventListener, useMagicKeys, whenever } from '@vueuse/core';
 import { AdvanceMouseEvent } from '../types';
-import { useMagicKeys } from '@vueuse/core';
 
 export const drawLine = (
     dom: MaybeRefOrGetter<HTMLElement>,
@@ -71,9 +70,4 @@ export const drawLine = (
             eventHook.trigger(mouseEvent.value);
         }
     }));
-
-
-            console.log(mouseEvent.value)
-
-
 };

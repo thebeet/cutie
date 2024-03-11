@@ -49,15 +49,11 @@ onMounted(async () => {
     for (const middleware of middlewares) {
         await runPlugin(middleware.name).then(({ useMiddleware }) => {
             useMiddleware && useMiddleware(middleware.params);
-        }).catch(e => {
-            console.log(e);
         });
     }
     for (const plugin of props.page.template.plugins) {
         await runPlugin(plugin.name).then(({ usePlugin }) => {
             usePlugin && usePlugin(plugin.params);
-        }).catch(e => {
-            console.log(e);
         });
     }
     launch();

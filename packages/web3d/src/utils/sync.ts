@@ -42,6 +42,21 @@ export const useSync = <A extends AElement, T extends THREE.Object3D>(
                 frame.update();
             }
         });
+        if (newDraft) {
+            const obj = objs.get(newDraft.uuid);
+            if (obj) {
+                used.set(newDraft.uuid, true);
+                const frame = obj.parent as TFrame;
+                modify(obj, newDraft);
+                frame.update();
+            } else {
+                const frame = frames[newDraft.frameIndex];
+                const obj = create(newDraft);
+                objs.set(newDraft.uuid, obj);
+                frame.add(obj);
+                frame.update();
+            }
+        }
         for (const [key, value] of used.entries()) {
             if (!value) {
                 const obj = objs.get(key);
@@ -52,20 +67,6 @@ export const useSync = <A extends AElement, T extends THREE.Object3D>(
                     frame.update();
                     objs.delete(key);
                 }
-            }
-        }
-        if (newDraft) {
-            const obj = objs.get(newDraft.uuid);
-            if (obj) {
-                const frame = obj.parent as TFrame;
-                modify(obj, newDraft);
-                frame.update();
-            } else {
-                const frame = frames[newDraft.frameIndex];
-                const obj = create(newDraft);
-                objs.set(newDraft.uuid, obj);
-                frame.add(obj);
-                frame.update();
             }
         }
     }, { immediate: true });

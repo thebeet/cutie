@@ -12,10 +12,14 @@ export interface TLineEventMap extends THREE.Object3DEventMap {
     blur: {}
 }
 
+const _sphereGeometry = new THREE.SphereGeometry(0.25, 16, 16);
+const _sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
 export class TLine extends THREE.Object3D<TLineEventMap> {
     line: ALine;
 
-    lines: THREE.Line;
+    private points: THREE.InstancedMesh;
+    private lines: THREE.Line;
 
     constructor(line: ALine) {
         super();
@@ -29,9 +33,15 @@ export class TLine extends THREE.Object3D<TLineEventMap> {
         this.lines = new THREE.Line(geometry, _lineMaterial);
         this.add(this.lines);
 
+        this.points = new THREE.InstancedMesh(_sphereGeometry, _sphereMaterial, p.length);
+        p.forEach((p, i) => this.points.setMatrixAt(i, new THREE.Matrix4().setPosition(p)));
+        this.add(this.points);
         this.matrixAutoUpdate = false;
         this.matrixWorldNeedsUpdate = false;
         this._bindEvent();
+    }
+
+    private init() {
     }
 
     private _bindEvent() {
@@ -65,9 +75,27 @@ export class TLine extends THREE.Object3D<TLineEventMap> {
     }
 
     apply(line: ALine) {
+        if (line !== this.line) {
+            this.line = line;
+
+            const p = [];
+            for (let i = 0; i < this.line.points.length; i += 3) {
+                p.push(new THREE.Vector3(this.line.points[i], this.line.points[i + 1], this.line.points[i + 2]));
+            }
+            this.lines.geometry.dispose();
+            const geometry = new THREE.BufferGeometry().setFromPoints(p);
+            this.lines.geometry = geometry;
+
+            this.remove(this.points);
+
+            this.points = new THREE.InstancedMesh(_sphereGeometry, _sphereMaterial, p.length);
+            p.forEach((p, i) => this.points.setMatrixAt(i, new THREE.Matrix4().setPosition(p)));
+            this.add(this.points);
+        }
     }
 
     dispose() {
         this.lines.geometry.dispose();
+        this.points.dispose();
     }
 }
