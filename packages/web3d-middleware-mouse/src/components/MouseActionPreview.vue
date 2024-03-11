@@ -8,14 +8,6 @@
             :height="rectPreview.height"
             style="stroke: #33ccff;stroke-width: 1;fill-opacity: .25;"
         />
-        <line
-            v-if="mouseEvent.type === 'lining'"
-            :x1="mouseEvent.points[0].x"
-            :y1="-mouseEvent.points[0].y"
-            :x2="mouseEvent.points[1].x"
-            :y2="-mouseEvent.points[1].y"
-            style="stroke: #33ccff;stroke-width: 1;"
-        />
         <polyline
             v-if="mouseEvent.type === 'polylining'"
             :points="polylinePreview.points"

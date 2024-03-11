@@ -64,6 +64,10 @@ export class TLine extends THREE.Object3D<TLineEventMap> {
         }
     }
 
+    apply(line: ALine) {
+    }
+
     dispose() {
+        this.lines.geometry.dispose();
     }
 }

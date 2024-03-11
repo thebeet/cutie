@@ -1,8 +1,8 @@
 export interface AdvanceMouseEvent {
-    type: string
-    points: {
-        x: number
-        y: number
+    readonly type: string
+    readonly points: readonly {
+        readonly x: number
+        readonly y: number
     }[]
 }
 

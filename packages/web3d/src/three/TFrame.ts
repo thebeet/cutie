@@ -14,7 +14,7 @@ const _infSphere = new THREE.Sphere(
     new THREE.Vector3(0, 0, 0), Infinity
 );
 
-interface ITFrame extends PointsIntersect {
+export interface ITFrame extends PointsIntersect {
     readonly index: number;
     readonly frame: THREE.Object3D;
     intersectDelegate: PointsIntersect | undefined;

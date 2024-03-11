@@ -9,7 +9,8 @@ export const useBoxStore = defineStore('plugin::box', () => {
 
     const elements = computed(() => answer.value.elements.filter(e => e.schema === 'box') as Readonly<ABox>[]);
     const boxes: Map<string, TBox> = new Map([]);
-    const { draft } = useSync(frames, elements, boxes, el => new TBox(el), (obj, el) => obj.apply(el), obj => obj.dispose());
+    const { draft } = useSync(frames, elements, boxes,
+        el => new TBox(el), (obj, el) => obj.apply(el), obj => obj.dispose());
     const { focused } = useFocus(elements, boxes);
     watch(focused, value => {
         if (value === undefined) {

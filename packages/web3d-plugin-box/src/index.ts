@@ -1,6 +1,5 @@
 import { h, watch } from 'vue';
 import ToolBox from './components/ToolBox.vue';
-import InstanceDetail from './components/InstanceDetail.vue';
 import { useDrama, addNodeToContainer, useSetFocusOnClick, RBox } from '@cutie/web3d';
 import { rectAction } from './actions/rect';
 import { AddBoxOperation } from './operations/AddBoxOperation';
@@ -11,7 +10,7 @@ import { useHotkeys } from './hotkeys';
 import { TBox } from './three/TBox';
 
 export const usePlugin = () => {
-    const { activeTool, toolbox, rightsidebar,
+    const { activeTool, toolbox,
         camera, primaryFrame,
         setupThreeView, onThreeViewChange, onThreeViewConfirm,
         onAdvanceMouseEvent,
@@ -50,5 +49,4 @@ export const usePlugin = () => {
     useHotkeys();
 
     addNodeToContainer(h(ToolBox), toolbox);
-    addNodeToContainer(h(InstanceDetail), rightsidebar);
 };

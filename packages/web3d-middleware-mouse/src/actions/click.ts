@@ -39,8 +39,10 @@ export const click = (
                 clickInfo.expire = 0;
                 const { x, y } = usePos(event, toValue(dom));
                 if (((x - clickInfo.x ) * (x - clickInfo.x) < ESP) && ((y - clickInfo.y) * (y - clickInfo.y) < ESP)) {
-                    mouseEvent.value.type = 'click';
-                    mouseEvent.value.points = [{ x, y }];
+                    mouseEvent.value = {
+                        type: 'click',
+                        points: [{ x, y }]
+                    };
                     eventHook.trigger(mouseEvent.value);
                 }
             }

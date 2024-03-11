@@ -60,11 +60,17 @@ export const useSync = <A extends AElement, T extends THREE.Object3D>(
                 const frame = obj.parent as TFrame;
                 modify(obj, newDraft);
                 frame.update();
+            } else {
+                const frame = frames[newDraft.frameIndex];
+                const obj = create(newDraft);
+                objs.set(newDraft.uuid, obj);
+                frame.add(obj);
+                frame.update();
             }
         }
-    });
+    }, { immediate: true });
     return {
         draft,
         stop
-    };
+    } as const;
 };

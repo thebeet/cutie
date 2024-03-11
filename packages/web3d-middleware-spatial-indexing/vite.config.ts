@@ -7,7 +7,7 @@ export default defineConfig({
     build: {
         rollupOptions: {
             input: 'index.ts',
-            external: ['vue', 'pinia', 'three', '@vueuse/core', '@vueuse/math', '@cutie/web3d']
+            external: ['vue', 'pinia', 'three', 'localforage', '@vueuse/core', '@vueuse/math', '@cutie/web3d']
         }
     }
 });

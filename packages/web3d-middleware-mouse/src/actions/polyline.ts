@@ -22,7 +22,10 @@ export const drawPolyline = (
                 const { x, y } = usePos(event, toValue(dom));
                 const { x: prevX, y: prevY } = mouseEvent.value.points[mouseEvent.value.points.length - 1];
                 if (((x - prevX) * (x - prevX) > ESP) || ((y - prevY) * (y - prevY) > ESP)) {
-                    mouseEvent.value.points.push({ x, y });
+                    mouseEvent.value = {
+                        ...mouseEvent.value,
+                        points: [...mouseEvent.value.points, { x, y }]
+                    };
                 }
             }
         } else {
@@ -34,10 +37,10 @@ export const drawPolyline = (
         if (event.button === 0) {
             polyline = true;
             const { x, y } = usePos(event, toValue(dom));
-            mouseEvent.value.type = 'polylining';
-            mouseEvent.value.points = [
-                { x, y }
-            ];
+            mouseEvent.value = {
+                type: 'polylining',
+                points: [{ x, y }]
+            };
         } else {
             polyline = false;
         }
@@ -48,7 +51,7 @@ export const drawPolyline = (
             if (polyline) {
                 polyline = false;
                 if (mouseEvent.value.points.length >= 3) {
-                    mouseEvent.value.type = 'polylined';
+                    mouseEvent.value = { ...mouseEvent.value, type: 'polylined' };
                     eventHook.trigger(mouseEvent.value);
                 }
             }

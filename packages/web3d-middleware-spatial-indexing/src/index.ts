@@ -1,10 +1,9 @@
-import { useDrama } from '@cutie/web3d';
+import { useDrama, usePerformanceStore } from '@cutie/web3d';
 import localforage from 'localforage';
 import { Octree, OctreeSerialization } from './libs/Octree';
 import { Bruteforce } from './libs/Bruteforce';
 import { injectPerformance } from './performance';
 import { Points } from 'three';
-import { usePerformanceStore } from '@cutie/web3d';
 
 const buildOctree = (points: Points) => {
     const { measure } = usePerformanceStore();

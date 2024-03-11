@@ -1,5 +1,6 @@
 import { bootstrap, registerPlugin } from '@cutie/web3d';
 
+// middleware
 registerPlugin('answer-cache', () => import('@cutie/web3d-middleware-answer-cache'));
 registerPlugin('answer-history', () => import('@cutie/web3d-middleware-answer-history'));
 registerPlugin('camera-control', () => import('@cutie/web3d-middleware-camera-control'));
@@ -10,6 +11,7 @@ registerPlugin('render-sampling', () => import('@cutie/web3d-middleware-render-s
 registerPlugin('spatial-indexing', () => import('@cutie/web3d-middleware-spatial-indexing'));
 registerPlugin('three-view', () => import('@cutie/web3d-middleware-three-view'));
 
+// plugin
 registerPlugin('box', () => import('@cutie/web3d-plugin-box'));
 registerPlugin('parsing', () => import('@cutie/web3d-plugin-parsing'));
 registerPlugin('line', () => import('@cutie/web3d-plugin-line'));

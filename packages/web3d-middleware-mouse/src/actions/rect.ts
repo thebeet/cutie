@@ -20,7 +20,13 @@ export const drawRect = (
         if (event.button === 0) {
             if (recting) {
                 const { x, y } = usePos(event, toValue(dom));
-                mouseEvent.value.points[1] = { x, y };
+                mouseEvent.value = {
+                    type: 'recting',
+                    points: [
+                        mouseEvent.value.points[0],
+                        { x, y }
+                    ]
+                };
             }
         } else {
             recting = false;
@@ -31,11 +37,13 @@ export const drawRect = (
         if (event.button === 0) {
             recting = true;
             const { x, y } = usePos(event, toValue(dom));
-            mouseEvent.value.type = 'recting';
-            mouseEvent.value.points = [
-                { x, y },
-                { x, y }
-            ];
+            mouseEvent.value = {
+                type: 'recting',
+                points: [
+                    { x, y },
+                    { x, y }
+                ]
+            };
         }
     }));
 
@@ -46,12 +54,17 @@ export const drawRect = (
                 const { x, y } = usePos(event, toValue(dom));
                 const { x: prevX, y: prevY } = mouseEvent.value.points[0];
                 if (((x - prevX) * (x - prevX) > ESP) && ((y - prevY) * (y - prevY) > ESP)) {
-                    mouseEvent.value.type = 'rected';
-                    mouseEvent.value.points[1] = { x, y };
+                    mouseEvent.value = {
+                        type: 'rected',
+                        points: [mouseEvent.value.points[0], { x, y }]
+                    };
                     eventHook.trigger(mouseEvent.value);
                 }
             } else {
-                mouseEvent.value.type = 'deprecated';
+                mouseEvent.value = {
+                    type: 'deprecated',
+                    points: []
+                };
             }
         }
     }));
