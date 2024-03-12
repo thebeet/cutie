@@ -1,3 +1,4 @@
+import './svg-icon';
 import { bootstrap, registerPlugin } from '@cutie/web3d';
 
 // middleware
@@ -10,6 +11,7 @@ registerPlugin('mouse', () => import('@cutie/web3d-middleware-mouse'));
 registerPlugin('render-sampling', () => import('@cutie/web3d-middleware-render-sampling'));
 registerPlugin('spatial-indexing', () => import('@cutie/web3d-middleware-spatial-indexing'));
 registerPlugin('three-view', () => import('@cutie/web3d-middleware-three-view'));
+registerPlugin('points-style', () => import('@cutie/web3d-middleware-points-style'));
 
 // plugin
 registerPlugin('box', () => import('@cutie/web3d-plugin-box'));

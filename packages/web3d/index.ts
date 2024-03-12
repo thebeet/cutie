@@ -11,6 +11,4 @@ export { usePerformanceStore } from './src/stores/performance';
 
 export * from './src/three/TFrame';
 
-export { type Operation, GroupOperation } from './src/operator/Operation';
-
 export { bootstrap } from './src/main';

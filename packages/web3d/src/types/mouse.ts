@@ -1,11 +1,7 @@
 export type AdvanceMouseEvent = {
-    type: string
-    cursor?: {
-        x: number
-        y: number
-    }
-    points: {
-        x: number
-        y: number
+    readonly type: string
+    readonly points: readonly {
+        readonly x: number
+        readonly y: number
     }[]
 }

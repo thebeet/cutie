@@ -1,12 +1,12 @@
 import { GLSL3, RawShaderMaterial } from 'three';
 
-type PointsLabelInstanceColorMaterialParam = {
+type PointsAllInOneMaterialParam = {
     size: number
 };
 
-export class PointsLabelInstanceColorMaterial extends RawShaderMaterial {
+export class PointsAllInOneMaterial extends RawShaderMaterial {
     public glslVersion = GLSL3;
-    constructor(param: PointsLabelInstanceColorMaterialParam) {
+    constructor(param: PointsAllInOneMaterialParam) {
         super({
             uniforms: { // make sure vectors count < 1024
                 pointSize: {
@@ -16,14 +16,14 @@ export class PointsLabelInstanceColorMaterial extends RawShaderMaterial {
                     value: new Float32Array(1024).fill(0.0) // 256 vectors
                 },
                 mode: {
-                    value: 0
+                    value: 1
                 },
                 highlightColor: {
                     value: new Float32Array(4).fill(1.0)
                 },
             },
             vertexShader: `
-            precision lowp float;
+            precision mediump float;
             in vec3 position;
             in vec3 color;
             in int label;
@@ -40,7 +40,9 @@ export class PointsLabelInstanceColorMaterial extends RawShaderMaterial {
             void main() {
                 gl_PointSize = pointSize;
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                if (mode == 0) {
+                if (mode == 1) {
+                    v_color = instanceColor[clamp(label, 0, 255)];
+                } else if (mode == 2) {
                     float vIntensity = intensity / 256.;
                     if (vIntensity < 0.25) {
                         v_color = vec4(0, vIntensity*4., 1.-vIntensity*4., 1.);
@@ -49,16 +51,23 @@ export class PointsLabelInstanceColorMaterial extends RawShaderMaterial {
                     } else {
                         v_color = vec4(1, vIntensity, vIntensity, 1);
                     }
-                }
-                if (mode == 1) {
-                    v_color = instanceColor[clamp(label, 0, 255)];
-                }
-                if (mode == 2) {
-                    v_color = instanceColor[clamp(label, 0, 255)];
+                } else if (mode == 3) {
+                    if (position.z < 0.) {
+                        float r = 1./(1.-position.z);
+                        v_color = vec4(r, r, 1, 1.);
+                    } else if (position.z < 1.) {
+                        float r = 1./(1.+position.z);
+                        v_color = vec4(r/2.+.5, 1., r*2.-1., 1.);
+                    } else {
+                        float r = 1./(1.+position.z);
+                        v_color = vec4(1.-r/2., r*2., 0., 1.);
+                    }
+                } else {
+                    v_color = vec4(1, 1, 1, 1);
                 }
             }`,
             fragmentShader: `
-            precision lowp float;
+            precision mediump float;
             in vec4 v_color;
             out vec4 o_FragColor;
             void main() {

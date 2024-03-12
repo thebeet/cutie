@@ -1,10 +1,8 @@
 import { watchEffect, h, watch } from 'vue';
-import { useDrama, addNodeToContainer, GroupOperation, useSync, useSetFocusOnClick } from '@cutie/web3d';
+import { useDrama, addNodeToContainer, useSync, useSetFocusOnClick } from '@cutie/web3d';
 import { useParsingStore } from './stores';
 import * as THREE from 'three';
 import ToolBox from './components/ToolBox.vue';
-import MouseActionDebugView from './components/MouseActionDebugView.vue';
-import MouseActionPreview from './components/MouseActionPreview.vue';
 import InstanceListView from './components/InstanceListView.vue';
 
 import { rectAction } from './actions/rect';
@@ -20,18 +18,18 @@ import { RBox } from './types';
 export const usePlugin = () => {
     const {
         scene,
-        toolbox, container, rightsidebar, activeTool, frames, camera,
+        toolbox, rightsidebar, activeTool, frames, camera,
         applyOperation, onApplyOperation, onAdvanceMouseEvent,
         setupThreeView, onThreeViewChange, onThreeViewConfirm
     } = useDrama();
 
     const parsingStore = useParsingStore();
-    const { pointsMaterial, tboxes, updateBox } = parsingStore;
+    const { tboxes, updateBox } = parsingStore;
     const { instances, boxes, focused, boxParsing } = storeToRefs(parsingStore);
     const { answer } = storeToRefs(useParsingAnswerStore());
 
     useSync(frames, boxes, tboxes, box => new TBox(box), (box, el) => box.apply(el), box => box.dispose());
-    useSetFocusOnClick(focused, tboxes, (box: Readonly<TBox>) => box.box);
+    useSetFocusOnClick(focused, tboxes, (box: Readonly<TBox>) => box.element);
     watch(focused, setupThreeView);
 
     const onThreeViewModify = (value: RBox & { uuid: string }) => {
@@ -44,7 +42,6 @@ export const usePlugin = () => {
 
     frames.forEach(frame => {
         frame.onPointsLoaded.then(({ points }) => {
-            points.material = pointsMaterial;
             const geometry = points.geometry;
             const label = answer.value.parsing!.frames[frame.index].label;
             geometry.setAttribute('label', new THREE.BufferAttribute(label, 1));
@@ -92,15 +89,10 @@ export const usePlugin = () => {
         if (operation instanceof ParsingOperation) {
             (operation as ParsingOperation).effect(instances.value);
         }
-        if (operation instanceof GroupOperation) {
-            (operation as GroupOperation).forEach((op) => (op as ParsingOperation).effect(instances.value));
-        }
     });
 
     useHotkeys();
 
     addNodeToContainer(h(ToolBox), toolbox);
-    addNodeToContainer(h(MouseActionDebugView), container);
-    addNodeToContainer(h(MouseActionPreview), container);
     addNodeToContainer(h(InstanceListView), rightsidebar);
 };

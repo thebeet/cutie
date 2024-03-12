@@ -1,6 +1,5 @@
 import { defineStore, storeToRefs } from 'pinia';
 import { ref, watch, watchEffect } from 'vue';
-import { PointsLabelInstanceColorMaterial } from '../three/material';
 import _ from 'lodash';
 import { useDrama, useFocus } from '@cutie/web3d';
 import * as THREE from 'three';
@@ -13,7 +12,7 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
     const brushRadius = ref(0.01);
     const boxParsing = ref(false);
 
-    const { scene, frames } = useDrama();
+    const { scene, frames, material } = useDrama();
     const { answer } = storeToRefs(useParsingAnswerStore());
 
     const instanceStates = ref<{
@@ -30,8 +29,6 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
     const updateBox = (newBox: Partial<ParsingBox>) => {
         boxes.value = boxes.value.map(box => (box.uuid === newBox.uuid) ? { ...box, ...newBox } : box);
     };
-
-    const pointsMaterial = new PointsLabelInstanceColorMaterial({ size: 1.0 });
 
     watch(() => answer.value.parsing?.instances, (answerInstances) => {
         if (instanceCounts.value.length === 0) {
@@ -58,18 +55,17 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
     });
 
     watchEffect(() => {
-        pointsMaterial.uniforms.instanceColor.value = _.flatten(instances.value.map(c => {
+        material.value.uniforms.instanceColor.value = _.flatten(instances.value.map(c => {
             const color = new THREE.Color(c.color);
             return [color.r, color.g, color.b, c.visible ? 1.0 : 0.0];
         }));
-        pointsMaterial.uniformsNeedUpdate = true;
+        material.value.uniformsNeedUpdate = true;
         scene.update();
     });
 
     return {
         mainLabelID, brushRadius, boxParsing,
         boxes, tboxes, focused, updateBox,
-        instances,
-        pointsMaterial
+        instances
     } as const;
 });

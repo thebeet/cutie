@@ -15,8 +15,8 @@ export const useAnswerCacheStore = defineStore('plugin::answer-cache', () => {
         localforage.setItem(key, klona(answer.value));
     };
 
-    onApplyOperation(({ save: opSave }) => {
-        if (opSave && autoSave.value) save();
+    onApplyOperation(() => {
+        if (autoSave.value) save();
     });
 
     return {

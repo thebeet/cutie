@@ -44,6 +44,7 @@ onMounted(async () => {
         { name: 'three-view' },
         { name: 'fullscreen' },
         { name: 'mouse' },
+        { name: 'points-style', params: { mode: 'label' } },
     ];
 
     for (const middleware of middlewares) {

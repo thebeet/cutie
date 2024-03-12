@@ -19,11 +19,9 @@ export const useAnswerHistoryStore = defineStore('plugin::answer-history', () =>
         clear();
     });
 
-    onApplyOperation(({ operation, save }) => {
-        if (save) {
-            commit();
-            operations.value = [operation, ...operations.value.slice(0, MAX_HISTORY_COUNT - 1)];
-        }
+    onApplyOperation(({ operation }) => {
+        commit();
+        operations.value = [operation, ...operations.value.slice(0, MAX_HISTORY_COUNT - 1)];
     });
 
     const reset = () => {

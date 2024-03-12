@@ -9,6 +9,7 @@ import { storeToRefs } from 'pinia';
 import { usePageStore } from '../stores/page';
 import { useFrame } from './frame';
 import { useThreeView } from './threeview';
+import { useShader } from './shader';
 
 const loader = usePCDCachedLoader(new PCDLoader());
 
@@ -55,6 +56,8 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
         confirmEvent: threeViewConfirmEventHook, changeEvent: threeViewChangeEventHook
     } = useThreeView();
 
+    const { mode: shaderMode, material } = useShader();
+
     const launch = async () => {
         const tAnswer: AnswerContent = {
             elements: []
@@ -91,6 +94,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
             activeTool, focusedUUID,
             page, answer, applyOperation, onApplyOperation,
             scene, camera,
+            shaderMode, material,
 
             launch,
             setupThreeView, onThreeViewSetup, onThreeViewChange, onThreeViewConfirm
