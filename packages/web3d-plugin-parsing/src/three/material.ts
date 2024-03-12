@@ -1,4 +1,4 @@
-import { GLSL3, RawShaderMaterial, Matrix4 } from 'three';
+import { GLSL3, RawShaderMaterial } from 'three';
 
 type PointsLabelInstanceColorMaterialParam = {
     size: number

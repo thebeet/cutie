@@ -1,5 +1,5 @@
 import { ref, watchEffect, MaybeRefOrGetter } from 'vue';
-import { AnswerContent } from '../types';
+import { AnswerContent, Frame } from '../types';
 import { useScene } from './scene';
 import { usePCDCachedLoader } from './loader';
 import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
@@ -7,7 +7,6 @@ import { useAnswerStore } from '../stores/answer';
 import { useMouse } from './mouse';
 import { storeToRefs } from 'pinia';
 import { usePageStore } from '../stores/page';
-import { Frame } from '../types';
 import { useFrame } from './frame';
 import { useThreeView } from './threeview';
 

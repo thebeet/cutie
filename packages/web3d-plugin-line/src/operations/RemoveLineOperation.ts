@@ -1,4 +1,4 @@
-import { AnswerContent, Operation, TFrame } from '@cutie/web3d';
+import { AnswerContent, Operation } from '@cutie/web3d';
 import { ALine } from '../types';
 
 export class RemoveLineOperation implements Operation {

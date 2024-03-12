@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { Float32BufferAttribute, Vector3 } from 'three';
 export const dbScanFit = (
     position: Float32BufferAttribute,

@@ -79,5 +79,6 @@ export const useLineCompletion = (
     const { position } = multiFramePointsCulled(frames, points, size);
     const index = _.range(0, position.count);
     const clusters = dbScanFit(position, index, 0.5, 5);
-    console.log(clusters);
+
+    return clusters;
 };

@@ -21,6 +21,7 @@ export const runPlugin = (id: string) => {
     if (id in plugins) {
         return plugins[id]();
     } else {
+        // eslint-disable-next-line no-console
         console.warn(`Plugin [${id}] not exists.`);
         return Promise.resolve();
     }
