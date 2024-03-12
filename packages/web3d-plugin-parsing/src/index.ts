@@ -1,10 +1,9 @@
-import { watchEffect, h, watch } from 'vue';
-import { useDrama, addNodeToContainer, useSync, useSetFocusOnClick } from '@cutie/web3d';
+import { watchEffect, h } from 'vue';
+import { useDrama, addNodeToContainer } from '@cutie/web3d';
 import { useParsingStore } from './stores';
 import * as THREE from 'three';
 import ToolBox from './components/ToolBox.vue';
 import InstanceListView from './components/InstanceListView.vue';
-
 import { rectAction } from './actions/rect';
 import { polylineAction } from './actions/polygon';
 import { storeToRefs } from 'pinia';
@@ -12,33 +11,17 @@ import { useParsingAnswerStore } from './stores/answer';
 import { ParsingOperation } from './operations/ParsingOperation';
 import { boxAction } from './actions/box';
 import { useHotkeys } from './hotkeys';
-import { TBox } from './three/TBox';
-import { RBox } from './types';
 
 export const usePlugin = () => {
     const {
         scene,
         toolbox, rightsidebar, activeTool, frames, camera,
-        applyOperation, onApplyOperation, onAdvanceMouseEvent,
-        setupThreeView, onThreeViewChange, onThreeViewConfirm
+        applyOperation, onApplyOperation, onAdvanceMouseEvent
     } = useDrama();
 
     const parsingStore = useParsingStore();
-    const { tboxes, updateBox } = parsingStore;
-    const { instances, boxes, focused, boxParsing } = storeToRefs(parsingStore);
+    const { instances, boxParsing } = storeToRefs(parsingStore);
     const { answer } = storeToRefs(useParsingAnswerStore());
-
-    useSync(frames, boxes, tboxes, box => new TBox(box), (box, el) => box.apply(el), box => box.dispose());
-    useSetFocusOnClick(focused, tboxes, (box: Readonly<TBox>) => box.element);
-    watch(focused, setupThreeView);
-
-    const onThreeViewModify = (value: RBox & { uuid: string }) => {
-        if (focused.value?.uuid === value.uuid) {
-            updateBox(value);
-        }
-    };
-    onThreeViewChange(onThreeViewModify);
-    onThreeViewConfirm(onThreeViewModify);
 
     frames.forEach(frame => {
         frame.onPointsLoaded.then(({ points }) => {

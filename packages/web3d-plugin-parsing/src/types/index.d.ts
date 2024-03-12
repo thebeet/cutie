@@ -27,4 +27,3 @@ export interface AnswerContent extends BaseType.AnswerContent {
     readonly parsing: ParsingAnswerResult
 }
 
-export type ParsingBox = BaseType.AElement & BaseType.RBox;

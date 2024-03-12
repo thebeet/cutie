@@ -8,6 +8,7 @@ import { useBoxStore } from './stores';
 import { ModifyBoxOperation } from './operations/ModifyBoxOperation';
 import { useHotkeys } from './hotkeys';
 import { TBox } from './three/TBox';
+import * as THREE from 'three';
 
 export const usePlugin = () => {
     const { activeTool, toolbox,
@@ -41,7 +42,7 @@ export const usePlugin = () => {
         if (activeTool.value === 'rect' && event.type === 'rected') {
             if (primaryFrame.value) {
                 const results = rectAction(event.points, camera);
-                applyOperation(new AddBoxOperation(primaryFrame.value, results, camera.rotation));
+                applyOperation(new AddBoxOperation(primaryFrame.value, results, new THREE.Euler(0, 0, camera.rotation.z)));
             }
         }
     });

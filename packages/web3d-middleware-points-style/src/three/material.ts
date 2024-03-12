@@ -54,13 +54,15 @@ export class PointsAllInOneMaterial extends RawShaderMaterial {
                 } else if (mode == 3) {
                     if (position.z < 0.) {
                         float r = 1./(1.-position.z);
-                        v_color = vec4(r, r, 1, 1.);
+                        v_color = vec4(r, r, 1., 1.);
                     } else if (position.z < 1.) {
-                        float r = 1./(1.+position.z);
-                        v_color = vec4(r/2.+.5, 1., r*2.-1., 1.);
+                        v_color = vec4(1.,1.,1.,1.)*(1.-position.z) + vec4(0.4,1.,.6,1.)*position.z;
+                    } else if (position.z < 5.) {
+                        float r = (position.z - 1.)/4.;
+                        v_color = vec4(0.4,1.,.6,1.)*(1.-r) + vec4(.8,.5,0.,1.)*r;
                     } else {
-                        float r = 1./(1.+position.z);
-                        v_color = vec4(1.-r/2., r*2., 0., 1.);
+                        float r = 1./(position.z - 4.);
+                        v_color = vec4(1.,.2,.5,1.)*(1.-r) + vec4(.8,.5,0.,1.)*r;
                     }
                 } else {
                     v_color = vec4(1, 1, 1, 1);

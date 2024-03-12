@@ -3,7 +3,6 @@
         <div class="toolbox-title">Parsing</div>
         <button type="button" class="toolbox-button" @click="click('rect')">Rect</button>
         <button type="button" class="toolbox-button" @click="click('polyline')">Polyline</button>
-        <button type="button" class="toolbox-button" @click="box()">Box</button>
         <button type="button" class="toolbox-button" @click="dump()">Dump</button>
     </div>
 </template>
@@ -21,12 +20,6 @@ const click = (mode: string) => {
     activeTool.value = 'parsing';
     mouseState.value = mode;
     boxParsing.value = false;
-};
-
-const box = () => {
-    activeTool.value = 'parsing';
-    mouseState.value = 'rect';
-    boxParsing.value = true;
 };
 
 const dump = () => {

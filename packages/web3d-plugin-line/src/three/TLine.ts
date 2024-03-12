@@ -1,26 +1,13 @@
 import * as THREE from 'three';
-import { TFrame } from '@cutie/web3d';
+import { TFocusableEventMap, TFrame } from '@cutie/web3d';
 import { ALine } from '../types';
 
-const _lineMaterial = new THREE.LineBasicMaterial({
-    color: 0xdddd00,
-    linewidth: 1000
-});
-
-const _lineFocusMaterial = new THREE.LineBasicMaterial({
-    color: 0xff3300,
-    linewidth: 1000
-});
-
-export interface TLineEventMap extends THREE.Object3DEventMap {
-    focus: {}
-    blur: {}
-}
-
+const _lineMaterial = new THREE.LineBasicMaterial({ color: 0xdddd00 });
+const _lineFocusMaterial = new THREE.LineBasicMaterial({ color: 0xff3300 });
 const _sphereGeometry = new THREE.SphereGeometry(0.25, 16, 16);
 const _sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
-export class TLine extends THREE.Object3D<TLineEventMap> {
+export class TLine extends THREE.Object3D<TFocusableEventMap> {
     element: ALine;
 
     private points: THREE.InstancedMesh;

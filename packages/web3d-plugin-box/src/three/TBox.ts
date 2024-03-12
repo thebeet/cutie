@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { ABox } from '../types';
-import { TFrame, rbox2Matrix } from '@cutie/web3d';
+import { TFocusableEventMap, TFrame, rbox2Matrix } from '@cutie/web3d';
 
 const _rectMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.2, transparent: true });
 const _rectFocusMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
@@ -13,12 +13,7 @@ const _edgesGeometry = /*@__PURE__*/ new THREE.EdgesGeometry(_boxGeometry);
 const _o = new THREE.Vector3(0, 0, 0);
 const _arrow = new THREE.Vector3(1, 0, 0);
 
-export interface TBoxEventMap extends THREE.Object3DEventMap {
-    focus: {}
-    blur: {}
-}
-
-export class TBox extends THREE.Object3D<TBoxEventMap> {
+export class TBox extends THREE.Object3D<TFocusableEventMap> {
     private _label: CSS2DObject;
     private _mesh: THREE.Mesh;
     private _edge: THREE.LineSegments;

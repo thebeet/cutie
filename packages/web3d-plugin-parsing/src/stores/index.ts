@@ -1,12 +1,10 @@
 import { defineStore, storeToRefs } from 'pinia';
 import { ref, watch, watchEffect } from 'vue';
 import _ from 'lodash';
-import { useDrama, useFocus } from '@cutie/web3d';
+import { useDrama } from '@cutie/web3d';
 import * as THREE from 'three';
 import { useParsingAnswerStore } from './answer';
-import { ParsingBox, ParsingInstance } from '../types';
-import { TBox } from '../three/TBox';
-
+import { ParsingInstance } from '../types';
 export const useParsingStore = defineStore('plugin::parsing', () => {
     const mainLabelID = ref(1);
     const brushRadius = ref(0.01);
@@ -21,14 +19,6 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
     }[]>([]);
     const instanceCounts = ref<number[][]>([]);
     const instances = ref<ParsingInstance[]>([]);
-
-    const boxes = ref<ParsingBox[]>([]);
-    const tboxes = new Map<string, TBox>([]);
-    const { focused } = useFocus(boxes, tboxes);
-
-    const updateBox = (newBox: Partial<ParsingBox>) => {
-        boxes.value = boxes.value.map(box => (box.uuid === newBox.uuid) ? { ...box, ...newBox } : box);
-    };
 
     watch(() => answer.value.parsing?.instances, (answerInstances) => {
         if (instanceCounts.value.length === 0) {
@@ -65,7 +55,6 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
 
     return {
         mainLabelID, brushRadius, boxParsing,
-        boxes, tboxes, focused, updateBox,
         instances
     } as const;
 });
