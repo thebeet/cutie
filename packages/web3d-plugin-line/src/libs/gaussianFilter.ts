@@ -30,22 +30,16 @@ const gaussianFilter1d = (array: number[], sigma: number): number[] => {
             filteredArray[i] += array[j] * kernel[weightIndex];
         }
     }
-
     return filteredArray;
 };
 
 export const gaussianFilter3d = (points: THREE.Vector3[], sigma: number): THREE.Vector3[] => {
     const filteredX = gaussianFilter1d(points.map(p => p.x), sigma);
     const filteredY = gaussianFilter1d(points.map(p => p.y), sigma);
-    const filteredZ = gaussianFilter1d(points.map(p => p.y), sigma);
+    const filteredZ = gaussianFilter1d(points.map(p => p.z), sigma);
     const filteredPositions: THREE.Vector3[] = [];
     for (let i = 0; i < filteredX.length; i++) {
         filteredPositions.push(new THREE.Vector3(filteredX[i], filteredY[i], filteredZ[i]));
     }
     return filteredPositions;
 };
-// 使用示例
-const data = [1, 2, 3, 2, 1]; // 示例数据
-const sigma = 1.0; // 高斯核的标准差
-const smoothedData = gaussianFilter1d(data, sigma);
-console.log(smoothedData);

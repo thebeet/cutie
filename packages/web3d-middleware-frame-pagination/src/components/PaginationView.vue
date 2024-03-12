@@ -4,16 +4,23 @@
             v-for="frame in frames"
             :key="frame.index"
             class="frame-pagination"
+            :class="{active: isActive(frame), primary: isPrimary(frame)}"
             @click="() => selectFrame(frame.index)"
         >{{frame.index}}</div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { useDrama } from '@cutie/web3d';
+import { useDrama, TFrame } from '@cutie/web3d';
 
-const { frames, selectFrame } = useDrama();
+const { frames, activeFrames, primaryFrame, selectFrame } = useDrama();
 
+const isActive = (frame: TFrame) => {
+    return activeFrames.value.includes(frame);
+};
+const isPrimary = (frame: TFrame) => {
+    return primaryFrame.value === frame;
+};
 </script>
 
 <style scoped>
@@ -30,5 +37,12 @@ const { frames, selectFrame } = useDrama();
     font-size: 12px;
     text-align: center;
     cursor: pointer;
+}
+.frame-pagination.active {
+    border: 1px solid #3333ff;
+}
+
+.frame-pagination.primary {
+    background-color: #ff0000;
 }
 </style>
