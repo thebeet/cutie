@@ -22,6 +22,21 @@ export interface ITFrame extends PointsIntersect {
     readonly onPointsLoaded: Promise<{frame: ITFrame, points: THREE.Points}>;
 }
 
+// 兼容Promise.withResolvers()
+const promiseWithResolvers = <T>() => {
+    let resolve: (payload: T) => void;
+    let reject: () => void;
+    const promise = new Promise<T>((resolve_, reject_) => {
+        resolve = resolve_;
+        reject = reject_;
+    });
+    return {
+        // @ts-ignore
+        resolve, reject, promise
+    };
+};
+
+
 export class TFrame extends THREE.Object3D implements ITFrame {
     readonly index: number;
     _points: THREE.Points | undefined;
@@ -37,7 +52,7 @@ export class TFrame extends THREE.Object3D implements ITFrame {
         super();
         this.index = index;
         // @ts-ignore
-        this._pointsLoadedPromise = Promise.withResolvers();
+        this._pointsLoadedPromise = promiseWithResolvers();
         this.addEventListener('change', () => {
             // @ts-ignore
             this.frame.parent?.dispatchEvent({ type: 'change' });
