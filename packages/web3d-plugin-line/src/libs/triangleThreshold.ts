@@ -1,36 +1,42 @@
 export const triangleThreshold = (histogram: number[]): number => {
-    const { maxValue, maxIndex, minValue, minIndex } = histogram.reduce((pre, cur, i) => {
+    const { maxValue, maxIndex } = histogram.reduce((pre, cur, i) => {
         if (cur > pre.maxValue) {
             pre.maxValue = cur;
             pre.maxIndex = i;
         }
-        if (cur < pre.minValue) {
-            pre.minValue = cur;
-            pre.minIndex = i;
-        }
         return pre;
-    }, { maxValue: 0, minValue: Number.MAX_VALUE, minIndex: 0, maxIndex: 0 });
+    }, { maxValue: 0, maxIndex: 0 });
 
-    // 应用三角算法
-    // 初始化阈值和最大距离
-    let threshold = 0;
-    let maxDistance = -1;
+    // 如果没有非零值，返回-1
+    if (maxValue === 0) {
+        return -1;
+    }
 
-    // 峰值与直方图尾部的连线方程为 y = mx + b
-    const dx = maxIndex - minIndex;
-    const dy = maxValue - minValue;
-    const d = Math.sqrt(dx * dx + dy * dy);
-    const m = dy / dx;
-    const b = minValue - m * minIndex;
+    // 确定基线的另一个端点：直方图两端的最远非零点
+    const firstNonZeroIndex = histogram.findIndex(count => count > 0);
+    const lastNonZeroIndex = histogram.length - 1 - [...histogram].reverse().findIndex(count => count > 0);
 
-    for (let i = minIndex; i <= maxIndex; i++) {
-        // 计算当前点到直线的距离
-        const distance = Math.abs(m * i - histogram[i] + b) / d;
-        // 更新最大距离和阈值
-        if (distance > maxDistance) {
-            maxDistance = distance;
+    // 确定基线端点顺序
+    let baseLineStartIndex = firstNonZeroIndex;
+    let baseLineEndIndex = lastNonZeroIndex;
+    if (maxIndex - firstNonZeroIndex < lastNonZeroIndex - maxIndex) {
+        baseLineStartIndex = maxIndex;
+    } else {
+        baseLineEndIndex = maxIndex;
+    }
+
+    // 构建基线并寻找最远点
+    const baseLineVec = [baseLineEndIndex - baseLineStartIndex, histogram[baseLineEndIndex] - histogram[baseLineStartIndex]];
+    let maxDistance = -Number.MAX_VALUE;
+    let threshold = baseLineStartIndex; // 初始化为基线开始端点，以防循环中没有找到更远的点
+
+    for (let i = baseLineStartIndex; i <= baseLineEndIndex; i++) {
+        const fake_distance = -baseLineVec[0] * histogram[i] + baseLineVec[1] * i; // 基线向量和该处数据向量叉乘的值，和距离成正比
+        if (fake_distance > maxDistance) {
+            maxDistance = fake_distance;
             threshold = i;
         }
     }
+
     return threshold;
 };

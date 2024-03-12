@@ -58,7 +58,7 @@ export const multiFramePointsCulled = (
 ) => {
     const allPoints: [TFrame, number[]][] = [];
     for (const frame of frames) {
-        const mergePoints = [];
+        const mergePoints: number[] = [];
         for (let i = 0; i < points.length - 1; ++i) {
             const start = points[i];
             const end = points[i + 1];
