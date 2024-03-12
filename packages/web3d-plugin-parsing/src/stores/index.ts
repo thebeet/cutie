@@ -8,7 +8,6 @@ import { ParsingInstance } from '../types';
 export const useParsingStore = defineStore('plugin::parsing', () => {
     const mainLabelID = ref(1);
     const brushRadius = ref(0.01);
-    const boxParsing = ref(false);
 
     const { scene, frames, material } = useDrama();
     const { answer } = storeToRefs(useParsingAnswerStore());
@@ -54,7 +53,7 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
     });
 
     return {
-        mainLabelID, brushRadius, boxParsing,
+        mainLabelID, brushRadius,
         instances
     } as const;
 });

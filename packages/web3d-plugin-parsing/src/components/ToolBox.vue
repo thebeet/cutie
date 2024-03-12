@@ -14,12 +14,11 @@ import { storeToRefs } from 'pinia';
 import * as THREE from 'three';
 
 const { activeTool, mouseState, frames } = useDrama();
-const { instances, boxParsing } = storeToRefs(useParsingStore());
+const { instances } = storeToRefs(useParsingStore());
 
 const click = (mode: string) => {
     activeTool.value = 'parsing';
     mouseState.value = mode;
-    boxParsing.value = false;
 };
 
 const dump = () => {

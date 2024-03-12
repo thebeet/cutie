@@ -9,7 +9,6 @@ import { polylineAction } from './actions/polygon';
 import { storeToRefs } from 'pinia';
 import { useParsingAnswerStore } from './stores/answer';
 import { ParsingOperation } from './operations/ParsingOperation';
-import { boxAction } from './actions/box';
 import { useHotkeys } from './hotkeys';
 
 export const usePlugin = () => {
@@ -20,7 +19,7 @@ export const usePlugin = () => {
     } = useDrama();
 
     const parsingStore = useParsingStore();
-    const { instances, boxParsing } = storeToRefs(parsingStore);
+    const { instances } = storeToRefs(parsingStore);
     const { answer } = storeToRefs(useParsingAnswerStore());
 
     frames.forEach(frame => {
@@ -47,13 +46,6 @@ export const usePlugin = () => {
     onAdvanceMouseEvent((event) => {
         if (activeTool.value === 'parsing') {
             if (event.type === 'rected') {
-                if (boxParsing.value) {
-                    const newBox = boxAction(event.points, camera);
-                    if (newBox) {
-                        boxes.value = [...boxes.value, newBox];
-                    }
-                    return;
-                }
                 const operation = rectAction(event.points, camera);
                 if (operation) {
                     applyOperation(operation);
