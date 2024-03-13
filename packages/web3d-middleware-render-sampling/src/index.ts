@@ -1,35 +1,46 @@
 import * as THREE from 'three';
 import { useAdvanceDrama } from '@cutie/web3d';
 import { useRafFn } from '@vueuse/core';
+import { computed } from 'vue';
 
 export const useMiddleware = () => {
-    const { controls, scene, frames, page } = useAdvanceDrama();
+    const { controls, scene, frames, page, activeFrames } = useAdvanceDrama();
 
-    let pointsCountTotal = 0;
-    let maxPointsCounts = 1;
-    page.data.frames.forEach((frameData) => {
-        pointsCountTotal += frameData.points;
-        maxPointsCounts = Math.max(maxPointsCounts, frameData.points);
-    });
+    const maxPointsCounts = Math.max(0, ...page.data.frames.map(f => f.points));
 
-    const sampleStep = Math.floor(pointsCountTotal / 2_000_000) + 1;
+    const activePoints = computed(() => activeFrames.value.reduce(
+        (acc, frame) => acc + page.data.frames[frame.index - 1].points, 0));
+
     const thredhold = 500_000;
-    const n = Math.floor(maxPointsCounts / sampleStep);
-    const indexArr = new Uint32Array(n);
-    for (let i = 0; i < n; i++) {
-        indexArr[i] = i * sampleStep;
-    }
-    const indexAttribute = new THREE.BufferAttribute(indexArr, 1);
+
+    const steps = [
+        2, 3, 4, 5, 6, 8, 10,
+        12, 14, 16, 18, 20,
+        25, 30, 35, 40, 45, 50,
+        60, 70, 80, 90, 100
+    ];
+    const sampleAttributes = new Map(steps.map(step => {
+        const n = Math.floor(maxPointsCounts / step);
+        const arr = new Uint32Array(n);
+        for (let i = 0; i < n; i++) {
+            arr[i] = i * step;
+        }
+        return [step, new THREE.BufferAttribute(arr, 1)];
+    }));
 
     scene.addEventListener('downsampling', () => {
+        if (activePoints.value <= thredhold) {
+            return;
+        }
+        const t = Math.floor(activePoints.value / thredhold);
+        const step = steps.reduce((acc, item) => t <= item ? Math.min(acc, item) : acc, 50);
+        const sampleAttribute = sampleAttributes.get(step)!;
         frames.forEach(frame => {
             if (frame.points) {
                 const geometry = frame.points.geometry;
                 const n = geometry.attributes.position.count;
-                if (n > thredhold) {
-                    geometry.setIndex(indexAttribute);
-                    geometry.setDrawRange(0, Math.floor(n / sampleStep));
-                }
+                geometry.setIndex(sampleAttribute);
+                geometry.setDrawRange(0, Math.floor(n / step));
             }
         });
     });

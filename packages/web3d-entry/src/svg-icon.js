@@ -41,7 +41,9 @@ class SvgIcon extends HTMLElement {
     get rotate() {
         const rotate = this.getAttribute('rotate');
 
-        if (!isNaN(rotate)) return rotate + 'deg';
+        if (!isNaN(rotate)) {
+            return rotate + 'deg';
+        }
         return rotate;
     }
 

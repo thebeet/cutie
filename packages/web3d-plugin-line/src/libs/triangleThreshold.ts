@@ -1,4 +1,4 @@
-export const triangleThreshold = (histogram: number[]): number => {
+export const triangleThreshold = (histogram: Uint32Array): number => {
     const { maxValue, maxIndex } = histogram.reduce((pre, cur, i) => {
         if (cur > pre.maxValue) {
             pre.maxValue = cur;

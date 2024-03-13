@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { TFocusableEventMap, TFrame } from '@cutie/web3d';
 import { ALine } from '../types';
+import { TLineBoxHelper } from './TLineBoxHelper';
 
 const _lineMaterial = new THREE.LineBasicMaterial({ color: 0xdddd00 });
 const _lineFocusMaterial = new THREE.LineBasicMaterial({ color: 0xff3300 });
@@ -12,6 +13,8 @@ export class TLine extends THREE.Object3D<TFocusableEventMap> {
 
     private points: THREE.InstancedMesh;
     private lines: THREE.Line;
+
+    private debugBoxHelper: TLineBoxHelper;
 
     constructor(line: ALine) {
         super();
@@ -28,6 +31,10 @@ export class TLine extends THREE.Object3D<TFocusableEventMap> {
         this.points = new THREE.InstancedMesh(_sphereGeometry, _sphereMaterial, p.length);
         p.forEach((p, i) => this.points.setMatrixAt(i, new THREE.Matrix4().setPosition(p)));
         this.add(this.points);
+
+        this.debugBoxHelper = new TLineBoxHelper(this.element);
+        this.add(this.debugBoxHelper);
+
         this.matrixAutoUpdate = false;
         this.matrixWorldNeedsUpdate = false;
         this._bindEvent();
@@ -74,11 +81,10 @@ export class TLine extends THREE.Object3D<TFocusableEventMap> {
                 p.push(new THREE.Vector3(this.element.points[i], this.element.points[i + 1], this.element.points[i + 2]));
             }
             this.lines.geometry.dispose();
-            const geometry = new THREE.BufferGeometry().setFromPoints(p);
-            this.lines.geometry = geometry;
+            this.lines.geometry = new THREE.BufferGeometry().setFromPoints(p);
 
+            this.points.dispose();
             this.remove(this.points);
-
             this.points = new THREE.InstancedMesh(_sphereGeometry, _sphereMaterial, p.length);
             p.forEach((p, i) => this.points.setMatrixAt(i, new THREE.Matrix4().setPosition(p)));
             this.add(this.points);

@@ -3,7 +3,11 @@
         <div>current {{ mainLabelID }}</div>
         <table>
             <tbody>
-                <tr v-for="instance in instances" :key="instance.id" @click="setMainLabelID(instance.id)">
+                <tr
+                    v-for="instance in instances"
+                    :key="instance.id"
+                    @click="setMainLabelID(instance.id)"
+                >
                     <td>{{ instance.id }}</td>
                     <td>
                         <svg-icon
@@ -20,7 +24,13 @@
                             @click.stop="show(instance.id)"
                         ></svg-icon>
                     </td>
-                    <td><input v-model="instance.color" type="color" @change="changeColor(instance.id, instance.color)"></td>
+                    <td>
+                        <input
+                            v-model="instance.color"
+                            type="color"
+                            @change="changeColor(instance.id, instance.color)"
+                        >
+                    </td>
                     <td>{{ instance.name }}</td>
                     <td>{{ activeFrames.reduce((sum, frame) => sum + instance.counts[frame.index], 0) }}</td>
                     <td>

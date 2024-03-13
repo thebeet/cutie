@@ -82,10 +82,6 @@ export class TBox extends THREE.Object3D<TFocusableEventMap> {
         return this.parent as TFrame;
     }
 
-    get isTCube() {
-        return true;
-    }
-
     raycast(raycaster: THREE.Raycaster, intersects: THREE.Intersection[]) {
         const innerIntersect = [] as THREE.Intersection[];
         this._mesh.raycast(raycaster, innerIntersect);

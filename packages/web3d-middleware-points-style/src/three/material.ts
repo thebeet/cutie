@@ -37,20 +37,20 @@ export class PointsAllInOneMaterial extends RawShaderMaterial {
             uniform vec4 instanceColor[256];
             uniform vec4 highlightColor;
             out vec4 v_color;
+            vec3 hsv2rgb(vec3 c)
+            {
+                vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+                return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+            }
             void main() {
                 gl_PointSize = pointSize;
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 if (mode == 1) {
                     v_color = instanceColor[clamp(label, 0, 255)];
                 } else if (mode == 2) {
-                    float vIntensity = intensity / 256.;
-                    if (vIntensity < 0.25) {
-                        v_color = vec4(0, vIntensity*4., 1.-vIntensity*4., 1.);
-                    } else if (vIntensity < 0.5) {
-                        v_color = vec4(vIntensity*4.-1., 2.-vIntensity*4., 0, 1.);
-                    } else {
-                        v_color = vec4(1, vIntensity, vIntensity, 1);
-                    }
+                    float vIntensity = clamp(intensity / 128., 0., 1.);
+                    v_color = vec4(hsv2rgb(vec3(vIntensity, 1., 1.)), 1.);
                 } else if (mode == 3) {
                     if (position.z < 0.) {
                         float r = 1./(1.-position.z);
