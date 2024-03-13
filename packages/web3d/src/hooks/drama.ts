@@ -41,7 +41,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     toolbox: MaybeRefOrGetter<HTMLDivElement | undefined>,
     footer: MaybeRefOrGetter<HTMLDivElement | undefined>,
     rightsidebar?: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
-    const { controls, scene, renderer, camera, controlMode } = useScene(container);
+    const { controls, scene, renderer, camera, controlMode, transform } = useScene(container);
 
     const { page } = usePageStore();
     const { frames, primaryFrame, activeFrames, selectFrame } = useFrame(scene);
@@ -95,6 +95,8 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
             page, answer, applyOperation, onApplyOperation,
             scene, camera,
             shaderMode, material,
+
+            transform,
 
             launch,
             setupThreeView, onThreeViewSetup, onThreeViewChange, onThreeViewConfirm

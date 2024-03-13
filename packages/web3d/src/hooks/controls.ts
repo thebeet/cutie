@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import { ref, watch } from 'vue';
 
 export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
@@ -23,8 +24,16 @@ export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
         }
     });
 
+    const transform = new TransformControls(camera, renderer.domElement);
+    transform.layers.enableAll();
+    transform.addEventListener('dragging-changed', (event) => {
+        controls.enabled = ! event.value;
+    });
+
     return {
         controls,
-        controlMode: mode
+        controlMode: mode,
+
+        transform
     } as const;
 };

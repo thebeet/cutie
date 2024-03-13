@@ -33,14 +33,13 @@ export const usePlugin = () => {
 
             draft.value = {
                 ...draft.value,
-                points: new Float32Array([...draft.value.points.slice(0, (n - 1) * 3), point.x, point.y, point.z]),
+                points: [...draft.value.points.slice(0, n - 1), point],
             };
         } else if (event.type === 'lined') {
             if (draft.value && draft.value.points.length >= 2) {
-                const n = event.points.length;
                 const op = new AddLineOperation(primaryFrame.value, {
                     ...draft.value,
-                    points: draft.value.points.slice(0, (n - 1) * 3)
+                    points: draft.value.points.slice(0, -1)
                 });
                 applyOperation(op);
                 draft.value = undefined;

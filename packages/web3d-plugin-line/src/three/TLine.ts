@@ -3,6 +3,7 @@ import { TFocusableEventMap, TFrame } from '@cutie/web3d';
 import { ALine } from '../types';
 import { TLineBoxHelper } from './TLineBoxHelper';
 
+
 const _lineMaterial = new THREE.LineBasicMaterial({ color: 0xdddd00 });
 const _lineFocusMaterial = new THREE.LineBasicMaterial({ color: 0xff3300 });
 const _sphereGeometry = new THREE.SphereGeometry(0.25, 16, 16);
@@ -20,10 +21,7 @@ export class TLine extends THREE.Object3D<TFocusableEventMap> {
         super();
         this.element = line;
 
-        const p = [];
-        for (let i = 0; i < this.element.points.length; i += 3) {
-            p.push(new THREE.Vector3(this.element.points[i], this.element.points[i + 1], this.element.points[i + 2]));
-        }
+        const p = this.element.points.map(p => new THREE.Vector3(p.x, p.y, p.z));
         const geometry = new THREE.BufferGeometry().setFromPoints(p);
         this.lines = new THREE.Line(geometry, _lineMaterial);
         this.add(this.lines);
@@ -32,8 +30,8 @@ export class TLine extends THREE.Object3D<TFocusableEventMap> {
         p.forEach((p, i) => this.points.setMatrixAt(i, new THREE.Matrix4().setPosition(p)));
         this.add(this.points);
 
-        this.debugBoxHelper = new TLineBoxHelper(this.element);
-        this.add(this.debugBoxHelper);
+        //this.debugBoxHelper = new TLineBoxHelper(this.element);
+        //this.add(this.debugBoxHelper);
 
         this.matrixAutoUpdate = false;
         this.matrixWorldNeedsUpdate = false;
@@ -76,10 +74,7 @@ export class TLine extends THREE.Object3D<TFocusableEventMap> {
         if (line !== this.element) {
             this.element = line;
 
-            const p = [];
-            for (let i = 0; i < this.element.points.length; i += 3) {
-                p.push(new THREE.Vector3(this.element.points[i], this.element.points[i + 1], this.element.points[i + 2]));
-            }
+            const p = this.element.points.map(p => new THREE.Vector3(p.x, p.y, p.z));
             this.lines.geometry.dispose();
             this.lines.geometry = new THREE.BufferGeometry().setFromPoints(p);
 

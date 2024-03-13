@@ -4,29 +4,21 @@ import { useLineStore } from '../stores';
 import { ALine } from '../types';
 import { useLineCompletion } from '../libs/lineCompletion';
 import * as THREE from 'three';
+import { ModifyLineOperation } from '../operations/ModifyLineOperation';
 
 export const useAutoAction = () => {
-    const { activeFrames, scene } = useDrama();
+    const { activeFrames, applyOperation } = useDrama();
     const { focused } = storeToRefs(useLineStore());
 
     const autoGeneratePoints = (line: ALine) => {
-        const points = [];
-        for (let i = 0; i < line.points.length; i += 3) {
-            points.push(new THREE.Vector3(line.points[i], line.points[i + 1], line.points[i + 2]));
-        }
-        const { result, buckets, position } = useLineCompletion(activeFrames.value, points);
-        console.log(buckets);
+        const points = line.points.map(p => new THREE.Vector3(p.x, p.y, p.z));
+        const { result } = useLineCompletion(activeFrames.value, points);
 
-        //const t = buckets.map(([_, p]) => p);
-        const geometry = new THREE.BufferGeometry().setFromPoints(result);
-        const debugPoint = new THREE.Points(
-            geometry,
-            new THREE.PointsMaterial({
-                color: 0xff0000,
-                size: 1,
-            })
-        );
-        scene.add(debugPoint);
+        const op = new ModifyLineOperation({
+            ...line,
+            points: result
+        });
+        applyOperation(op);
     };
 
     const autoGeneratePointsForFocus = () => {

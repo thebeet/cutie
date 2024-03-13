@@ -25,7 +25,7 @@ export const useLineStore = defineStore('plugin::line', () => {
         label: 'label',
         description: 'description',
         frameIndex: primaryFrame.value.index,
-        points: new Float32Array(),
+        points: [],
     } as ALine);
 
     return {

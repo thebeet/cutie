@@ -50,7 +50,7 @@ export class PointsAllInOneMaterial extends RawShaderMaterial {
                     v_color = instanceColor[clamp(label, 0, 255)];
                 } else if (mode == 2) {
                     float vIntensity = clamp(intensity / 128., 0., 1.);
-                    v_color = vec4(hsv2rgb(vec3(vIntensity, 1., 1.)), 1.);
+                    v_color = vec4(hsv2rgb(vec3(vIntensity, 1., clamp(intensity / 128., 0., .5) + 0.5)), 1.);
                 } else if (mode == 3) {
                     if (position.z < 0.) {
                         float r = 1./(1.-position.z);
