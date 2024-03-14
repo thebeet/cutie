@@ -10,5 +10,3 @@ export { useAnswerStore } from './src/stores/answer';
 export { usePerformanceStore } from './src/stores/performance';
 
 export * from './src/three/TFrame';
-
-export { bootstrap } from './src/main';

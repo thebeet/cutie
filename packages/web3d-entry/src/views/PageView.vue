@@ -15,11 +15,8 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { Page } from '../types';
-import { useDrama } from '../hooks/drama';
-import { usePageStore } from '../stores/page';
+import { Page, useDrama, usePageStore, runPlugin } from '@cutie/web3d';
 import { mdiCar } from '@mdi/js';
-import { runPlugin } from '../plugins';
 
 const props = defineProps<{
     page: Page

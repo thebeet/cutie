@@ -2,7 +2,7 @@
     <PageView v-if="page" :page="page"/>
 </template>
 <script lang="ts" setup>
-import { Page } from './types';
+import { Page } from '@cutie/web3d';
 import PageView from './views/PageView.vue';
 import { ref } from 'vue';
 
