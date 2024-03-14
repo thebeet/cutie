@@ -11,8 +11,6 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "vue": "^3.4.21",
-    "pinia": "^2.1.7",
     "@cutie/web3d": "0.0.1",
     "@cutie/web3d-middleware-answer-cache": "0.0.1",
     "@cutie/web3d-middleware-answer-history": "0.0.1",
@@ -25,7 +23,10 @@
     "@cutie/web3d-middleware-three-view": "0.0.1",
     "@cutie/web3d-plugin-box": "0.0.1",
     "@cutie/web3d-plugin-line": "0.0.1",
-    "@cutie/web3d-plugin-parsing": "0.0.1"
+    "@cutie/web3d-plugin-parsing": "0.0.1",
+    "@mdi/js": "^7.4.47",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.21"
   },
   "devDependencies": {
     "@types/node": "^20.10.6",

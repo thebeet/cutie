@@ -19,7 +19,7 @@ describe('useLineCompletion', () => {
         const frame = {
             points: tpoints,
             intersect(obj, callback) {
-                const position = this.points.geometry.getAttribute('position') as BufferAttribute;
+                const position = this.points!.geometry.getAttribute('position') as BufferAttribute;
                 const v = new Vector3();
                 for (let i = 0; i < position.count; i++) {
                     v.fromBufferAttribute(position, i);
@@ -63,7 +63,7 @@ describe('useLineCompletion', () => {
         const frame = {
             points: tpoints,
             intersect(obj, callback) {
-                const position = this.points.geometry.getAttribute('position') as BufferAttribute;
+                const position = this.points!.geometry.getAttribute('position') as BufferAttribute;
                 const v = new Vector3();
                 for (let i = 0; i < position.count; i++) {
                     v.fromBufferAttribute(position, i);

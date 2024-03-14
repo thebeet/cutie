@@ -159,9 +159,8 @@ export const useLineCompletion = (
 
     result.sort((a, b) => a.pos - b.pos);
 
-    const beforeGaussian = klona(result.map(({point}) => point));
-    const afterGaussian = gaussianFilter3d(beforeGaussian, gaussianKernel);
-/*
+    const beforeGaussian = klona(result.map(({ point }) => point));
+
     if (gaussianOutput) {
 
         let s = 0, end = 1;
@@ -171,7 +170,6 @@ export const useLineCompletion = (
             }
 
             if (end - s > 3) {
-                console.log(end - s)
                 const newPoints = gaussianFilter3d(
                     result.slice(s, end).map(({ point }) => point), gaussianKernel);
                 for (let i = 1; i < newPoints.length - 1; ++i) {
@@ -181,13 +179,13 @@ export const useLineCompletion = (
             s = end;
             end++;
         }
-    }*/
+    }
 
     return {
         //clusters,
         position,
         buckets,
-        result: afterGaussian,
+        result: result.map(({ point }) => point),
         beforeGaussian
-    };
+    } as const;
 };

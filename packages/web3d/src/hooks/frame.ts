@@ -7,7 +7,7 @@ export const useFrame = (scene: THREE.Scene) => {
     const { page } = usePageStore();
     const frame0 = new TFrame(0);
     frame0.visible = true;
-    const frames = [frame0, ...page!.data.frames.map(frameData => {
+    const frames: readonly TFrame[] = [frame0, ...page!.data.frames.map(frameData => {
         const frame = new TFrame(frameData.index);
         frame.visible = false;
         frame.userData['data'] = frameData;

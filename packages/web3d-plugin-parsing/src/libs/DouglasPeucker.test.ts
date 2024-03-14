@@ -1,11 +1,10 @@
 import { describe, expect, test } from 'vitest';
 import * as THREE from 'three';
-import _ from 'lodash';
 import { DouglasPeucker } from './DouglasPeucker';
 
 describe('DouglasPeucker', () => {
     test('one line', () => {
-        const line = _.range(30).map(i => new THREE.Vector2(i * 0.1, i * 0.2));
+        const line = new Array(30).map((_, i) => new THREE.Vector2(i * 0.1, i * 0.2));
         const result = DouglasPeucker(line, 0.001);
         expect(result.length).toBe(2);
         const resultReverse = DouglasPeucker(line.reverse(), 0.001);

@@ -10,5 +10,5 @@ export interface PointsIntersect {
 }
 
 export interface ITFrame extends PointsIntersect {
-    points: Points;
+    points: Points | undefined;
 }

@@ -14,7 +14,7 @@ import { TFrame } from '../three/TFrame';
  * @returns {object} - An object containing a `stop` function to stop the watch listener.
  */
 export const useSync = <A extends AElement, T extends THREE.Object3D>(
-    frames: TFrame[],
+    frames: readonly TFrame[],
     elements: Ref<A[]>,
     objs: Map<string, T>,
     create: (a: A) => T,

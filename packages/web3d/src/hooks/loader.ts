@@ -1,9 +1,6 @@
 import localforage from 'localforage';
 
 import * as THREE from 'three';
-import { PointsMaterial } from '../three/PointsMaterial';
-
-const _pointsMaterial = new PointsMaterial({ size: 1.0 });
 
 export const usePCDCachedLoader = (loader: THREE.Loader<THREE.Points>) => {
     const promises: {
@@ -17,7 +14,6 @@ export const usePCDCachedLoader = (loader: THREE.Loader<THREE.Points>) => {
                     if (err || value === null || value === undefined) {
                         loader.load(url, (data) => {
                             localforage.setItem(key, data.geometry);
-                            data.material = _pointsMaterial;
                             resolve(data);
                         },
                         () => { },
@@ -31,7 +27,7 @@ export const usePCDCachedLoader = (loader: THREE.Loader<THREE.Points>) => {
                             const attribute: THREE.BufferAttribute = Object.setPrototypeOf(value.attributes[key], THREE.BufferAttribute.prototype);
                             g.setAttribute(key, attribute);
                         }
-                        const obj = new THREE.Points(g, _pointsMaterial);
+                        const obj = new THREE.Points(g);
                         resolve(obj);
                     }
                 });

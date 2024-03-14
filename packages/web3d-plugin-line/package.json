@@ -12,9 +12,11 @@
   "dependencies": {
     "@cutie/web3d": "0.0.1",
     "@vueuse/core": "10.9.0",
+    "lodash": "^4.17.21",
     "vue": "^3.4.21"
   },
   "devDependencies": {
+    "@types/lodash": "^4",
     "@types/node": "^20.10.6",
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/eslint-config-typescript": "^12.0.0",

@@ -77,7 +77,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     const { mouseEvent, state: mouseState, eventHook: mouseEventHook } = useMouse();
     const activeTool = ref('');
 
-    const focusedUUID = ref();
+    const focusedUUID = ref<string>();
 
     watchEffect(() => {
         controls.enableRotate = mouseState.value === 'free';
