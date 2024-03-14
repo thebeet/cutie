@@ -1,5 +1,6 @@
 import { Float32BufferAttribute, Vector3 } from 'three';
-export const dbScanFit = (
+
+export const dbScan = (
     position: Float32BufferAttribute,
     points: number[],
     epsilon: number,
@@ -10,7 +11,7 @@ export const dbScanFit = (
     const visited = new Uint8Array(N).fill(0);
     const clusterID = new Int32Array(N).fill(0);
 
-    const regionQuery = (i: number): number[] => { // use octree or kdtree
+    const ballQuery = (i: number): number[] => { // use octree or kdtree
         const neighbors: number[] = [];
         const p = new Vector3().fromBufferAttribute(position, points[i]);
         const v = new Vector3();
@@ -30,7 +31,7 @@ export const dbScanFit = (
             neighbors.shift();
             if (!visited[j]) {
                 visited[j] = 1;
-                const newNeighbors = regionQuery(j);
+                const newNeighbors = ballQuery(j);
                 if (newNeighbors.length >= minPoints) {
                     neighbors.push(...newNeighbors);
                 }
@@ -46,7 +47,7 @@ export const dbScanFit = (
     let id = 0;
     for (let i = 0; i < N; ++i) {
         if (visited[i]) continue;
-        const neighbors = regionQuery(i);
+        const neighbors = ballQuery(i);
         if (neighbors.length >= minPoints) {
             id++;
             const newCluster: number[] = [i];

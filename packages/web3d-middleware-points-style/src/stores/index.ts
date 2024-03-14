@@ -7,7 +7,7 @@ export const usePointsStyleStore = defineStore('plugin::points-style', () => {
     const { shaderMode, material, frames, scene } = useDrama();
     const pointSize = ref(1);
 
-    material.value = new PointsAllInOneMaterial({ size: 1 });
+    material.value = new PointsAllInOneMaterial({ size: 2 });
 
     frames.forEach(frame => {
         frame.onPointsLoaded.then(({ points }) => {

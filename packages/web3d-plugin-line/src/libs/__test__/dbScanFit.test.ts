@@ -1,5 +1,5 @@
 import { Float32BufferAttribute } from 'three';
-import { dbScanFit } from '../dbScanFit'; // Assuming the function is in a file named dbScan.ts
+import { dbScan } from '../dbScan'; // Assuming the function is in a file named dbScan.ts
 import { describe, expect, it } from 'vitest';
 
 describe('dbScanFit', () => {
@@ -17,7 +17,7 @@ describe('dbScanFit', () => {
         const epsilon = 3.0;
         const minPoints = 2;
 
-        const clusters = dbScanFit(positions, points, epsilon, minPoints);
+        const clusters = dbScan(positions, points, epsilon, minPoints);
         expect(clusters.length).toBe(2); // One cluster and one noise array
         expect(clusters[0]).toEqual([5]); // The noise
         expect(clusters[1]).toContain(0); // The cluster
@@ -39,7 +39,7 @@ describe('dbScanFit', () => {
         const epsilon = 3.0;
         const minPoints = 2;
 
-        const clusters = dbScanFit(positions, points, epsilon, minPoints);
+        const clusters = dbScan(positions, points, epsilon, minPoints);
         expect(clusters.length).toBe(2); // One cluster and one noise array
         expect(clusters[0]).toEqual([3]); // The noise
         expect(clusters[1]).toContain(0); // The cluster
@@ -85,7 +85,7 @@ describe('dbScanFit', () => {
         const epsilon = 2.5;
         const minPoints = 3;
 
-        const clusters = dbScanFit(positions, points, epsilon, minPoints);
+        const clusters = dbScan(positions, points, epsilon, minPoints);
         expect(clusters.length).toBeGreaterThanOrEqual(3); // Expecting at least 3 clusters
 
         // Validate the clusters - the exact indices will depend on the dbScanFit implementation

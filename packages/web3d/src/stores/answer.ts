@@ -24,8 +24,8 @@ export const useAnswerStore = defineStore('answer', () => {
 
     const applyOperationEvent = createEventHook<{ answer: AnswerContent, operation: Operation }>();
     const composedApplyOperation = new Composer<{ answer: AnswerContent, operation: Operation }>();
-    composedApplyOperation.use(async (ctx, next) => {
-        await next();
+    composedApplyOperation.use((ctx, next) => {
+        next();
         ctx.answer = ctx.operation.apply(ctx.answer);
         answer.value = ctx.answer;
         applyOperationEvent.trigger({ answer: ctx.answer, operation: ctx.operation });

@@ -1,12 +1,10 @@
 import * as THREE from 'three';
 import { TFocusableEventMap, TFrame } from '@cutie/web3d';
 import { ALine } from '../types';
-import { TLineBoxHelper } from './TLineBoxHelper';
-
 
 const _lineMaterial = new THREE.LineBasicMaterial({ color: 0xdddd00 });
 const _lineFocusMaterial = new THREE.LineBasicMaterial({ color: 0xff3300 });
-const _sphereGeometry = new THREE.SphereGeometry(0.25, 16, 16);
+const _sphereGeometry = new THREE.SphereGeometry(0.1, 16, 16);
 const _sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
 export class TLine extends THREE.Object3D<TFocusableEventMap> {
@@ -14,8 +12,6 @@ export class TLine extends THREE.Object3D<TFocusableEventMap> {
 
     private points: THREE.InstancedMesh;
     private lines: THREE.Line;
-
-    private debugBoxHelper: TLineBoxHelper;
 
     constructor(line: ALine) {
         super();
@@ -29,9 +25,6 @@ export class TLine extends THREE.Object3D<TFocusableEventMap> {
         this.points = new THREE.InstancedMesh(_sphereGeometry, _sphereMaterial, p.length);
         p.forEach((p, i) => this.points.setMatrixAt(i, new THREE.Matrix4().setPosition(p)));
         this.add(this.points);
-
-        //this.debugBoxHelper = new TLineBoxHelper(this.element);
-        //this.add(this.debugBoxHelper);
 
         this.matrixAutoUpdate = false;
         this.matrixWorldNeedsUpdate = false;

@@ -1,10 +1,14 @@
-import { RBox, TFrame, frustumFromRBox } from '@cutie/web3d';
+import { ITFrame } from './frameAdaptor';
+import { RBox, frustumFromRBox } from './rbox';
 import { Vector3, Line3, Quaternion, Euler, Float32BufferAttribute } from 'three';
 import { otsu } from './otsu';
 import { triangleThreshold } from './triangleThreshold';
 import _ from 'lodash';
+import { findNearistLine } from './pointLine';
+import { gaussianFilter3d } from './gaussianFilter';
+import { klona } from 'klona';
 
-const pointsCulled = (frame: TFrame, start: Vector3, end: Vector3, size: number) => {
+const pointsCulled = (frame: ITFrame, start: Vector3, end: Vector3, size: number) => {
     const center = start.clone().add(end).multiplyScalar(0.5);
     const vx = new Vector3(1, 0, 0);
     const vtarget = end.clone().sub(start).normalize();
@@ -33,7 +37,7 @@ const pointsCulled = (frame: TFrame, start: Vector3, end: Vector3, size: number)
     return highIntensityPoints;
 };
 
-const buildMergePoints = (allPoints: [TFrame, number[]][]) => {
+const buildMergePoints = (allPoints: [ITFrame, number[]][]) => {
     const count = allPoints.reduce((acc, [, points]) => acc + points.length, 0);
     const position = new Float32BufferAttribute(new Float32Array(count * 3), 3);
     let i = 0;
@@ -53,11 +57,11 @@ const buildMergePoints = (allPoints: [TFrame, number[]][]) => {
 };
 
 export const multiFramePointsCulled = (
-    frames: TFrame[],
+    frames: ITFrame[],
     points: Vector3[],
     size: number
 ) => {
-    const allPoints: [TFrame, number[]][] = [];
+    const allPoints: [ITFrame, number[]][] = [];
     for (const frame of frames) {
         const mergePoints: number[] = [];
         for (let i = 0; i < points.length - 1; ++i) {
@@ -72,29 +76,13 @@ export const multiFramePointsCulled = (
     return mergedPoints;
 };
 
-const findNearistLine = (lines: Line3[], point: Vector3) => {
-    let minDistance = Infinity;
-    let nearestLine: Line3 | undefined;
-    let lineIndex = 0;
-    const v = new Vector3();
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        line.closestPointToPoint(point, true, v);
-        const distance = point.distanceTo(v);
-        if (distance < minDistance) {
-            minDistance = distance;
-            nearestLine = line;
-            lineIndex = i;
-        }
-    }
-    return { minDistance, nearestLine: nearestLine!, lineIndex };
-};
-
 type Config = {
     culledBoxSize: number; // 围绕当前线的裁切盒子的宽高尺寸
-    space: number;
+    space: number;  // 间隔多少米生成点
     inverseDistanceWeightingPow: number;
     maxWeight: number;
+    gaussianOutput: boolean; // 是否使用高斯滤波
+    gaussianKernel: number;
 };
 
 const defaultConfig: Readonly<Config> = {
@@ -102,17 +90,21 @@ const defaultConfig: Readonly<Config> = {
     culledBoxSize: 1.0,
     inverseDistanceWeightingPow: 2.0,
     maxWeight: 10000,
+    gaussianOutput: true,
+    gaussianKernel: 3
 };
 
 export const useLineCompletion = (
-    frames: TFrame[],
+    frames: ITFrame[],
     points: Vector3[],
     pConfig?: Partial<Config>
 ) => {
     const {
         culledBoxSize,
         space,
-        inverseDistanceWeightingPow
+        inverseDistanceWeightingPow,
+        gaussianOutput,
+        gaussianKernel
     } = { ...defaultConfig, ...pConfig };
     const lines = points.map((p, i, arr) => new Line3(p, arr[(i + 1) % arr.length]))
         .slice(0, -1);
@@ -140,9 +132,10 @@ export const useLineCompletion = (
 
     buckets.sort((a, b) => a.pos - b.pos);
 
-    const result: { pos: number, point: Vector3 }[] = points.map((p, i) => ({ pos: lineLengthSum[i], point: p }));
-    
-    const tmp = _.groupBy(buckets, (b) => Math.floor(b.pos));
+    const result: { pos: number, point: Vector3, fix?: boolean }[] = points.map(
+        (p, i) => ({ pos: lineLengthSum[i], point: p, fix: true }));
+
+    const tmp = _.groupBy(buckets, (b) => Math.floor(b.pos / space));
     for (const key in tmp) {
         const arr = tmp[key];
         if (arr.length > 2) {
@@ -166,10 +159,35 @@ export const useLineCompletion = (
 
     result.sort((a, b) => a.pos - b.pos);
 
+    const beforeGaussian = klona(result.map(({point}) => point));
+    const afterGaussian = gaussianFilter3d(beforeGaussian, gaussianKernel);
+/*
+    if (gaussianOutput) {
+
+        let s = 0, end = 1;
+        while (s < result.length) {
+            while ((end < result.length) && !result[end].fix) {
+                end++;
+            }
+
+            if (end - s > 3) {
+                console.log(end - s)
+                const newPoints = gaussianFilter3d(
+                    result.slice(s, end).map(({ point }) => point), gaussianKernel);
+                for (let i = 1; i < newPoints.length - 1; ++i) {
+                    result[s + i].point = newPoints[i];
+                }
+            }
+            s = end;
+            end++;
+        }
+    }*/
+
     return {
         //clusters,
         position,
         buckets,
-        result: result.map(({ point }) => point)
+        result: afterGaussian,
+        beforeGaussian
     };
 };

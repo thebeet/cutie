@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { Vector3 } from 'three';
 
 const gaussianKernel = (sigma: number): number[] => {
     // 根据sigma确定核的长度，确保核的长度为奇数
@@ -19,27 +19,29 @@ const gaussianKernel = (sigma: number): number[] => {
 
 const gaussianFilter1d = (array: number[], sigma: number): number[] => {
     const kernel = gaussianKernel(sigma);
-    const kernelHalfSize = Math.floor(kernel.length / 2);
-    const filteredArray = new Array(array.length).fill(0);
+    const halfSize = Math.floor(kernel.length / 2);
+    const smoothedArray: number[] = [];
 
     for (let i = 0; i < array.length; i++) {
-        const windowStart = Math.max(0, i - kernelHalfSize);
-        const windowEnd = Math.min(array.length - 1, i + kernelHalfSize);
-        for (let j = windowStart; j <= windowEnd; j++) {
-            const weightIndex = j - i + kernelHalfSize;
-            filteredArray[i] += array[j] * kernel[weightIndex];
+        let weightedSum = 0;
+        for (let j = 0; j < kernel.length; j++) {
+            const x = i + j - halfSize;
+            const value = x >= 0 && x < array.length ? array[x] : array[Math.max(0, Math.min(array.length - 1, x))];
+            weightedSum += value * kernel[j];
         }
+        smoothedArray.push(weightedSum);
     }
-    return filteredArray;
+
+    return smoothedArray;
 };
 
-export const gaussianFilter3d = (points: THREE.Vector3[], sigma: number): THREE.Vector3[] => {
+export const gaussianFilter3d = (points: Vector3[], sigma: number): Vector3[] => {
     const filteredX = gaussianFilter1d(points.map(p => p.x), sigma);
     const filteredY = gaussianFilter1d(points.map(p => p.y), sigma);
     const filteredZ = gaussianFilter1d(points.map(p => p.z), sigma);
-    const filteredPositions: THREE.Vector3[] = [];
+    const filteredPositions: Vector3[] = [];
     for (let i = 0; i < filteredX.length; i++) {
-        filteredPositions.push(new THREE.Vector3(filteredX[i], filteredY[i], filteredZ[i]));
+        filteredPositions.push(new Vector3(filteredX[i], filteredY[i], filteredZ[i]));
     }
     return filteredPositions;
 };
