@@ -1,8 +1,9 @@
 {
-  "name": "@cutie/web3d-middleware-points-style",
+  "name": "@cutie/web3d-middleware-pcd-loader",
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "exports": "./src/index.ts",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -12,8 +13,7 @@
   "dependencies": {
     "@cutie/web3d": "0.0.1",
     "@vueuse/core": "^10.9.0",
-    "vue": "^3.4.21",
-    "three": "^0.162.0"
+    "vue": "^3.4.21"
   },
   "devDependencies": {
     "@types/node": "^20.10.6",

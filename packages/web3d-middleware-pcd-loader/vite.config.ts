@@ -6,7 +6,8 @@ export default defineConfig({
     plugins: [vue()],
     build: {
         rollupOptions: {
-            input: 'index.ts'
+            input: 'index.ts',
+            external: ['vue', 'pinia', 'three', '@vueuse/core', '@vueuse/math', '@cutie/web3d']
         }
     }
 });

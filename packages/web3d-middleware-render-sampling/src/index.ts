@@ -11,13 +11,12 @@ export const useMiddleware = () => {
     const activePoints = computed(() => activeFrames.value.reduce(
         (acc, frame) => acc + page.data.frames[frame.index - 1].points, 0));
 
-    const thredhold = 500_000;
+    const thredhold = 1_000_000;
 
     const steps = [
         2, 3, 4, 5, 6, 8, 10,
         12, 14, 16, 18, 20,
         25, 30, 35, 40, 45, 50,
-        60, 70, 80, 90, 100
     ];
     const sampleAttributes = new Map(steps.map(step => {
         const n = Math.floor(maxPointsCounts / step);

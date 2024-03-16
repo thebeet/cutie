@@ -36,7 +36,6 @@ const promiseWithResolvers = <T>() => {
     };
 };
 
-
 export class TFrame extends THREE.Object3D implements ITFrame {
     readonly index: number;
     _points: THREE.Points | undefined;

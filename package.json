@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "yarn workspace @cutie/web3d-entry dev",
     "build": "yarn workspace @cutie/web3d-entry build",
-    "lint": "yarn workspaces foreach -A run lint"
+    "test": "yarn workspaces foreach -A run test --run",
+    "lint": "yarn workspaces foreach -Apt run lint"
   },
   "workspaces": [
     "packages/*"

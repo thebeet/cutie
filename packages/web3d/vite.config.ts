@@ -3,12 +3,6 @@ import vue from '@vitejs/plugin-vue';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => ({
-    plugins: [vue({
-        template: {
-            compilerOptions: {
-                isCustomElement: (tag) => ['svg-icon'].includes(tag),
-            }
-        }
-    })],
+    plugins: [vue()],
     publicDir: command === 'serve' ? '../../public' : false,
 }));

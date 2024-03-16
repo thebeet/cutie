@@ -7,7 +7,7 @@ export const usePointsStyleStore = defineStore('plugin::points-style', () => {
     const { shaderMode, material, frames, scene } = useDrama();
     const pointSize = ref(1);
 
-    material.value = new PointsAllInOneMaterial({ size: 2 });
+    material.value = new PointsAllInOneMaterial({ size: pointSize.value });
 
     frames.forEach(frame => {
         frame.onPointsLoaded.then(({ points }) => {
@@ -22,11 +22,12 @@ export const usePointsStyleStore = defineStore('plugin::points-style', () => {
         });
     });
 
-    watch(shaderMode, (mode) => {
+    watch([pointSize, shaderMode], ([size, mode]) => {
         if (mode === 'normal') material.value.uniforms.mode.value = 0;
         if (mode === 'label') material.value.uniforms.mode.value = 1;
         if (mode === 'intensity') material.value.uniforms.mode.value = 2;
         if (mode === 'deep') material.value.uniforms.mode.value = 3;
+        material.value.uniforms.pointSize.value = size;
         material.value.needsUpdate = true;
         scene.update();
     }, { immediate: true });

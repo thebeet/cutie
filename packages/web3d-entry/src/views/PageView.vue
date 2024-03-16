@@ -42,6 +42,7 @@ onMounted(async () => {
         { name: 'fullscreen' },
         { name: 'mouse' },
         { name: 'points-style', params: { mode: 'label' } },
+        { name: 'pcd-loader', params: { } },
     ];
 
     for (const middleware of middlewares) {

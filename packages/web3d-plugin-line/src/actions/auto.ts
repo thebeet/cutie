@@ -21,9 +21,6 @@ export const useAutoAction = () => {
         });
         applyOperation(op);
 
-        console.log(beforeGaussian)
-        console.log(result);
-
         const opNew = new AddLineOperation(primaryFrame.value, {
             ...line,
             uuid: THREE.MathUtils.generateUUID(),
@@ -37,7 +34,6 @@ export const useAutoAction = () => {
             autoGeneratePoints(focused.value);
         }
     };
-
 
     return {
         autoGeneratePoints,

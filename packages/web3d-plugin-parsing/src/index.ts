@@ -24,9 +24,11 @@ export const usePlugin = () => {
 
     frames.forEach(frame => {
         frame.onPointsLoaded.then(({ points }) => {
-            const geometry = points.geometry;
-            const label = answer.value.parsing!.frames[frame.index].label;
-            geometry.setAttribute('label', new THREE.BufferAttribute(label, 1));
+            if (answer.value.parsing) {
+                const geometry = points.geometry;
+                const label = answer.value.parsing.frames[frame.index].label;
+                geometry.setAttribute('label', new THREE.BufferAttribute(label, 1));
+            }
         });
     });
     watchEffect(() => {

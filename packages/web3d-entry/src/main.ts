@@ -16,6 +16,7 @@ registerPlugin('render-sampling', () => import('@cutie/web3d-middleware-render-s
 registerPlugin('spatial-indexing', () => import('@cutie/web3d-middleware-spatial-indexing'));
 registerPlugin('three-view', () => import('@cutie/web3d-middleware-three-view'));
 registerPlugin('points-style', () => import('@cutie/web3d-middleware-points-style'));
+registerPlugin('pcd-loader', () => import('@cutie/web3d-middleware-pcd-loader'));
 
 // plugin
 registerPlugin('box', () => import('@cutie/web3d-plugin-box'));

@@ -17,6 +17,7 @@
     "@cutie/web3d-middleware-camera-control": "0.0.1",
     "@cutie/web3d-middleware-frame-pagination": "0.0.1",
     "@cutie/web3d-middleware-mouse": "0.0.1",
+    "@cutie/web3d-middleware-pcd-loader": "0.0.1",
     "@cutie/web3d-middleware-points-style": "0.0.1",
     "@cutie/web3d-middleware-render-sampling": "0.0.1",
     "@cutie/web3d-middleware-spatial-indexing": "0.0.1",

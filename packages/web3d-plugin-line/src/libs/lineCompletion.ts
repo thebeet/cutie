@@ -87,8 +87,8 @@ type Config = {
 
 const defaultConfig: Readonly<Config> = {
     space: 1,
-    culledBoxSize: 1.0,
-    inverseDistanceWeightingPow: 2.0,
+    culledBoxSize: 0.5,
+    inverseDistanceWeightingPow: 0.0,
     maxWeight: 10000,
     gaussianOutput: true,
     gaussianKernel: 3

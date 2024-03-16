@@ -44,10 +44,15 @@ export const useParsingStore = defineStore('plugin::parsing', () => {
     });
 
     watchEffect(() => {
-        material.value.uniforms.instanceColor.value = _.flatten(instances.value.map(c => {
-            const color = new THREE.Color(c.color);
-            return [color.r, color.g, color.b, c.visible ? 1.0 : 0.0];
-        }));
+        const colorUniform = material.value.uniforms.instanceColor.value;
+        for (let i = 0; i < instances.value.length; i++) {
+            const inst = instances.value[i];
+            const color = new THREE.Color(inst.color);
+            colorUniform[i * 4] = color.r;
+            colorUniform[i * 4 + 1] = color.g;
+            colorUniform[i * 4 + 2] = color.b;
+            colorUniform[i * 4 + 3] = inst.visible ? 1 : 0;
+        }
         material.value.uniformsNeedUpdate = true;
         scene.update();
     });

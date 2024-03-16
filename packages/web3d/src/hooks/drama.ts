@@ -1,8 +1,6 @@
 import { ref, watchEffect, MaybeRefOrGetter } from 'vue';
 import { AnswerContent, Frame } from '../types';
 import { useScene } from './scene';
-import { usePCDCachedLoader } from './loader';
-import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
 import { useAnswerStore } from '../stores/answer';
 import { useMouse } from './mouse';
 import { storeToRefs } from 'pinia';
@@ -10,8 +8,6 @@ import { usePageStore } from '../stores/page';
 import { useFrame } from './frame';
 import { useThreeView } from './threeview';
 import { useShader } from './shader';
-
-const loader = usePCDCachedLoader(new PCDLoader());
 
 export type Drama = ReturnType<typeof setupDrama>;
 let defaultDrama: Drama;
@@ -63,15 +59,6 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
             elements: []
         };
         await setupAnswer(tAnswer);
-        frames.forEach(frame => {
-            if (frame.index === 0) {
-                return;
-            }
-            const url = (frame.userData['data'] as Frame).url;
-            loader.load(url).then((obj) => {
-                frame.points = obj;
-            });
-        });
     };
 
     const { mouseEvent, state: mouseState, eventHook: mouseEventHook } = useMouse();
