@@ -1,6 +1,5 @@
 import { defineStore, storeToRefs } from 'pinia';
 import { ref, watch, watchEffect } from 'vue';
-import _ from 'lodash';
 import { useDrama } from '@cutie/web3d';
 import * as THREE from 'three';
 import { useParsingAnswerStore } from './answer';

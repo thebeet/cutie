@@ -10,11 +10,9 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@cutie/web3d": "0.0.1",
-    "lodash": "^4.17.21"
+    "@cutie/web3d": "0.0.1"
   },
   "devDependencies": {
-    "@types/lodash": "^4",
     "@types/node": "^20.10.6",
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/eslint-config-typescript": "^12.0.0",

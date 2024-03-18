@@ -1,10 +1,9 @@
-import { usePageStore } from '../stores/page';
+import { Page } from '../types';
 import { TFrame } from '../three/TFrame';
 import * as THREE from 'three';
 import { shallowRef } from 'vue';
 
-export const useFrame = (scene: THREE.Scene) => {
-    const { page } = usePageStore();
+export const useFrame = (page: Page, scene: THREE.Scene) => {
     const frame0 = new TFrame(0);
     frame0.visible = true;
     const frames: readonly TFrame[] = [frame0, ...page!.data.frames.map(frameData => {
@@ -19,7 +18,7 @@ export const useFrame = (scene: THREE.Scene) => {
         return frame;
     })];
     frames.forEach(frame => scene.add(frame));
-    const activeFrames = shallowRef<TFrame[]>([]);
+    const activeFrames = shallowRef<readonly TFrame[]>([]);
     const primaryFrame = shallowRef<TFrame>(frame0);
     const selectFrame = (id: number | number[]) => {
         for (let i = 1; i < frames.length; i++) {
@@ -28,11 +27,7 @@ export const useFrame = (scene: THREE.Scene) => {
         if (id instanceof Array) {
             const ids = id as number[];
             activeFrames.value = ids.map(i => frames[i]);
-            if (ids.length > 0) {
-                primaryFrame.value = frames[ids[0]];
-            } else {
-                primaryFrame.value = frames[0];
-            }
+            primaryFrame.value = ids.length > 0 ? frames[ids[0]] : frames[0];
         } else {
             const frame = frames[id as number];
             primaryFrame.value = frame;

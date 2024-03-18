@@ -59,13 +59,8 @@ export const useSetFocusOnClick = <A extends AElement, T extends THREE.Object3D<
         if (event.type === 'click') {
             const { x, y } = event.points[0];
             const raycaster = new THREE.Raycaster();
-            raycaster.setFromCamera(
-                new THREE.Vector2(x, y),
-                camera
-            );
-            const items = Array.from(objs, (entry) => {
-                return entry[1];
-            }).filter(item => item.visible && item.parent?.visible);
+            raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+            const items = Array.from(objs, entry => entry[1]).filter(item => item.visible && item.parent?.visible);
             const result = raycaster.intersectObjects(items, false);
             if (result.length > 0) {
                 let intersect = result[0];

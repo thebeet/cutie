@@ -1,12 +1,11 @@
-import { useAnswerStore, useDrama } from '@cutie/web3d';
+import { useDrama } from '@cutie/web3d';
 import { klona } from 'klona';
 import localforage from 'localforage';
-import { defineStore, storeToRefs } from 'pinia';
+import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 export const useAnswerCacheStore = defineStore('plugin::answer-cache', () => {
-    const { answer } = storeToRefs(useAnswerStore());
-    const { page, onApplyOperation } = useDrama();
+    const { page, answer, onApplyOperation } = useDrama();
     const key = `answer-${page.response!.id}`;
 
     const autoSave = ref(false);

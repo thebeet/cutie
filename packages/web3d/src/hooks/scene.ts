@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { watchEffect } from 'vue';
-import { MaybeRefOrGetter, toValue, useResizeObserver } from '@vueuse/core';
+import { MaybeRefOrGetter, createEventHook, toValue, useResizeObserver } from '@vueuse/core';
 import { useControls } from './controls';
 import { TScene } from '../three/TScene';
 import { useCamera } from './camera';
@@ -30,12 +30,16 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
     scene.addEventListener('change', () => { dirty = true; });
     scene.add(transform);
 
+    const renderHook = createEventHook<{scene: THREE.Scene, renderer: THREE.WebGLRenderer}>();
+
     const animate = () => {
         renderer.autoClear = false;
         if (dirty) {
             dirty = false;
+            transform.updateMatrixWorld();
             renderer.render(scene, camera);
             labelRenderer.render(scene, camera);
+            renderHook.trigger({ scene, renderer });
         }
     };
     renderer.setAnimationLoop(animate);
@@ -63,5 +67,6 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
     return {
         scene, camera, renderer,
         controls, controlMode, transform,
+        onRender: renderHook.on
     } as const;
 };

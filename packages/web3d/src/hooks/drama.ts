@@ -1,5 +1,5 @@
-import { ref, watchEffect, MaybeRefOrGetter } from 'vue';
-import { AnswerContent, Frame } from '../types';
+import { ref, watchEffect, MaybeRefOrGetter, shallowRef, readonly } from 'vue';
+import { AnswerContent, Page } from '../types';
 import { useScene } from './scene';
 import { useAnswerStore } from '../stores/answer';
 import { useMouse } from './mouse';
@@ -11,7 +11,9 @@ import { useShader } from './shader';
 
 export type Drama = ReturnType<typeof setupDrama>;
 let defaultDrama: Drama;
-export const useDrama = (container?: MaybeRefOrGetter<HTMLDivElement | undefined>,
+export const useDrama = (
+    page?: Page,
+    container?: MaybeRefOrGetter<HTMLDivElement | undefined>,
     toolbox?: MaybeRefOrGetter<HTMLDivElement | undefined>,
     footer?: MaybeRefOrGetter<HTMLDivElement | undefined>,
     rightsidebar?: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
@@ -20,6 +22,8 @@ export const useDrama = (container?: MaybeRefOrGetter<HTMLDivElement | undefined
         if (container === undefined) {
             throw new Error('drama not setup');
         } else {
+            const { page: storePage } = storeToRefs(usePageStore());
+            storePage.value = page;
             defaultDrama = setupDrama(container, toolbox, footer, rightsidebar);
         }
     }
@@ -37,14 +41,14 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     toolbox: MaybeRefOrGetter<HTMLDivElement | undefined>,
     footer: MaybeRefOrGetter<HTMLDivElement | undefined>,
     rightsidebar?: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
-    const { controls, scene, renderer, camera, controlMode, transform } = useScene(container);
+    const { controls, scene, renderer, camera, controlMode, transform, onRender } = useScene(container);
 
     const { page } = usePageStore();
-    const { frames, primaryFrame, activeFrames, selectFrame } = useFrame(scene);
+    const { frames, primaryFrame, activeFrames, selectFrame } = useFrame(page!, scene);
 
     const answerStore = useAnswerStore();
     const { answer } = storeToRefs(answerStore);
-    const { setupAnswer, applyOperation, onApplyOperation, useSetupAnswer } = answerStore;
+    const { setupAnswer, onSetupAnswer, useSetupAnswer, applyOperation, onApplyOperation } = answerStore;
 
     const {
         setup: setupThreeView,
@@ -61,10 +65,12 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
         await setupAnswer(tAnswer);
     };
 
-    const { mouseEvent, state: mouseState, eventHook: mouseEventHook } = useMouse();
+    const { state: mouseState, eventHook: mouseEventHook } = useMouse();
+
     const activeTool = ref('');
 
     const focusedUUID = ref<string>();
+    const selectedUUIDs = shallowRef<Set<string>>(new Set<string>([]));
 
     watchEffect(() => {
         controls.enableRotate = mouseState.value === 'free';
@@ -76,10 +82,10 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
             toolbox: toolbox as MaybeRefOrGetter<HTMLDivElement>,
             footer: footer as MaybeRefOrGetter<HTMLDivElement>,
             rightsidebar: rightsidebar as MaybeRefOrGetter<HTMLDivElement>,
-            mouseEvent, mouseState, onAdvanceMouseEvent: mouseEventHook.on,
+            mouseState, onAdvanceMouseEvent: mouseEventHook.on,
             frames, primaryFrame, activeFrames, selectFrame,
-            activeTool, focusedUUID,
-            page, answer, applyOperation, onApplyOperation,
+            activeTool, focusedUUID, selectedUUIDs,
+            page: page!, answer: readonly(answer), useSetupAnswer, applyOperation, onApplyOperation,
             scene, camera,
             shaderMode, material,
 
@@ -90,9 +96,9 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
         } as const,
 
         advance: {
-            controls, renderer, controlMode, mouseEventHook,
+            controls, renderer, controlMode, mouseEventHook, onRender,
             threeViewConfirmEventHook, threeViewChangeEventHook,
-            useSetupAnswer,
+            onSetupAnswer, originAnswer: answer
         } as const
     } as const;
 };

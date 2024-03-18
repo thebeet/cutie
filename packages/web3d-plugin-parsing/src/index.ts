@@ -15,7 +15,7 @@ export const usePlugin = () => {
     const {
         scene,
         toolbox, rightsidebar, activeTool, frames, camera,
-        applyOperation, onApplyOperation, onAdvanceMouseEvent
+        applyOperation, onAdvanceMouseEvent
     } = useDrama();
 
     const parsingStore = useParsingStore();
@@ -51,20 +51,16 @@ export const usePlugin = () => {
                 const operation = rectAction(event.points, camera);
                 if (operation) {
                     applyOperation(operation);
+                    (operation as ParsingOperation).effect(instances.value);
                 }
             }
             if (event.type === 'polylined') {
                 const operation = polylineAction(event.points, camera);
                 if (operation) {
                     applyOperation(operation);
+                    (operation as ParsingOperation).effect(instances.value);
                 }
             }
-        }
-    });
-
-    onApplyOperation(({ operation }) => {
-        if (operation instanceof ParsingOperation) {
-            (operation as ParsingOperation).effect(instances.value);
         }
     });
 

@@ -1,5 +1,4 @@
 import localforage from 'localforage';
-
 import * as THREE from 'three';
 
 export const usePCDCachedLoader = (loader: THREE.Loader<THREE.Points>) => {
@@ -27,15 +26,12 @@ export const usePCDCachedLoader = (loader: THREE.Loader<THREE.Points>) => {
                             const attribute: THREE.BufferAttribute = Object.setPrototypeOf(value.attributes[key], THREE.BufferAttribute.prototype);
                             g.setAttribute(key, attribute);
                         }
-                        const obj = new THREE.Points(g);
-                        resolve(obj);
+                        resolve(new THREE.Points(g));
                     }
                 });
             });
         }
         return promises[key];
     };
-    return {
-        load
-    } as const;
+    return { load } as const;
 };

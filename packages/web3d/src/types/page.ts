@@ -76,8 +76,8 @@ export interface AnswerContent {
 }
 
 export type CameraParams = {
-    readonly K: number[] & { readonly length: 9}
-    readonly M: number[] & { readonly length: 16 }
+    readonly K: readonly number[] & { readonly length: 9}
+    readonly M: readonly number[] & { readonly length: 16 }
     readonly distortionType: string
     readonly distortionCoefficients: {
         readonly k1: number

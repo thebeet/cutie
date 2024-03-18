@@ -6,10 +6,14 @@ import { drawPolyline } from './actions/polyline';
 import { click } from './actions/click';
 import { hover } from './actions/hover';
 import { drawLine } from './actions/line';
+import { useMouseStore } from './stores';
+import { storeToRefs } from 'pinia';
 
 export const useMiddleware = () => {
-    const { container, renderer, mouseState, mouseEvent, mouseEventHook } = useAdvanceDrama();
+    const { container, renderer, mouseState, mouseEventHook } = useAdvanceDrama();
     const mainCanvas = renderer.domElement;
+    const { mouseEvent } = storeToRefs(useMouseStore());
+
     click(mainCanvas, () => mouseState.value !== 'line', mouseEvent, mouseEventHook);
     hover(mainCanvas, true, mouseEvent, mouseEventHook);
 

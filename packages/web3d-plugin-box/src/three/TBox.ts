@@ -35,6 +35,7 @@ export class TBox extends THREE.Object3D<TFocusableEventMap> {
         this._label = new CSS2DObject(this._makeLabelDom(box));
 
         this.add(this._label);
+
         this._bindEvent();
     }
 

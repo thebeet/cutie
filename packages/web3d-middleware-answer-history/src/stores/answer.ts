@@ -1,14 +1,12 @@
-import { defineStore, storeToRefs } from 'pinia';
-import { useAnswerStore, AnswerContent, Operation } from '@cutie/web3d';
+import { defineStore } from 'pinia';
+import { AnswerContent, Operation, useAdvanceDrama } from '@cutie/web3d';
 import { useManualRefHistory } from '@vueuse/core';
 import { shallowRef } from 'vue';
 
 const MAX_HISTORY_COUNT = 10;
 
 export const useAnswerHistoryStore = defineStore('plugin::answer-history', () => {
-    const answerStore = useAnswerStore();
-    const { originAnswer } = storeToRefs(answerStore);
-    const { onSetupAnswer, onApplyOperation } = answerStore;
+    const { originAnswer, onSetupAnswer, onApplyOperation } = useAdvanceDrama();
     const { history, commit, undo, redo, clear, canUndo, canRedo } = useManualRefHistory<AnswerContent>(originAnswer, {
         capacity: MAX_HISTORY_COUNT,
     });

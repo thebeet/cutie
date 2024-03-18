@@ -25,9 +25,26 @@ export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
     });
 
     const transform = new TransformControls(camera, renderer.domElement);
+    transform.addEventListener('added', () => {
+        transform.updateMatrixWorld(true);
+    });
+    transform.addEventListener('childadded', () => {
+        transform.updateMatrixWorld(true);
+    });
     transform.layers.enableAll();
     transform.addEventListener('dragging-changed', (event) => {
-        controls.enabled = ! event.value;
+        console.log(event);
+        controls.enabled = !event.value;
+    });
+    transform.addEventListener('object-changed', (event) => {
+        console.log(event);
+    });
+
+    transform.addEventListener('change', (event) => {
+        transform.updateMatrixWorld();
+        transform.object?.updateMatrix();
+        console.log(transform.position);
+        console.log(event);
     });
 
     return {

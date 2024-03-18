@@ -1,13 +1,10 @@
-import { defineStore, storeToRefs } from 'pinia';
-import { useAnswerStore, usePageStore } from '@cutie/web3d';
+import { defineStore } from 'pinia';
+import { useDrama } from '@cutie/web3d';
 import { AnswerContent } from '../types';
 import { ShallowRef } from 'vue';
 
 export const useParsingAnswerStore = defineStore('plugin::parsing-answer', () => {
-    const answerStore = useAnswerStore();
-    const { useSetupAnswer } = answerStore;
-    const { answer } = storeToRefs(answerStore);
-    const { page } = storeToRefs(usePageStore());
+    const { answer, page, useSetupAnswer } = useDrama();
 
     useSetupAnswer(async (ctx, next) => {
         const parsingAnswer = ctx.answer as AnswerContent;

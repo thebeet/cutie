@@ -105,10 +105,6 @@ export class TFrame extends THREE.Object3D implements ITFrame {
         this.intersectDelegate?.intersectRay(obj, d, callback);
     }
 
-    get isTFrame() {
-        return true;
-    }
-
     update() {
         // @ts-ignore
         this.frame.dispatchEvent({ type: 'change' });

@@ -15,7 +15,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { Page, useDrama, usePageStore, runPlugin } from '@cutie/web3d';
+import { Page, useDrama, runPlugin } from '@cutie/web3d';
 import { mdiCar } from '@mdi/js';
 
 const props = defineProps<{
@@ -27,8 +27,7 @@ const toolbox = ref<HTMLDivElement>();
 const footer = ref<HTMLDivElement>();
 const rightsidebar = ref<HTMLDivElement>();
 
-usePageStore(props.page);
-const { launch } = useDrama(container, toolbox, footer, rightsidebar);
+const { launch } = useDrama(props.page, container, toolbox, footer, rightsidebar);
 
 onMounted(async () => {
     const middlewares = [

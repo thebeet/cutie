@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import * as THREE from 'three';
 
 interface PCDField {
@@ -62,7 +61,7 @@ const dumpAscii = (points: THREE.Points, fields: PCDField[]) => {
     const geometry = points.geometry;
     const pointCount = points.geometry.attributes.position.count;
     const header = createPcdHeader('ascii', pointCount, fields);
-    const buffer = _.range(0, pointCount).map(i => fields.map(field => field.value(geometry, i)).join(' ')).join('\n');
+    const buffer = Array.from({ length: pointCount }).map((_, i) => fields.map(field => field.value(geometry, i)).join(' ')).join('\n');
     return header + buffer;
 };
 

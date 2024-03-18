@@ -1,12 +1,10 @@
-import { readonly, shallowRef } from 'vue';
+import { shallowRef } from 'vue';
 import { Page } from '../types';
 import { defineStore } from 'pinia';
 
-export const usePageStore = (initPage?: Page) => {
-    return defineStore('page', () => {
-        const page = shallowRef<Page>(initPage!);
-        return {
-            page: readonly(page)
-        } as const;
-    })();
-};
+export const usePageStore = defineStore('page', () => {
+    const page = shallowRef<Page>();
+    return {
+        page
+    } as const;
+});

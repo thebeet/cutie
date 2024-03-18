@@ -20,12 +20,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useElementSize } from '@vueuse/core';
-import { useDrama } from '@cutie/web3d';
+import { storeToRefs } from 'pinia';
+import { useMouseStore } from '../stores';
 
 const container = ref<HTMLDivElement>();
-const { mouseEvent } = useDrama();
 
 const { width: containerWidth, height: containerHeight } = useElementSize(container);
+
+const { mouseEvent } = storeToRefs(useMouseStore());
 
 const rectPreview = computed(() => {
     const x = (Math.min(mouseEvent.value.points[0].x, mouseEvent.value.points[1].x) + 1) * containerWidth.value / 2.0;
