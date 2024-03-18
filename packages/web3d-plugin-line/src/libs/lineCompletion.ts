@@ -5,8 +5,9 @@ import { otsu } from './otsu';
 import { triangleThreshold } from './triangleThreshold';
 import _ from 'lodash';
 import { findNearistLine } from './pointLine';
-import { gaussianFilter3d } from './gaussianFilter';
+import { gaussianSmooth3d } from './gaussianSmooth';
 import { klona } from 'klona';
+import { rearrange } from './lineRearrange';
 
 const pointsCulled = (frame: ITFrame, start: Vector3, end: Vector3, size: number) => {
     const center = start.clone().add(end).multiplyScalar(0.5);
@@ -117,19 +118,18 @@ export const useLineCompletion = (
     const { position } = multiFramePointsCulled(frames, points, culledBoxSize);
 
     const buckets: {pos: number, distance: number, point: Vector3}[] = [];
-    const v = new Vector3();
     for (let i = 0; i < position.count; ++i) {
-        v.fromBufferAttribute(position, i);
-        const { minDistance: distance, nearestLine, lineIndex } = findNearistLine(lines, v);
-        const partial = nearestLine!.closestPointToPointParameter(v, true);
+        const point = new Vector3();
+        point.fromBufferAttribute(position, i);
+        const { minDistance: distance, nearestLine, lineIndex } = findNearistLine(lines, point);
+        const partial = nearestLine!.closestPointToPointParameter(point, true);
         const pos = lineLengthSum[lineIndex] + lineLength[lineIndex] * partial;
         buckets.push({
             pos,
             distance,
-            point: v.clone()
+            point
         });
     }
-
     buckets.sort((a, b) => a.pos - b.pos);
 
     const result: { pos: number, point: Vector3, fix?: boolean }[] = points.map(
@@ -162,15 +162,13 @@ export const useLineCompletion = (
     const beforeGaussian = klona(result.map(({ point }) => point));
 
     if (gaussianOutput) {
-
         let s = 0, end = 1;
         while (s < result.length) {
             while ((end < result.length) && !result[end].fix) {
                 end++;
             }
-
             if (end - s > 3) {
-                const newPoints = gaussianFilter3d(
+                const newPoints = gaussianSmooth3d(
                     result.slice(s, end).map(({ point }) => point), gaussianKernel);
                 for (let i = 1; i < newPoints.length - 1; ++i) {
                     result[s + i].point = newPoints[i];
@@ -181,11 +179,13 @@ export const useLineCompletion = (
         }
     }
 
+    const rearrangeResult = rearrange(result.map(({ point }) => point), space);
+
     return {
         //clusters,
         position,
         buckets,
-        result: result.map(({ point }) => point),
+        result: rearrangeResult,
         beforeGaussian
     } as const;
 };

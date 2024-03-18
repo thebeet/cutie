@@ -17,7 +17,7 @@ const gaussianKernel = (sigma: number): number[] => {
     return kernel.map(value => value / kernelSum);
 };
 
-const gaussianFilter1d = (array: number[], sigma: number): number[] => {
+const gaussianSmooth1d = (array: number[], sigma: number): number[] => {
     const kernel = gaussianKernel(sigma);
     const halfSize = Math.floor(kernel.length / 2);
     const smoothedArray: number[] = [];
@@ -35,10 +35,10 @@ const gaussianFilter1d = (array: number[], sigma: number): number[] => {
     return smoothedArray;
 };
 
-export const gaussianFilter3d = (points: Vector3[], sigma: number): Vector3[] => {
-    const filteredX = gaussianFilter1d(points.map(p => p.x), sigma);
-    const filteredY = gaussianFilter1d(points.map(p => p.y), sigma);
-    const filteredZ = gaussianFilter1d(points.map(p => p.z), sigma);
+export const gaussianSmooth3d = (points: Vector3[], sigma: number): Vector3[] => {
+    const filteredX = gaussianSmooth1d(points.map(p => p.x), sigma);
+    const filteredY = gaussianSmooth1d(points.map(p => p.y), sigma);
+    const filteredZ = gaussianSmooth1d(points.map(p => p.z), sigma);
     const filteredPositions: Vector3[] = [];
     for (let i = 0; i < filteredX.length; i++) {
         filteredPositions.push(new Vector3(filteredX[i], filteredY[i], filteredZ[i]));
