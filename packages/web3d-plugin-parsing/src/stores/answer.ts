@@ -34,7 +34,7 @@ export const useParsingAnswerStore = defineStore('plugin::parsing-answer', () =>
                     frames: [{
                         index: 0,
                         label: new Int32Array(),
-                    }, ...page.value.data.frames.map(frame => ({
+                    }, ...page.data.frames.map(frame => ({
                         index: frame.index,
                         label: new Int32Array(frame.points)
                     }))],

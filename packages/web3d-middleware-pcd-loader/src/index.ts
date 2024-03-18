@@ -4,7 +4,7 @@ import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
 import { usePCDCachedLoader } from './loader';
 
 export const useMiddleware = () => {
-    const { page, frames } = useDrama();
+    const { frames } = useDrama();
 
     const loader = usePCDCachedLoader(new PCDLoader());
 

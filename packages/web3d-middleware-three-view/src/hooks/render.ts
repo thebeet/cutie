@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useDrama, RBox } from '@cutie/web3d';
+import { useDrama, RBox, LAYER_POINTS } from '@cutie/web3d';
 import { MaybeRefOrGetter, computed, ref, toValue, watch, watchEffect } from 'vue';
 import { useElementSize, useEventListener, useRafFn, useResizeObserver } from '@vueuse/core';
 
@@ -41,6 +41,8 @@ export const useRender = (containers: Containers) => {
         side: useElementSize(containers.side),
         top: useElementSize(containers.top),
     };
+    const layer = new THREE.Layers();
+    layer.set(LAYER_POINTS);
     const getCamera = (name: 'front' | 'side' | 'top', rbox: MaybeRefOrGetter<RBox | undefined>) => {
         const vbox = toValue(rbox);
         if (!vbox) return;
@@ -67,6 +69,7 @@ export const useRender = (containers: Containers) => {
             camera.position.set(...center.clone().add(views[name].z.clone().applyQuaternion(rotation).multiplyScalar(deep / 2)).toArray());
             camera.lookAt(...center.toArray());
             camera.zoom = zooms.value[name];
+            camera.layers = layer;
             camera.updateMatrixWorld();
             camera.updateProjectionMatrix();
             return camera;

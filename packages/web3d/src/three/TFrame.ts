@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { LAYER_POINTS } from '../constants';
 
 export interface IntersectAbleObject {
     containsPoint(point: THREE.Vector3): boolean;
@@ -68,6 +69,7 @@ export class TFrame extends THREE.Object3D implements ITFrame {
         }
         this._points = obj;
         if (this._points !== undefined) {
+            this._points.layers.enable(LAYER_POINTS);
             this._points.frustumCulled = false;
             this._points.geometry.boundingSphere = _infSphere;
             this.add(this._points);

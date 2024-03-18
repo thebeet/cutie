@@ -9,6 +9,13 @@
         @mouseup.stop="deselectControlPoint"
         @mouseleave="deselectControlPoint"
     >
+        <polygon
+            v-if="hasView && controlPoints.length === 8"
+            :points="`${controlPoints[0].x},${controlPoints[0].y} ${controlPoints[2].x},${controlPoints[2].y} ${controlPoints[4].x},${controlPoints[4].y} ${controlPoints[6].x},${controlPoints[6].y}`"
+            fill="red"
+            fill-opacity="0.2"
+            stroke="white"
+        ></polygon>
         <rect
             v-for="(point, index) in controlPoints"
             :key="'control-point-' + index"

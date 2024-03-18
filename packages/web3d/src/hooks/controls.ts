@@ -25,13 +25,13 @@ export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
     });
 
     const transform = new TransformControls(camera, renderer.domElement);
+
     transform.addEventListener('added', () => {
         transform.updateMatrixWorld(true);
     });
     transform.addEventListener('childadded', () => {
         transform.updateMatrixWorld(true);
     });
-    transform.layers.enableAll();
     transform.addEventListener('dragging-changed', (event) => {
         console.log(event);
         controls.enabled = !event.value;

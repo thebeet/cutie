@@ -4,7 +4,7 @@ import { DouglasPeucker } from './DouglasPeucker';
 
 describe('DouglasPeucker', () => {
     test('one line', () => {
-        const line = new Array(30).map((_, i) => new THREE.Vector2(i * 0.1, i * 0.2));
+        const line = Array.from({ length: 30 }).map((_, i) => new THREE.Vector2(i * 0.1, i * 0.2));
         const result = DouglasPeucker(line, 0.001);
         expect(result.length).toBe(2);
         const resultReverse = DouglasPeucker(line.reverse(), 0.001);

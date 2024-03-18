@@ -18,6 +18,9 @@ export const pointToLineDistance = (p: THREE.Vector2, a: THREE.Vector2, b: THREE
 };
 
 export const filterPoints = (points: THREE.Vector2[], epsilon: number): THREE.Vector2[] => {
+    if (points.length < 2) {
+        return [...points];
+    }
     const result = [points[0]];
     for (let i = 1; i < points.length; ++i) {
         const p = result[result.length - 1].distanceTo(points[i]);

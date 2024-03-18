@@ -58,8 +58,8 @@ const buildMergePoints = (allPoints: [ITFrame, number[]][]) => {
 };
 
 export const multiFramePointsCulled = (
-    frames: ITFrame[],
-    points: Vector3[],
+    frames: readonly ITFrame[],
+    points: readonly Vector3[],
     size: number
 ) => {
     const allPoints: [ITFrame, number[]][] = [];
@@ -96,8 +96,8 @@ const defaultConfig: Readonly<Config> = {
 };
 
 export const useLineCompletion = (
-    frames: ITFrame[],
-    points: Vector3[],
+    frames: readonly ITFrame[],
+    points: readonly Vector3[],
     pConfig?: Partial<Config>
 ) => {
     const {
