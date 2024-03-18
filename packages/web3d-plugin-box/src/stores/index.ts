@@ -3,9 +3,10 @@ import { computed, watch } from 'vue';
 import { TBox } from '../three/TBox';
 import { ABox } from '../types';
 import { useDrama, useFocus, useSync } from '@cutie/web3d';
+import { ModifyBoxOperation } from '../operations/ModifyBoxOperation';
 
 export const useBoxStore = defineStore('plugin::box', () => {
-    const { frames, answer, transform } = useDrama();
+    const { frames, answer, transform, attachTransform, applyOperation } = useDrama();
 
     const elements = computed(() => answer.value.elements.filter(e => e.schema === 'box') as Readonly<ABox>[]);
     const boxes: Map<string, TBox> = new Map([]);
@@ -15,9 +16,18 @@ export const useBoxStore = defineStore('plugin::box', () => {
     watch(focused, value => {
         if (value === undefined) {
             draft.value = undefined;
+            attachTransform();
         } else {
-            // transform.setSpace('local');
-            // transform.attach(boxes.get(value.uuid)!);
+            transform.setSpace('local');
+            attachTransform(boxes.get(value.uuid), (box) => {
+                draft.value = {
+                    ...value,
+                    ...box
+                };
+            }, (box) => {
+                const op = new ModifyBoxOperation(value.uuid, { ...value, ...box });
+                applyOperation(op);
+            });
         }
     });
 

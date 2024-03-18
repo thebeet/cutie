@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import { ref, watch } from 'vue';
+import { RBox } from '../types';
 
 export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -26,31 +27,54 @@ export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
 
     const transform = new TransformControls(camera, renderer.domElement);
 
-    transform.addEventListener('added', () => {
-        transform.updateMatrixWorld(true);
-    });
-    transform.addEventListener('childadded', () => {
-        transform.updateMatrixWorld(true);
-    });
+
+    type ChangeCallBack = (box: RBox) => void;
+    let changeCallback: ChangeCallBack | undefined = undefined;
+    let confirmCallback: ChangeCallBack | undefined = undefined;
+    let attachedObj: THREE.Object3D | undefined = undefined;
     transform.addEventListener('dragging-changed', (event) => {
-        console.log(event);
         controls.enabled = !event.value;
-    });
-    transform.addEventListener('object-changed', (event) => {
-        console.log(event);
+        if (!event.value && confirmCallback && transform.object && (attachedObj === transform.object)) {
+            const box = {
+                position: { x: transform.object.position.x, y: transform.object.position.y, z: transform.object.position.z },
+                rotation: { x: transform.object.rotation.x, y: transform.object.rotation.y, z: transform.object.rotation.z },
+                size: { x: transform.object.scale.x, y: transform.object.scale.y, z: transform.object.scale.z }
+            } as RBox;
+            confirmCallback(box);
+        }
     });
 
-    transform.addEventListener('change', (event) => {
+    transform.addEventListener('change', () => {
         transform.updateMatrixWorld();
-        transform.object?.updateMatrix();
-        console.log(transform.position);
-        console.log(event);
+        if (transform.object && changeCallback) {
+            transform.object.updateMatrix();
+            if (attachedObj === transform.object) {
+                const box = {
+                    position: { x: transform.object.position.x, y: transform.object.position.y, z: transform.object.position.z },
+                    rotation: { x: transform.object.rotation.x, y: transform.object.rotation.y, z: transform.object.rotation.z },
+                    size: { x: transform.object.scale.x, y: transform.object.scale.y, z: transform.object.scale.z }
+                } as RBox;
+                changeCallback(box);
+            }
+        }
     });
+
+
+    const attachTransform = (obj?: THREE.Object3D, onChange?: ChangeCallBack, onConfirm?: ChangeCallBack) => {
+        if (obj) {
+            transform.attach(obj);
+            attachedObj = obj;
+            changeCallback = onChange;
+            confirmCallback = onConfirm;
+        } else {
+            transform.detach();
+        }
+    };
 
     return {
         controls,
         controlMode: mode,
 
-        transform
+        transform, attachTransform
     } as const;
 };

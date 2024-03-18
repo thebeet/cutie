@@ -22,7 +22,7 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
     labelRenderer.domElement.style.pointerEvents = 'none';
     labelRenderer.render = measure('web3d::2drenderer::render', labelRenderer.render.bind(labelRenderer));
 
-    const { controls, controlMode, transform } = useControls(camera, renderer);
+    const { controls, controlMode, transform, attachTransform } = useControls(camera, renderer);
     const scene = new TScene();
     let dirty = true;
     controls.addEventListener('change', () => { dirty = true; });
@@ -66,7 +66,7 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
 
     return {
         scene, camera, renderer,
-        controls, controlMode, transform,
+        controls, controlMode, transform, attachTransform,
         onRender: renderHook.on
     } as const;
 };
