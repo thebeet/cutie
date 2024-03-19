@@ -3,10 +3,10 @@ import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { ABox } from '../types';
 import { TFocusableEventMap, TFrame, rbox2Matrix } from '@cutie/web3d';
 
-const _rectMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.2, transparent: true });
-const _rectFocusMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.4, transparent: true });
-const _edgeMaterial = /*@__PURE__*/ new THREE.LineBasicMaterial({ color: 0xffffff });
-const _edgeFocusMaterial = /*@__PURE__*/ new THREE.LineBasicMaterial({ color: 0x007bff, depthFunc: THREE.AlwaysDepth });
+const _rectMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ name: 'box::surface', color: 0xff0000, opacity: 0.2, transparent: true });
+const _rectFocusMaterial = /*@__PURE__*/ new THREE.MeshBasicMaterial({ name: 'box[focus::surface]', color: 0xff0000, opacity: 0.4, transparent: true });
+const _edgeMaterial = /*@__PURE__*/ new THREE.LineBasicMaterial({ name: 'box::edge', color: 0xffffff });
+const _edgeFocusMaterial = /*@__PURE__*/ new THREE.LineBasicMaterial({ name: 'box[focus]::edge', color: 0x007bff, depthFunc: THREE.AlwaysDepth });
 const _boxGeometry = /*@__PURE__*/ new THREE.BoxGeometry();
 const _edgesGeometry = /*@__PURE__*/ new THREE.EdgesGeometry(_boxGeometry);
 

@@ -26,7 +26,15 @@ export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
     });
 
     const transform = new TransformControls(camera, renderer.domElement);
-
+    transform.traverse((obj) => {
+        if (obj instanceof THREE.Mesh) {
+            obj.material.name = 'transform';
+        } else if (obj instanceof THREE.Sprite) {
+            obj.material.name = 'transform::sprite';
+        } else if (obj instanceof THREE.Line) {
+            obj.material.name = 'transform::line';
+        }
+    });
 
     type ChangeCallBack = (box: RBox) => void;
     let changeCallback: ChangeCallBack | undefined = undefined;

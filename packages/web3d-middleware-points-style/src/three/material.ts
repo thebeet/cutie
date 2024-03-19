@@ -8,6 +8,7 @@ export class PointsAllInOneMaterial extends RawShaderMaterial {
     public glslVersion = GLSL3;
     constructor(param: PointsAllInOneMaterialParam) {
         super({
+            name: 'points',
             uniforms: { // make sure vectors count < 1024
                 pointSize: {
                     value: param.size

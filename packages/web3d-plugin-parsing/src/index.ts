@@ -37,7 +37,7 @@ export const usePlugin = () => {
             if (points) {
                 const geometry = points.geometry;
                 const labelAttribute = geometry.getAttribute('label');
-                if (labelAttribute.array !== frame.label) {
+                if (labelAttribute?.array !== frame.label) {
                     geometry.setAttribute('label', new THREE.BufferAttribute(frame.label, 1));
                     scene.update();
                 }

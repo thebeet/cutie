@@ -2,10 +2,10 @@ import * as THREE from 'three';
 import { TFocusableEventMap, TFrame } from '@cutie/web3d';
 import { ALine } from '../types';
 
-const _lineMaterial = new THREE.LineBasicMaterial({ color: 0xdddd00 });
-const _lineFocusMaterial = new THREE.LineBasicMaterial({ color: 0xff3300 });
+const _lineMaterial = new THREE.LineBasicMaterial({ name: 'line', color: 0xdddd00 });
+const _lineFocusMaterial = new THREE.LineBasicMaterial({ name: 'line[focus]', color: 0xff3300 });
 const _sphereGeometry = new THREE.SphereGeometry(0.1, 16, 16);
-const _sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+const _sphereMaterial = new THREE.MeshBasicMaterial({ name: 'line::point', color: 0xffffff });
 
 export class TLine extends THREE.Object3D<TFocusableEventMap> {
     element: ALine;

@@ -30,7 +30,7 @@ const FieldLabel: PCDField = {
     name: 'label',
     type: 'I',
     size: 4,
-    value: (geometry, pos) => geometry.attributes.label.getZ(pos)
+    value: (geometry, pos) => geometry.attributes.label.getX(pos)
 };
 
 const createPcdHeader = (format: string, pointsCount: number, fields: PCDField[]): string => {
