@@ -51,7 +51,7 @@
         --color-danger: #ff6666;          /* 危险颜色 - 红色 */
         --color-warning: #ffcc00;         /* 警告颜色 - 黄色 */
         --color-info: #3399ff;            /* 信息颜色 - 蓝色 */
-        
+
         --color-background: #202020;      /* 背景颜色 - 深灰色 */
         --color-text: #ffffff;            /* 文本颜色 - 白色 */
         --color-text-light: #cccccc;      /* 浅色文本颜色 - 浅灰色 */
@@ -62,6 +62,7 @@ body {
     margin: 0;
     font-family: var(--font-family);            /* 使用默认字体 */
     font-size: var(--font-size-base);           /* 使用基础字体大小 */
+    color: var(--color-text);
     line-height: var(--line-height-base);       /* 使用基础行高 */
     background-color: var(--color-background);
 }
