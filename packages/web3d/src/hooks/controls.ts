@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { RBox } from '../types';
+import { TFrame } from '../three/TFrame';
 
 export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -15,15 +16,6 @@ export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
     controls.update();
 
     const mode = ref<string>('free');
-
-    watch(mode, (value) => {
-        if (value === 'top-down') {
-            controls.maxPolarAngle = 0;
-            controls.update();
-        } else {
-            controls.maxPolarAngle = Math.PI / 2;
-        }
-    });
 
     const transform = new TransformControls(camera, renderer.domElement);
     transform.traverse((obj) => {
@@ -70,6 +62,8 @@ export const useControls = (camera: THREE.Camera, renderer: THREE.Renderer) => {
 
     const attachTransform = (obj?: THREE.Object3D, onChange?: ChangeCallBack, onConfirm?: ChangeCallBack) => {
         if (obj) {
+            const frame = obj.parent as TFrame;
+            frame.add(transform);
             transform.attach(obj);
             attachedObj = obj;
             changeCallback = onChange;

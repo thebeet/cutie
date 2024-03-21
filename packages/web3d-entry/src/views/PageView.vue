@@ -31,15 +31,15 @@ const { launch } = useDrama(props.page, container, toolbox, footer, rightsidebar
 
 onMounted(async () => {
     const middlewares = [
-        { name: 'camera-control' },
-        { name: 'frame-pagination' },
+        { name: 'camera-control', params: { } },
+        { name: 'frame-pagination', params: { } },
         { name: 'answer-cache', params: { auto: false } },
-        { name: 'answer-history' },
-        { name: 'render-sampling' },
+        { name: 'answer-history', params: { } },
+        /*{ name: 'render-sampling', params: { } },*/
         { name: 'spatial-indexing', params: { impl: 'octree' } },
-        { name: 'three-view' },
-        { name: 'fullscreen' },
-        { name: 'mouse' },
+        { name: 'three-view', params: { } },
+        { name: 'fullscreen', params: { } },
+        { name: 'mouse', params: { } },
         { name: 'points-style', params: { mode: 'label' } },
         { name: 'pcd-loader', params: { } },
         { name: 'render-info', params: { } },

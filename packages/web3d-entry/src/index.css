@@ -1,7 +1,67 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+:root {
+    --color-primary: #007bff;    /* 主要颜色 */
+    --color-secondary: #6c757d;  /* 次要颜色 */
+    --color-success: #28a745;    /* 成功颜色 */
+    --color-danger: #dc3545;     /* 危险颜色 */
+    --color-warning: #ffc107;    /* 警告颜色 */
+    --color-info: #17a2b8;       /* 信息颜色 */
+
+    --color-background: #f8f8f8;    /* 背景颜色 */
+    --color-text: #333;             /* 文本颜色 */
+    --color-text-light: #888;       /* 浅色文本颜色 */
+
+    --font-family: Arial, sans-serif;  /* 默认字体 */
+    --font-size-base: 16px;            /* 基础字体大小 */
+    --line-height-base: 1.5;           /* 基础行高 */
+
+    --border-radius: 4px;       /* 边框圆角大小 */
+    --border-width: 1px;        /* 边框宽度 */
+    --border-color: #ddd;       /* 边框颜色 */
+
+    --spacing-small: 4px;       /* 小间距 */
+    --spacing-medium: 8px;      /* 中等间距 */
+    --spacing-large: 16px;      /* 大间距 */
+
+    --transition-duration: 0.3s;  /* 过渡效果持续时间 */
+    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  /* 阴影效果 */
+
+    --button-width: 120px;      /* 按钮宽度 */
+    --button-height: 36px;      /* 按钮高度 */
+    --input-height: 32px;       /* 输入框高度 */
+    --icon-size: 16px;          /* 图标大小 */
+
+    --button-primary-bg: var(--color-primary);    /* 主要按钮背景色 */
+    --button-primary-text: #fff;                  /* 主要按钮文本颜色 */
+    --input-border: #ccc;                          /* 输入框边框颜色 */
+    --input-focus-border: var(--color-primary);    /* 输入框获得焦点时的边框颜色 */
+    --input-placeholder: #999;                     /* 输入框占位符文本颜色 */
+
+    --panel-bg: #fff;                   /* 面板背景色 */
+    --panel-border: #ddd;               /* 面板边框颜色 */
+    --card-bg: #fff;                    /* 卡片背景色 */
+    --card-border: #ddd;                /* 卡片边框颜色 */
+    --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  /* 卡片阴影效果 */
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-primary: #336699;         /* 主要颜色 - 深蓝色 */
+        --color-secondary: #808080;       /* 次要颜色 - 灰色 */
+        --color-success: #00cc66;         /* 成功颜色 - 绿色 */
+        --color-danger: #ff6666;          /* 危险颜色 - 红色 */
+        --color-warning: #ffcc00;         /* 警告颜色 - 黄色 */
+        --color-info: #3399ff;            /* 信息颜色 - 蓝色 */
+        
+        --color-background: #202020;      /* 背景颜色 - 深灰色 */
+        --color-text: #ffffff;            /* 文本颜色 - 白色 */
+        --color-text-light: #cccccc;      /* 浅色文本颜色 - 浅灰色 */
+    }
+}
 
 body {
     margin: 0;
+    font-family: var(--font-family);            /* 使用默认字体 */
+    font-size: var(--font-size-base);           /* 使用基础字体大小 */
+    line-height: var(--line-height-base);       /* 使用基础行高 */
+    background-color: var(--color-background);
 }
