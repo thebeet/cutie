@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useResizeObserver, MaybeRefOrGetter } from '@vueuse/core';
+import { MaybeRefOrGetter, useResizeObserver } from '@vueuse/core';
 
 export const useCamera = (container: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
     const camera = new THREE.PerspectiveCamera(45, 1, 1, 5000);

@@ -1,6 +1,6 @@
 import { useActiveElement, useMagicKeys, whenever } from '@vueuse/core';
 import { logicAnd } from '@vueuse/math';
-import { watch, ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useRemoveAction } from '../actions/remove';
 
 export const useHotkeys = () => {

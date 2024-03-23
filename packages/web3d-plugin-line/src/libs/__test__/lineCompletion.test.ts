@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { multiFramePointsCulled, useLineCompletion } from '../lineCompletion';
-import { Vector3, BufferAttribute, BufferGeometry, Points, Line3 } from 'three';
+import { BufferAttribute, BufferGeometry, Line3, Points, Vector3 } from 'three';
 import { ITFrame } from '../frameAdaptor';
 
 describe('useLineCompletion', () => {

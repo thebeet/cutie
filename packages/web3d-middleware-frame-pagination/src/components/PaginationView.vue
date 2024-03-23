@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { useDrama, TFrame } from '@cutie/web3d';
+import { TFrame, useDrama } from '@cutie/web3d';
 
 const { frames, activeFrames, primaryFrame, selectFrame } = useDrama();
 

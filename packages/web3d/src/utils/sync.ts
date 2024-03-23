@@ -1,7 +1,8 @@
-import { watch, Ref, ref } from 'vue';
+import { Ref, ref, watch } from 'vue';
 import { AElement } from '../types';
 import * as THREE from 'three';
 import { TFrame } from '../three/TFrame';
+import { useDrama } from '../hooks/drama';
 
 /**
  * Synchronizes elements with objects in a 3D scene.
@@ -21,8 +22,9 @@ export const useSync = <A extends AElement, T extends THREE.Object3D>(
     modify: (t: T, a: A) => void,
     dispose: (t: T) => void = () => {}
 ) => {
+    const { activeFrames } = useDrama();
     const draft = ref<A>();
-    const stop = watch([elements, draft], ([newValue, newDraft]) => {
+    const stop = watch([elements, draft, activeFrames], ([newValue, newDraft]) => {
         const used: Map<string, boolean> = new Map([]);
         for (const key of objs.keys()) {
             used.set(key, false);
@@ -36,10 +38,12 @@ export const useSync = <A extends AElement, T extends THREE.Object3D>(
                 frame.update();
             } else {
                 const frame = frames[element.frameIndex];
-                const obj = create(element);
-                objs.set(element.uuid, obj);
-                frame.add(obj);
-                frame.update();
+                if (frame.visible) {
+                    const obj = create(element);
+                    objs.set(element.uuid, obj);
+                    frame.add(obj);
+                    frame.update();
+                }
             }
         });
         if (newDraft) {

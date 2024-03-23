@@ -1,4 +1,4 @@
-import { expect, describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import * as THREE from 'three';
 import { convexHull2D, pointInPolygon, rotatingCalipers } from './ConvexHull2D';
 

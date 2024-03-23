@@ -1,9 +1,9 @@
-import { nextTick } from 'vue';
+import { Ref, nextTick } from 'vue';
 import { RBox } from '../types';
 import { createEventHook } from '@vueuse/core';
 
 export const useThreeView = () => {
-    type RBoxWithUUID = RBox & { uuid: string };
+    type RBoxWithUUID = RBox & { readonly uuid: string };
 
     const setupEvent = createEventHook<RBoxWithUUID | undefined>();
     const confirmEvent = createEventHook<RBoxWithUUID>();
@@ -17,6 +17,10 @@ export const useThreeView = () => {
             pending.splice(0, pending.length);
             setupEvent.trigger(box);
         });
+    };
+
+    const attach = (box: Ref<RBoxWithUUID>) => {
+
     };
 
     return {

@@ -1,12 +1,12 @@
 import {
+    Box2,
+    Camera,
+    Frustum,
+    Matrix4,
+    Plane,
+    Raycaster,
     Vector2,
     Vector3,
-    Plane,
-    Box2,
-    Frustum,
-    Camera,
-    Matrix4,
-    Raycaster,
 } from 'three';
 import { rbox2Matrix } from './rbox';
 import { RBox } from '../types';

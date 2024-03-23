@@ -1,4 +1,4 @@
-import { watchEffect, MaybeRefOrGetter, VNode, render, toValue } from 'vue';
+import { MaybeRefOrGetter, VNode, render, toValue, watchEffect } from 'vue';
 
 const plugins: { [key: string]: () => Promise<any> } = {};
 

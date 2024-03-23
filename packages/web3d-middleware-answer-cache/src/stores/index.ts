@@ -1,8 +1,7 @@
 import { useDrama } from '@cutie/web3d';
-import { klona } from 'klona';
 import localforage from 'localforage';
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, toRaw } from 'vue';
 
 export const useAnswerCacheStore = defineStore('plugin::answer-cache', () => {
     const { page, answer, onApplyOperation } = useDrama();
@@ -11,7 +10,7 @@ export const useAnswerCacheStore = defineStore('plugin::answer-cache', () => {
     const autoSave = ref(false);
 
     const save = () => {
-        localforage.setItem(key, klona(answer.value));
+        localforage.setItem(key, toRaw(answer.value));
     };
 
     onApplyOperation(() => {

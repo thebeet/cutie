@@ -1,5 +1,5 @@
-import { watchEffect, h } from 'vue';
-import { useDrama, addNodeToContainer } from '@cutie/web3d';
+import { h, watchEffect } from 'vue';
+import { addNodeToContainer, useDrama } from '@cutie/web3d';
 import { useParsingStore } from './stores';
 import * as THREE from 'three';
 import ToolBox from './components/ToolBox.vue';

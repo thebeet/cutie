@@ -1,6 +1,6 @@
 import { h, watch } from 'vue';
 import ToolBox from './components/ToolBox.vue';
-import { useDrama, addNodeToContainer, useSetFocusOnClick, RBox } from '@cutie/web3d';
+import { RBox, addNodeToContainer, useDrama, useSetFocusOnClick } from '@cutie/web3d';
 import { rectAction } from './actions/rect';
 import { AddBoxOperation } from './operations/AddBoxOperation';
 import { storeToRefs } from 'pinia';

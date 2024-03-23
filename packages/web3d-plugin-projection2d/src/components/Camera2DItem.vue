@@ -10,7 +10,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { useDrama, Camera2D } from '@cutie/web3d';
+import { Camera2D, useDrama } from '@cutie/web3d';
 import { useProjection2d } from '../hooks';
 import { ref } from 'vue';
 import { useToggle } from '@vueuse/core';

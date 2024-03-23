@@ -2,9 +2,9 @@
 /* eslint-disable spaced-comment */
 import {
     BufferAttribute,
-    Vector3,
-    Ray,
     Points,
+    Ray,
+    Vector3,
 } from 'three';
 import { IntersectAbleObject } from '../types';
 

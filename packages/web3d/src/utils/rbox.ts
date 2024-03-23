@@ -1,4 +1,4 @@
-import { Matrix4, Quaternion, Euler, Vector3 } from 'three';
+import { Euler, Matrix4, Quaternion, Vector3 } from 'three';
 import { RBox } from '../types';
 
 export const rbox2Matrix = (rbox: RBox): Matrix4 => {

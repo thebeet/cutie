@@ -1,10 +1,10 @@
 import {
-    BufferAttribute,
     Box3,
-    Vector3,
-    Ray,
+    BufferAttribute,
     BufferGeometry,
     Points,
+    Ray,
+    Vector3,
 } from 'three';
 import { IntersectAbleObject } from '../types';
 

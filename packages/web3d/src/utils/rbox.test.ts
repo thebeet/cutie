@@ -1,4 +1,4 @@
-import { expect, describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { Vector3 } from 'three';
 import { RBox } from '../types';
 import { rbox2Matrix, rboxIOUBruteforce } from './rbox';

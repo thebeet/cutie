@@ -1,7 +1,7 @@
 import { useActiveElement, useMagicKeys, whenever } from '@vueuse/core';
 import { logicAnd } from '@vueuse/math';
 import { useAnswerHistoryStore } from '../stores/answer';
-import { watch, ref } from 'vue';
+import { ref, watch } from 'vue';
 
 export const useHotkeys = () => {
     const activeElement = useActiveElement();

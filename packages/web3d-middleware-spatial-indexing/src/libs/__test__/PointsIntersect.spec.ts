@@ -1,6 +1,6 @@
-import { expect, describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import * as THREE from 'three';
-import { Octree } from './Octree';
+import { Octree } from '../Octree';
 
 describe('Points Intersect', () => {
     const position = new Float32Array(300_00_00);

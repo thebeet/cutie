@@ -14,8 +14,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { Page, useDrama, runPlugin } from '@cutie/web3d';
+import { onMounted, ref } from 'vue';
+import { Page, runPlugin, useDrama } from '@cutie/web3d';
 import { mdiCar } from '@mdi/js';
 
 const props = defineProps<{

@@ -1,4 +1,4 @@
-import { useDrama, addNodeToContainer } from '@cutie/web3d';
+import { addNodeToContainer, useDrama } from '@cutie/web3d';
 import PaginationView from './components/PaginationView.vue';
 import ToolBox from './components/ToolBox.vue';
 import { h } from 'vue';

@@ -24,12 +24,12 @@ export class PointsAllInOneMaterial extends RawShaderMaterial {
                 },
             },
             vertexShader: `
-            precision mediump float;
+            precision highp float;
             in vec3 position;
-            in vec3 color;
+            in lowp vec3 color;
             in int label;
             in int highlight;
-            in float intensity;
+            in lowp float intensity;
             uniform mat4 projectionMatrix;
             uniform mat4 modelMatrix;
             uniform mat4 modelViewMatrix;
@@ -37,7 +37,7 @@ export class PointsAllInOneMaterial extends RawShaderMaterial {
             uniform int mode;
             uniform vec4 instanceColor[256];
             uniform vec4 highlightColor;
-            out vec4 v_color;
+            out lowp vec4 v_color;
             vec3 hsv2rgb(vec3 c)
             {
                 vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -70,9 +70,8 @@ export class PointsAllInOneMaterial extends RawShaderMaterial {
                 }
             }`,
             fragmentShader: `
-            precision mediump float;
-            in vec4 v_color;
-            out vec4 o_FragColor;
+            in lowp vec4 v_color;
+            out lowp vec4 o_FragColor;
             void main() {
                 if (v_color.a < 0.1) discard;
                 o_FragColor = v_color;

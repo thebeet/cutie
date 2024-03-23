@@ -1,4 +1,4 @@
-import { Matrix4, Vector3, Quaternion, Euler, Frustum, Plane } from 'three';
+import { Euler, Frustum, Matrix4, Plane, Quaternion, Vector3 } from 'three';
 
 export type RBox = {
     readonly position: {

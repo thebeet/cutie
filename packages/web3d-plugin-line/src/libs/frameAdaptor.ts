@@ -1,4 +1,4 @@
-import { Points, Vector3, Box3 } from 'three';
+import { Box3, Points, Vector3 } from 'three';
 
 export interface IntersectAbleObject {
     containsPoint(point: Vector3): boolean;

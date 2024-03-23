@@ -1,6 +1,6 @@
-import { expect, describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
-import { dumpAscii, dumpBinary, FieldX, FieldY, FieldZ } from './dump';
+import { FieldX, FieldY, FieldZ, dumpAscii, dumpBinary } from './dump';
 import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
 
 describe('dumpAscii', () => {

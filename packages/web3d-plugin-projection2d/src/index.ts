@@ -1,4 +1,4 @@
-import { useDrama, addNodeToContainer } from '@cutie/web3d';
+import { addNodeToContainer, useDrama } from '@cutie/web3d';
 import { h } from 'vue';
 
 import ToolBox from './components/ToolBox.vue';

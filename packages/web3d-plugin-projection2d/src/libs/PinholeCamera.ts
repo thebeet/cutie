@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Matrix4, Matrix3 } from 'three';
+import { Matrix3, Matrix4, PerspectiveCamera } from 'three';
 
 function makeNdcMatrix(
     left: number,

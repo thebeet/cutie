@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import { useDrama, Camera2D } from '@cutie/web3d';
+import { computed, ref } from 'vue';
+import { Camera2D, useDrama } from '@cutie/web3d';
 import * as THREE from 'three';
 
 export const useProjection2DStore = defineStore('plugin::projection2d', () => {

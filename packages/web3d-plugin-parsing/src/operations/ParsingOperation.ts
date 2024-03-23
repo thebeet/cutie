@@ -1,17 +1,16 @@
 import { TFrame } from '@cutie/web3d';
 import { AnswerContent, ParsingInstance } from '../types';
-import { klona } from 'klona';
 
 export class ParsingOperation {
     private readonly labelID: number;
     private readonly points: [TFrame, number[]][];
-    private readonly instances: ParsingInstance[]; // snapshot
+    private readonly instances: readonly ParsingInstance[]; // snapshot
     private change: number[][][] = [];
 
     constructor(labelID: number, points: [TFrame, number[]][], instances: ParsingInstance[]) {
         this.labelID = labelID;
         this.points = points;
-        this.instances = klona(instances);
+        this.instances = instances;
         this.change = points.map(() => this.instances.map(() => [] as number[]));
     }
 

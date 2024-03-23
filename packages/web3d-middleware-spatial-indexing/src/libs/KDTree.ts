@@ -1,8 +1,8 @@
 import {
     Box3,
-    Vector3,
     BufferAttribute,
     BufferGeometry,
+    Vector3,
 } from 'three';
 import { IntersectAbleObject } from '../types';
 

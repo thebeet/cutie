@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { rearrange } from '../lineRearrange'; // Assuming rejust is exported from 'rejust.ts'
 import * as THREE from 'three';
 

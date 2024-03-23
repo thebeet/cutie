@@ -1,9 +1,9 @@
 import {
     DataTexture,
-    RGBAFormat,
     FloatType,
     LinearFilter,
     Matrix3,
+    RGBAFormat,
 } from 'three';
 
 export const FisheyeDistortionShader = {

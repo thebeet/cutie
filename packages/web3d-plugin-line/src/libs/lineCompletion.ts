@@ -1,13 +1,12 @@
 import { ITFrame } from './frameAdaptor';
 import { RBox, frustumFromRBox } from './rbox';
-import { Vector3, Line3, Quaternion, Euler, Float32BufferAttribute } from 'three';
+import { Euler, Float32BufferAttribute, Line3, Quaternion, Vector3 } from 'three';
 import { otsu } from './otsu';
 import { triangleThreshold } from './triangleThreshold';
-import _ from 'lodash';
 import { findNearistLine } from './pointLine';
 import { gaussianSmooth3d } from './gaussianSmooth';
-import { klona } from 'klona';
 import { rearrange } from './lineRearrange';
+import _ from 'lodash';
 
 const pointsCulled = (frame: ITFrame, start: Vector3, end: Vector3, size: number) => {
     const center = start.clone().add(end).multiplyScalar(0.5);
@@ -138,7 +137,7 @@ export const useLineCompletion = (
     const tmp = _.groupBy(buckets, (b) => Math.floor(b.pos / space));
     for (const key in tmp) {
         const arr = tmp[key];
-        if (arr.length > 2) {
+        if (arr && arr.length > 2) {
             let weightSum = 0;
             const mean = arr.reduce((acc, { distance, pos, point }) => {
                 const weight = Math.min(Math.pow(1 / distance, inverseDistanceWeightingPow), 10000); // 反距离权重, 限制最高10000
@@ -158,8 +157,6 @@ export const useLineCompletion = (
     }
 
     result.sort((a, b) => a.pos - b.pos);
-
-    const beforeGaussian = klona(result.map(({ point }) => point));
 
     if (gaussianOutput) {
         let s = 0, end = 1;
@@ -182,10 +179,6 @@ export const useLineCompletion = (
     const rearrangeResult = rearrange(result.map(({ point }) => point), space);
 
     return {
-        //clusters,
-        position,
-        buckets,
-        result: rearrangeResult,
-        beforeGaussian
+        result: rearrangeResult
     } as const;
 };

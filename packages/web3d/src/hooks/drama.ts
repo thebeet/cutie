@@ -1,5 +1,5 @@
-import { ref, watchEffect, MaybeRefOrGetter, shallowRef, readonly } from 'vue';
-import { AnswerContent, Page } from '../types';
+import { MaybeRefOrGetter, readonly, ref, shallowRef, watchEffect } from 'vue';
+import { Page } from '../types';
 import { useScene } from './scene';
 import { useAnswerStore } from '../stores/answer';
 import { useMouse } from './mouse';
@@ -59,10 +59,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     const { mode: shaderMode, material } = useShader();
 
     const launch = async () => {
-        const tAnswer: AnswerContent = {
-            elements: []
-        };
-        await setupAnswer(tAnswer);
+        await setupAnswer({ elements: [] });
     };
 
     const { state: mouseState, eventHook: mouseEventHook } = useMouse();
