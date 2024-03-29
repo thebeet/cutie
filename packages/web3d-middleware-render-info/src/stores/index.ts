@@ -16,18 +16,17 @@ export const useRenderInfoStore = defineStore('plugin::render-info', () => {
         };
         scene.traverseVisible(obj => {
             info.value.counts.objects++;
-            if (obj instanceof THREE.Mesh) {
-                const geometry = obj.geometry;
+            if (obj instanceof THREE.Points) {
+                const geometry = obj.geometry as THREE.BufferGeometry;
                 if (geometry.index !== null) {
-                    info.value.counts.vertices += geometry.index.count;
-                    info.value.counts.triangles += geometry.index.count / 3;
+                    info.value.counts.vertices += Math.min(geometry.index.count, geometry.drawRange.count);
                 } else {
-                    info.value.counts.vertices += geometry.attributes.position.count;
-                    info.value.counts.triangles += geometry.attributes.position.count / 3;
+                    info.value.counts.vertices += Math.min(geometry.attributes.position.count, geometry.drawRange.count);
                 }
-            } else if (obj instanceof THREE.Points) {
+            } else if (obj instanceof THREE.Mesh) {
                 const geometry = obj.geometry;
                 info.value.counts.vertices += geometry.attributes.position.count;
+                info.value.counts.triangles += geometry.attributes.position.count / 3;
             }
         });
     });
