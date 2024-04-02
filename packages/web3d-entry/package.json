@@ -14,6 +14,7 @@
     "@cutie/web3d": "0.0.1",
     "@cutie/web3d-middleware-answer-cache": "0.0.1",
     "@cutie/web3d-middleware-answer-history": "0.0.1",
+    "@cutie/web3d-middleware-benchmark": "0.0.1",
     "@cutie/web3d-middleware-camera-control": "0.0.1",
     "@cutie/web3d-middleware-frame-pagination": "0.0.1",
     "@cutie/web3d-middleware-mouse": "0.0.1",

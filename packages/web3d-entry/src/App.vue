@@ -8,7 +8,7 @@ import { ref } from 'vue';
 
 const page = ref<Page>();
 
-fetch('/200/page.json').then((response) => response.json() as Promise<Page>).then(data => {
+fetch('/200/page20.json').then((response) => response.json() as Promise<Page>).then(data => {
     page.value = data;
 });
 </script>
