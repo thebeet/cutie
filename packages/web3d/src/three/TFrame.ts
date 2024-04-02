@@ -39,6 +39,8 @@ const promiseWithResolvers = <T>() => {
 
 export class TFrame extends THREE.Object3D implements ITFrame {
     readonly index: number;
+    readonly local: THREE.Object3D;
+    readonly timestamp: number = 0;
     _points: THREE.Points | undefined;
     intersectDelegate: PointsIntersect | undefined;
 
@@ -48,9 +50,12 @@ export class TFrame extends THREE.Object3D implements ITFrame {
         reject: () => void,
     };
 
-    constructor(index: number) {
+    constructor(index: number, timestamp: number) {
         super();
         this.index = index;
+        this.local = new THREE.Object3D();
+        this.add(this.local);
+        this.timestamp = timestamp;
         // @ts-ignore
         this._pointsLoadedPromise = promiseWithResolvers();
         this.addEventListener('change', () => {
@@ -72,7 +77,7 @@ export class TFrame extends THREE.Object3D implements ITFrame {
             this._points.layers.enable(LAYER_POINTS);
             this._points.frustumCulled = false;
             this._points.geometry.boundingSphere = _infSphere;
-            this.add(this._points);
+            this.local.add(this._points);
             if (this.frame.visible) {
                 this.update();
             }

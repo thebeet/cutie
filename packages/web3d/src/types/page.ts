@@ -56,6 +56,7 @@ export interface Data {
 
 export type Frame = {
     readonly index: number
+    readonly timestamp: number
     readonly url: string
     readonly pose: readonly number[] & { readonly length: 9 }
     readonly points: number

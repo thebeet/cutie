@@ -17,6 +17,7 @@ export class AddBoxOperation implements Operation {
             schema: 'box',
             type: 'box',
             frameIndex: frame.index,
+            traceId: THREE.MathUtils.generateUUID(),
             label: 'label',
             description: 'description',
             position: {
