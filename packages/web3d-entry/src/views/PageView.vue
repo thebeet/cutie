@@ -43,7 +43,6 @@ onMounted(async () => {
         { name: 'points-style', params: { mode: 'label' } },
         { name: 'pcd-loader', params: { } },
         { name: 'render-info', params: { } },
-        { name: 'benchmark', params: { } },
     ];
 
     for (const middleware of middlewares) {

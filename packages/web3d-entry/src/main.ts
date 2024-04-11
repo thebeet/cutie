@@ -18,7 +18,6 @@ registerPlugin('three-view', () => import('@cutie/web3d-middleware-three-view'))
 registerPlugin('points-style', () => import('@cutie/web3d-middleware-points-style'));
 registerPlugin('pcd-loader', () => import('@cutie/web3d-middleware-pcd-loader'));
 registerPlugin('render-info', () => import('@cutie/web3d-middleware-render-info'));
-registerPlugin('benchmark', () => import('@cutie/web3d-middleware-benchmark'));
 
 // plugin
 registerPlugin('box', () => import('@cutie/web3d-plugin-box'));
