@@ -11,6 +11,6 @@
   },
   "dependencies": {
     "@cutie/web3d": "0.0.1",
-    "three": "^0.162.0"
+    "three": "^0.163.0"
   }
 }

@@ -1,45 +1,60 @@
 import * as THREE from 'three';
+import { TFrame } from '../types';
 
-interface PCDField {
-    name: string;
-    type: 'F' | 'U' | 'I';
-    size: 1 | 2 | 4 | 8;
-    value: (geometry: THREE.BufferGeometry, pos: number) => number;
+type PCDFieldSize = 1 | 2 | 4 | 8;
+type PCDFieldType = 'F' | 'U' | 'I';
+
+export type PCDFields = {
+    name: string[];
+    type: PCDFieldType[];
+    size: PCDFieldSize[];
+    value: (geometry: THREE.BufferGeometry, pos: number, mat: THREE.Matrix4) => number[];
 }
 
-const FieldX: PCDField = {
-    name: 'x',
-    type: 'F',
-    size: 4,
-    value: (geometry, pos) => geometry.attributes.position.getX(pos)
+type PCDFieldsWithOffset = PCDFields & {
+    offset: number[]
+}
+
+const _v = new THREE.Vector3();
+
+export const FieldXYZ: PCDFields = {
+    name: ['x', 'y', 'z'],
+    type: ['F', 'F', 'F'],
+    size: [4, 4, 4],
+    value: (geometry, pos) => {
+        _v.fromBufferAttribute(geometry.attributes.position, pos);
+        return [_v.x, _v.y, _v.z];
+    }
 };
 
-const FieldY: PCDField = {
-    name: 'y',
-    type: 'F',
-    size: 4,
-    value: (geometry, pos) => geometry.attributes.position.getY(pos)
-};
-const FieldZ: PCDField = {
-    name: 'z',
-    type: 'F',
-    size: 4,
-    value: (geometry, pos) => geometry.attributes.position.getZ(pos)
-};
-const FieldLabel: PCDField = {
-    name: 'label',
-    type: 'I',
-    size: 4,
-    value: (geometry, pos) => geometry.attributes.label.getX(pos)
+export const FieldLabel: PCDFields = {
+    name: ['label'],
+    type: ['I'],
+    size: [4],
+    value: (geometry, pos) => [geometry.attributes.label.getX(pos)]
 };
 
-const createPcdHeader = (format: string, pointsCount: number, fields: PCDField[]): string => {
+const buildFields = (fields: readonly PCDFields[]): PCDFieldsWithOffset => {
+    let _offset = 0;
+    return {
+        name: fields.flatMap(f => f.name),
+        type: fields.flatMap(f => f.type),
+        size: fields.flatMap(f => f.size),
+        value: (geometry, pos, mat) => fields.flatMap(f => f.value(geometry, pos, mat)),
+        offset: fields.flatMap(f => f.size).map(v => {
+            _offset += v;
+            return _offset - v;
+        })
+    };
+};
+
+const createPcdHeader = (format: string, pointsCount: number, fields: PCDFields): string => {
     return [
         'VERSION 0.7',
-        'FIELDS ' + fields.map(field => field.name).join(' '),
-        'SIZE ' + fields.map(field => field.size.toString()).join(' '),
-        'TYPE ' + fields.map(field => field.type).join(' '),
-        'COUNT ' + fields.map(() => '1').join(' '),
+        'FIELDS ' + fields.name.join(' '),
+        'SIZE ' + fields.size.map(v => v.toString()).join(' '),
+        'TYPE ' + fields.type.join(' '),
+        'COUNT ' + fields.name.map(() => '1').join(' '),
         `WIDTH ${pointsCount}`,
         'HEIGHT 1',
         'VIEWPOINT 0 0 0 1 0 0 0',
@@ -49,95 +64,81 @@ const createPcdHeader = (format: string, pointsCount: number, fields: PCDField[]
     ].join('\n');
 };
 
-/**
- * Serializes a THREE.Points object into an ASCII PCD (Point Cloud Data) string.
- * @author XIANG GuangTe
- *
- * @param {THREE.Points} points - The THREE.Points object containing the point cloud geometry.
- * @param {PCDField[]} fields - An array of field descriptors defining the structure and types of the point data.
- * @returns {string} A string representing the serialized ASCII PCD data, including header and point data.
- */
-const dumpAscii = (points: THREE.Points, fields: PCDField[]) => {
-    const geometry = points.geometry;
-    const pointCount = points.geometry.attributes.position.count;
-    const header = createPcdHeader('ascii', pointCount, fields);
-    const buffer = Array.from({ length: pointCount }).map((_, i) => fields.map(field => field.value(geometry, i)).join(' ')).join('\n');
+export const dumpAscii = (frames: readonly TFrame[], fields: readonly PCDFields[]) => {
+    const mergeFields = buildFields(fields);
+    const pointCount = frames.reduce((acc, frame) => acc + frame.points!.geometry.attributes.position.count, 0);
+    const header = createPcdHeader('ascii', pointCount, mergeFields);
+    const buffer = frames.map(frame => {
+        const geometry = frame.points!.geometry;
+        const c = geometry.attributes.position.count;
+        return Array.from({ length: c }).map((_, i) => mergeFields.value(geometry, i, frame.local.matrixWorld).join(' ')).join('\n');
+    }).join('\n');
     return header + buffer;
 };
 
-/**
- * Serializes a THREE.Points object into a binary PCD (Point Cloud Data) buffer.
- * @author XIANG GuangTe
- *
- * @param {THREE.Points} points - The THREE.Points object containing the point cloud geometry.
- * @param {PCDField[]} fields - An array of field descriptors defining the structure and types of the point data.
- * @returns {ArrayBuffer} An ArrayBuffer representing the serialized binary PCD data, including header and point data.
- */
-const dumpBinary = (points: THREE.Points, fields: PCDField[]) => {
-    const geometry = points.geometry;
-    const pointCount = points.geometry.attributes.position.count;
-    const header = createPcdHeader('binary', pointCount, fields);
-    const pointBufferSize = fields.reduce((acc, field) => acc + field.size, 0);
-
-    const offsets = new WeakMap<PCDField, number>();
-    let offset = 0;
-    for (const field of fields) {
-        offsets.set(field, offset);
-        offset += field.size;
-    }
+export const dumpBinary = (frames: readonly TFrame[], fields: readonly PCDFields[]) => {
+    const mergeFields = buildFields(fields);
+    const pointCount = frames.reduce((acc, frame) => acc + frame.points!.geometry.attributes.position.count, 0);
+    const header = createPcdHeader('binary', pointCount, mergeFields);
+    const pointBufferSize = fields.reduce((acc, field) => acc + field.size.reduce((acc, item) => acc + item, 0), 0);
 
     const headerBuffer = new TextEncoder().encode(header);
-
     const buffer = new ArrayBuffer(headerBuffer.byteLength + pointBufferSize * pointCount);
     new Uint8Array(buffer).set(headerBuffer);
     const bufferView = new DataView(buffer, headerBuffer.byteLength);
 
-    for (let i = 0; i < pointCount; i++) {
-        for (const field of fields) {
-            const value = field.value(geometry, i);
-            const offset = offsets.get(field)! + i * pointBufferSize;
-            switch (field.type) {
-            case 'F':
-                if (field.size === 4) {
-                    bufferView.setFloat32(offset, value, true);
-                } else if (field.size === 8) {
-                    bufferView.setFloat64(offset, value, true);
-                } else {
-                    throw new Error('Unsupported field size: ' + field.size);
-                }
-                break;
-            case 'I':
-                if (field.size === 1) {
-                    bufferView.setInt8(offset, value);
-                } else if (field.size === 2) {
-                    bufferView.setInt16(offset, value, true);
-                } else if (field.size === 4) {
-                    bufferView.setInt32(offset, value, true);
-                } else {
-                    throw new Error('Unsupported field size: ' + field.size);
-                }
-                break;
-            case 'U':
-                if (field.size === 1) {
-                    bufferView.setUint8(offset, value);
-                } else if (field.size === 2) {
-                    bufferView.setUint16(offset, value, true);
-                } else if (field.size === 4) {
-                    bufferView.setUint32(offset, value, true);
-                } else {
-                    throw new Error('Unsupported field size: ' + field.size);
-                }
-                break;
-            default:
-                throw new Error('Unsupported field type: ' + field.type);
+    let frameOffset = 0;
+    frames.forEach(frame => {
+        const geometry = frame.points!.geometry;
+        const c = geometry.attributes.position.count;
+        for (let i = 0; i < c; i++) {
+            const values = mergeFields.value(geometry, i, frame.local.matrixWorld);
+            for (let j = 0; j < values.length; ++j) {
+                const value = values[j];
+                const offset = frameOffset + mergeFields.offset[j] + i * pointBufferSize;
+                dataViewHelper(bufferView, offset, value, mergeFields.type[j], mergeFields.size[j]);
             }
         }
-    }
+        frameOffset += pointBufferSize * c;
+    });
+
     return buffer;
 };
 
-export {
-    dumpAscii, dumpBinary,
-    type PCDField,
-    FieldX, FieldY, FieldZ, FieldLabel,
+const dataViewHelper = (dataView: DataView, offset: number, value: number, type: PCDFieldType, size: PCDFieldSize) => {
+    switch (type) {
+    case 'F':
+        if (size === 4) {
+            dataView.setFloat32(offset, value, true);
+        } else if (size === 8) {
+            dataView.setFloat64(offset, value, true);
+        } else {
+            throw new Error(`Unsupported field size for type[${type}] ${size}`);
+        }
+        break;
+    case 'I':
+        if (size === 1) {
+            dataView.setInt8(offset, value);
+        } else if (size === 2) {
+            dataView.setInt16(offset, value, true);
+        } else if (size === 4) {
+            dataView.setInt32(offset, value, true);
+        } else {
+            throw new Error(`Unsupported field size for type[${type}] ${size}`);
+        }
+        break;
+    case 'U':
+        if (size === 1) {
+            dataView.setUint8(offset, value);
+        } else if (size === 2) {
+            dataView.setUint16(offset, value, true);
+        } else if (size === 4) {
+            dataView.setUint32(offset, value, true);
+        } else {
+            throw new Error(`Unsupported field size for type[${type}] ${size}`);
+        }
+        break;
+    default:
+        throw new Error('Unsupported field type: ' + type);
+    }
 };

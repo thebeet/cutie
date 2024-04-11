@@ -8,12 +8,12 @@
 </template>
 <script lang="ts" setup>
 import { useDrama } from '@cutie/web3d';
-import { FieldX, FieldY, FieldZ, PCDField, dumpBinary } from '../features/dump';
+import { FieldXYZ, PCDFields, dumpBinary } from '../features/dump';
 import { useParsingStore } from '../stores';
 import { storeToRefs } from 'pinia';
 import * as THREE from 'three';
 
-const { activeTool, mouseState, frames } = useDrama();
+const { activeTool, mouseState, activeFrames } = useDrama();
 const { instances } = storeToRefs(useParsingStore());
 
 const click = (mode: string) => {
@@ -26,14 +26,14 @@ const dump = () => {
         const c = new THREE.Color(instance.color);
         return c.getHex();
     });
-    const fieldRGB: PCDField = {
-        name: 'rgb',
-        type: 'I',
-        size: 4,
-        value: (geometry, index) => rgbColors[geometry.attributes.label.array[index]] ?? 0xffffff,
+    const fieldRGB: PCDFields = {
+        name: ['rgb'],
+        type: ['I'],
+        size: [4],
+        value: (geometry, index) => [rgbColors[geometry.attributes.label.array[index]] ?? 0xffffff],
     };
-    const buffer = dumpBinary(frames[1].points!, [
-        FieldX, FieldY, FieldZ, fieldRGB,
+    const buffer = dumpBinary(activeFrames.value, [
+        FieldXYZ, fieldRGB,
     ]);
 
     const blob = new Blob([buffer], { type: 'application/octet-stream' });
