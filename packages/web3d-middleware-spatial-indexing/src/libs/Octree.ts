@@ -227,7 +227,7 @@ export class Octree {
                         );
                     case 3:
                         return new Box3(
-                            new Vector3(this.box.min.x, this.box.min.y, midpoint.z),
+                            new Vector3(this.box.min.x, midpoint.y, midpoint.z),
                             new Vector3(midpoint.x, this.box.max.y, this.box.max.z)
                         );
                     case 4:
@@ -247,7 +247,7 @@ export class Octree {
                         );
                     case 7:
                         return new Box3(
-                            new Vector3(midpoint.x, this.box.min.y, midpoint.z),
+                            new Vector3(midpoint.x, midpoint.y, midpoint.z),
                             new Vector3(this.box.max.x, this.box.max.y, this.box.max.z)
                         );
                     }

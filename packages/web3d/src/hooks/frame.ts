@@ -4,17 +4,17 @@ import * as THREE from 'three';
 import { shallowRef } from 'vue';
 
 export const useFrame = (page: Page, scene: THREE.Scene) => {
-    const frame0 = new TFrame(0);
+    const frame0 = new TFrame(0, 0);
     frame0.visible = true;
     const frames: readonly TFrame[] = [frame0, ...page!.data.frames.map(frameData => {
-        const frame = new TFrame(frameData.index);
+        const frame = new TFrame(frameData.index, frameData.timestamp);
         frame.visible = false;
         frame.userData['data'] = frameData;
         const position = new THREE.Vector3(frameData.pose[2], frameData.pose[3], frameData.pose[4]);
         const quaternion = new THREE.Quaternion(frameData.pose[5], frameData.pose[6], frameData.pose[7], frameData.pose[8]);
         const matrix4 = new THREE.Matrix4().makeRotationFromQuaternion(quaternion).setPosition(position);
-        frame.applyMatrix4(matrix4);
-        frame.updateMatrixWorld();
+        frame.local.applyMatrix4(matrix4);
+        frame.local.updateMatrixWorld();
         return frame;
     })];
     frames.forEach(frame => scene.add(frame));

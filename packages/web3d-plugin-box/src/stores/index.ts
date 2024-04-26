@@ -9,8 +9,7 @@ import { useMotions } from '../hooks/motion';
 export const useBoxStore = defineStore('plugin::box', () => {
     const { frames, answer, transform, attachTransform, applyOperation } = useDrama();
 
-    const elements = computed(() => answer.value.elements.filter(e => e.schema === 'box') as ABox[]);
-    const { motions } = useMotions(elements);
+    const { elementsWithMotion: elements } = useMotions(computed(() => answer.value.elements.filter(e => e.schema === 'box') as ABox[]));
     const boxes: Map<string, TBox> = new Map([]);
     const { draft } = useSync(frames, elements, boxes,
         el => new TBox(el), (obj, el) => obj.apply(el), obj => obj.dispose());
@@ -36,6 +35,5 @@ export const useBoxStore = defineStore('plugin::box', () => {
     return {
         focused, draft,
         elements, boxes,
-        motions
     } as const;
 });

@@ -20,7 +20,8 @@ export interface ITFrame extends PointsIntersect {
     readonly frame: THREE.Object3D;
     intersectDelegate: PointsIntersect | undefined;
     points: THREE.Points | undefined;
-    readonly onPointsLoaded: Promise<{frame: ITFrame, points: THREE.Points}>;
+    readonly onPointsLoaded: Promise<{frame: ITFrame, points: THREE.Points, callback?: (point: THREE.Points) => void}>;
+
 }
 
 // 兼容Promise.withResolvers()
@@ -42,11 +43,13 @@ export class TFrame extends THREE.Object3D implements ITFrame {
     readonly local: THREE.Object3D;
     readonly timestamp: number = 0;
     _points: THREE.Points | undefined;
+    renderPoints: THREE.Points | undefined;
+
     intersectDelegate: PointsIntersect | undefined;
 
     _pointsLoadedPromise: {
-        promise: Promise<{frame: TFrame; points: THREE.Points}>,
-        resolve: (payload: {frame: TFrame; points: THREE.Points}) => void,
+        promise: Promise<{frame: TFrame; points: THREE.Points, callback?: (point: THREE.Points) => void}>,
+        resolve: (payload: {frame: TFrame; points: THREE.Points, callback?: (point: THREE.Points) => void}) => void,
         reject: () => void,
     };
 
@@ -77,13 +80,16 @@ export class TFrame extends THREE.Object3D implements ITFrame {
             this._points.layers.enable(LAYER_POINTS);
             this._points.frustumCulled = false;
             this._points.geometry.boundingSphere = _infSphere;
-            this.local.add(this._points);
-            if (this.frame.visible) {
-                this.update();
-            }
             this._pointsLoadedPromise.resolve({
                 frame: this,
-                points: this._points
+                points: this._points,
+                callback: (point) => {
+                    this.local.add(point);
+                    if (this.frame.visible) {
+                        this.update();
+                    }
+                    // console.log(point);
+                }
             });
         }
     }
@@ -100,7 +106,7 @@ export class TFrame extends THREE.Object3D implements ITFrame {
         return this._points;
     }
 
-    get onPointsLoaded(): Promise<{frame: TFrame, points: THREE.Points}> {
+    get onPointsLoaded(): Promise<{frame: TFrame, points: THREE.Points, callback?: (point: THREE.Points) => void}> {
         return this._pointsLoadedPromise.promise;
     }
 

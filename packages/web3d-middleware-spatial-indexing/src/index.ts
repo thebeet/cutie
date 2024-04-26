@@ -1,9 +1,11 @@
 import { useDrama, usePerformanceStore } from '@cutie/web3d';
 import localforage from 'localforage';
 import { Octree, OctreeSerialization } from './libs/Octree';
+import { QuadTree, QuadTreeSerialization } from './libs/QuadTree';
 import { Bruteforce } from './libs/Bruteforce';
 import { injectPerformance } from './performance';
 import { Points } from 'three';
+import { TFrustumCulledPoints } from './three/TFrustumCulledPoints';
 
 const buildOctree = (points: Points) => {
     const { measure } = usePerformanceStore();
@@ -26,14 +28,41 @@ const buildOctree = (points: Points) => {
     });
 };
 
+const buildQuadTree = (points: Points) => {
+    const { measure } = usePerformanceStore();
+    const key = 'quadtree-' + points.geometry.uuid;
+    return localforage.getItem<QuadTreeSerialization>(key).then((data) => {
+        if (data) {
+            const quadtree = QuadTree.fromSerialization(points.geometry, data);
+            if (quadtree) {
+                return quadtree;
+            }
+        }
+        const quadtree = QuadTree.fromPointsGeometry(points.geometry);
+        localforage.setItem(key, quadtree.serialization());
+        return quadtree;
+    }).then(quadtree => {
+        if (quadtree) {
+            quadtree.intersect = measure('web3d::quadtree::intersect', quadtree.intersect);
+        }
+        return quadtree;
+    });
+};
+
 export const useMiddleware = () => {
     injectPerformance();
     const { frames } = useDrama();
 
     frames.forEach((frame) => {
-        frame.onPointsLoaded.then(({ points }) => {
+        frame.onPointsLoaded.then(({ points, callback }) => {
             frame.intersectDelegate = Bruteforce.fromPoints(points);
-            buildOctree(points).then(octree => frame.intersectDelegate = octree);
+            buildQuadTree(points).then(tree => {
+                frame.intersectDelegate = tree;
+                if (callback) {
+                    //callback(points);
+                    callback(new TFrustumCulledPoints(points, tree));
+                }
+            });
         });
     });
 };

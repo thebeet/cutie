@@ -12,6 +12,6 @@
   "dependencies": {
     "@cutie/web3d": "0.0.1",
     "@vueuse/core": "^10.9.0",
-    "vue": "^3.4.21"
+    "vue": "^3.4.25"
   }
 }

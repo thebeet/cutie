@@ -15,6 +15,13 @@
         >
             showAll
         </button>
+        <button
+            type="button"
+            class="toolbox-button"
+            @click="show10"
+        >
+            show10
+        </button>
     </div>
 </template>
 <script lang="ts" setup>
@@ -35,6 +42,11 @@ const play = () => {
 
 const showAll = () => {
     selectFrame(frames.map(f => f.index).filter(i => i > 0));
+};
+
+
+const show10 = () => {
+    selectFrame(frames.map(f => f.index).filter(i => i > 0 && i <= 10));
 };
 </script>
 <style scoped>
