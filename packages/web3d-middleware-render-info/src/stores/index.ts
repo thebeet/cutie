@@ -12,7 +12,7 @@ export const useRenderInfoStore = defineStore('plugin::render-info', () => {
             memory: { ...renderer.info.memory },
             render: { ...renderer.info.render },
             // programs: renderer.info.programs ? [...renderer.info.programs!.map((program) => `${program.name}(${program.usedTimes})`)] : [],
-            counts: { objects: 0, frustumCulled: 0, vertices: 0, triangles: 0 }
+            counts: { objects: 0, vertices: 0, triangles: 0 }
         };
         const frustum = new THREE.Frustum();
         const projScreenMatrix = new THREE.Matrix4();
@@ -21,12 +21,6 @@ export const useRenderInfoStore = defineStore('plugin::render-info', () => {
         frustum.setFromProjectionMatrix(projScreenMatrix);
 
         scene.traverseVisible(obj => {
-            if (obj.frustumCulled &&  ( obj.isMesh || obj.isLine || obj.isPoints )) {
-                if (!frustum.intersectsObject(obj)) {
-                    info.value.counts.frustumCulled++;
-                    return;
-                }
-            }
             info.value.counts.objects++;
             if (obj instanceof THREE.Points) {
                 const geometry = obj.geometry as THREE.BufferGeometry;

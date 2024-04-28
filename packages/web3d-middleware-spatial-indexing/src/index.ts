@@ -1,4 +1,4 @@
-import { useDrama, usePerformanceStore } from '@cutie/web3d';
+import { useAdvanceDrama, usePerformanceStore } from '@cutie/web3d';
 import localforage from 'localforage';
 import { Octree, OctreeSerialization } from './libs/Octree';
 import { QuadTree, QuadTreeSerialization } from './libs/QuadTree';
@@ -6,6 +6,8 @@ import { Bruteforce } from './libs/Bruteforce';
 import { injectPerformance } from './performance';
 import { Points } from 'three';
 import { TFrustumCulledPoints } from './three/TFrustumCulledPoints';
+import { OctreeHelper } from 'three/examples/jsm/Addons.js';
+import * as THREE from 'three';
 
 const buildOctree = (points: Points) => {
     const { measure } = usePerformanceStore();
@@ -51,16 +53,34 @@ const buildQuadTree = (points: Points) => {
 
 export const useMiddleware = () => {
     injectPerformance();
-    const { frames } = useDrama();
+    const { frames, onBeforeRender } = useAdvanceDrama();
+
+    const tPoints: TFrustumCulledPoints[] = [];
+
+    onBeforeRender(({ camera }) => {
+        const frustum = new THREE.Frustum();
+        const projScreenMatrix = new THREE.Matrix4();
+        projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+        frustum.setFromProjectionMatrix(projScreenMatrix);
+
+        tPoints.forEach(p => {
+            if (p.parent?.visible === true) {
+                p.onBeforeProject(frustum);
+            }
+        });
+    });
 
     frames.forEach((frame) => {
-        frame.onPointsLoaded.then(({ points, callback }) => {
+        frame.onPointsLoaded.then(({ frame, points, callback }) => {
             frame.intersectDelegate = Bruteforce.fromPoints(points);
             buildQuadTree(points).then(tree => {
                 frame.intersectDelegate = tree;
                 if (callback) {
                     //callback(points);
-                    callback(new TFrustumCulledPoints(points, tree));
+                    const p = new TFrustumCulledPoints(points, tree);
+                    tPoints.push(p);
+                    callback(p);
+                    //frame.add(new OctreeHelper(tree))
                 }
             });
         });
