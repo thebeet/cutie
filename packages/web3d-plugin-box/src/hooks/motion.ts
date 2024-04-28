@@ -11,13 +11,14 @@ type TracedAElement = AElement & {
     }
 };
 type Motion = {
-    speed: THREE.Vector3;
-    acceleration: THREE.Vector3;
+    readonly speed: THREE.Vector3;
+    readonly acceleration: THREE.Vector3;
 };
 
-export const useMotions = (elements: Ref<TracedAElement[]>) => {
+export const useMotions = <T extends TracedAElement>(elements: Ref<T[]>) => {
     const { frames } = useDrama();
-    const motions = shallowRef<Map<string, Motion>>(new Map([]));
+    type ELE = T & { motion: Motion };
+    const elementsWithMotion = shallowRef<ELE[]>([]);
     watch(elements, (value) => {
         const result = new Map<string, TracedAElement[]>([]);
         value.forEach(el => {
@@ -28,7 +29,7 @@ export const useMotions = (elements: Ref<TracedAElement[]>) => {
                 result.set(el.traceId, [el]);
             }
         });
-        const results: [string, Motion][] = [];
+        const results: (readonly [string, Motion])[] = [];
         for (const [, value] of result) {
             if (value.length > 1) {
                 value.sort((a, b) => a.frameIndex - b.frameIndex);
@@ -40,14 +41,19 @@ export const useMotions = (elements: Ref<TracedAElement[]>) => {
                 }]);
             }
         }
-        motions.value = new Map(results);
+
+        const motions = new Map(results);
+        elementsWithMotion.value = elements.value.map(el => ({
+            ...el,
+            motion: motions.get(el.uuid)!
+        }));
     });
     return {
-        motions
+        elementsWithMotion
     };
 };
 
-const calculateMotion = (sortedElements: readonly TracedAElement[], frames: readonly TFrame[]): [string, Motion][] => {
+const calculateMotion = (sortedElements: readonly TracedAElement[], frames: readonly TFrame[]) => {
     const itemSpeed = sortedElements.map((el, index, arr) => {
         const prevId = Math.max(index - 1, 0);
         const nextId = Math.min(index + 1, arr.length - 1);
@@ -58,7 +64,7 @@ const calculateMotion = (sortedElements: readonly TracedAElement[], frames: read
             next.position.x - prev.position.x,
             next.position.y - prev.position.y,
             next.position.z - prev.position.z
-        ).multiplyScalar(timeDelta)] as const;
+        ).multiplyScalar(1 / timeDelta)] as const;
     });
     return itemSpeed.map(([uuid, speed], index, arr) => {
         const prevId = Math.max(index - 1, 0);
