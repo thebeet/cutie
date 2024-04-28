@@ -26,11 +26,13 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
     scene.add(transform);
 
     const renderHook = createEventHook<{renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera}>();
+    const renderBeforeHook = createEventHook<{renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera}>();
     const animate = () => {
         renderer.autoClear = false;
         if (dirty) {
             dirty = false;
             transform.updateMatrixWorld();
+            renderBeforeHook.trigger({ renderer, scene, camera });
             renderer.render(scene, camera);
             labelRenderer.render(scene, camera);
             renderHook.trigger({ renderer, scene, camera });
@@ -63,6 +65,7 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
     return {
         scene, camera, renderer,
         controls, controlMode, transform, attachTransform,
+        onBeforeRender: renderBeforeHook.on,
         onRender: renderHook.on
     } as const;
 };
