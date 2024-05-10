@@ -52,7 +52,7 @@ export class PointsAllInOneMaterial extends RawShaderMaterial {
                     (abs(fract(gl_Position.x * 31.415926)) * (gl_Position.w - 50.0) > abs(fract(gl_Position.y * 31.415926)) * 50.)) {
                     // 当距离大于50.0时，根据距离随机剔除点，距离越远剔除概率越大
                     gl_Position = vec4(0., 0., 2., 1.);
-                    v_color = vec4(1., 1., 1., 1.);
+                    v_color = vec4(1., 1., 1., 0.);
                 } else {
                     if (mode == 1) {
                         v_color = instanceColor[clamp(label, 0, 255)];

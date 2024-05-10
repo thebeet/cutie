@@ -14,7 +14,7 @@
   ],
   "packageManager": "yarn@4.1.1",
   "dependencies": {
-    "vue": "^3.4.21"
+    "vue": "^3.4.25"
   },
   "devDependencies": {
     "@types/node": "^20.12.4",
@@ -27,7 +27,7 @@
     "prettier": "^3.2.5",
     "typescript": "5.4.4",
     "vite": "^5.2.8",
-    "vitest": "^1.4.0",
+    "vitest": "^1.5.2",
     "vue-tsc": "^2.0.10"
   }
 }

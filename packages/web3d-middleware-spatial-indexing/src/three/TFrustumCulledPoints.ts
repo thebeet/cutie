@@ -32,7 +32,7 @@ export class TFrustumCulledPoints extends THREE.Points {
 
     /**
      * 在渲染前，完成视锥体裁剪剔除
-     * 尽可能的保证渲染物体的连续性，减少渲染次数
+     * 同时尽可能的保证渲染物体的连续性，减少渲染次数
      *
      * @param frustum THREE.Frustum - 相机视锥体
      */

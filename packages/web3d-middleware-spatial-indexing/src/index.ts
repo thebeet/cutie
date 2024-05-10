@@ -1,18 +1,19 @@
 import { useAdvanceDrama, usePerformanceStore } from '@cutie/web3d';
 import localforage from 'localforage';
-import { Octree, OctreeSerialization } from './libs/Octree';
-import { QuadTree, QuadTreeSerialization } from './libs/QuadTree';
+import { Octree } from './libs/Octree';
+import { QuadTree } from './libs/QuadTree';
 import { Bruteforce } from './libs/Bruteforce';
 import { injectPerformance } from './performance';
 import { Points } from 'three';
 import { TFrustumCulledPoints } from './three/TFrustumCulledPoints';
 import { OctreeHelper } from 'three/examples/jsm/Addons.js';
 import * as THREE from 'three';
+import { SpatialTreeSerialization } from './libs/SpatialTree';
 
 const buildOctree = (points: Points) => {
     const { measure } = usePerformanceStore();
     const key = 'octree-' + points.geometry.uuid;
-    return localforage.getItem<OctreeSerialization>(key).then((data) => {
+    return localforage.getItem<SpatialTreeSerialization>(key).then((data) => {
         if (data) {
             const octree = Octree.fromSerialization(points.geometry, data);
             if (octree) {
@@ -33,7 +34,7 @@ const buildOctree = (points: Points) => {
 const buildQuadTree = (points: Points) => {
     const { measure } = usePerformanceStore();
     const key = 'quadtree-' + points.geometry.uuid;
-    return localforage.getItem<QuadTreeSerialization>(key).then((data) => {
+    return localforage.getItem<SpatialTreeSerialization>(key).then((data) => {
         if (data) {
             const quadtree = QuadTree.fromSerialization(points.geometry, data);
             if (quadtree) {
@@ -51,7 +52,22 @@ const buildQuadTree = (points: Points) => {
     });
 };
 
-export const useMiddleware = () => {
+type Config = {
+    readonly spatialTree: 'octree' | 'quadtree';
+};
+
+const defaultConfig: Config = {
+    spatialTree: 'quadtree',
+};
+
+export const useMiddleware = (config?: Partial<Config>) => {
+    const {
+        spatialTree,
+    } = {
+        ...defaultConfig,
+        ...config,
+    };
+    const treeBuilder = spatialTree === 'octree' ? buildOctree : buildQuadTree;
     injectPerformance();
     const { frames, onBeforeRender } = useAdvanceDrama();
 
@@ -73,7 +89,7 @@ export const useMiddleware = () => {
     frames.forEach((frame) => {
         frame.onPointsLoaded.then(({ frame, points, callback }) => {
             frame.intersectDelegate = Bruteforce.fromPoints(points);
-            buildQuadTree(points).then(tree => {
+            treeBuilder(points).then(tree => {
                 frame.intersectDelegate = tree;
                 if (callback) {
                     //callback(points);

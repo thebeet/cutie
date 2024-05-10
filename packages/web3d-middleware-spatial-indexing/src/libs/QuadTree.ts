@@ -5,48 +5,9 @@ import {
     Points,
     Vector3,
 } from 'three';
-import { Octree } from './Octree';
+import { SpatialTree, SpatialTreeSerialization, fromPointsGeometry, fromSerialization, pointSort } from './SpatialTree';
 
-/**
- * 使用双指针的快速排序算法对数组的子区间进行排序。
- * @param from 子区间的起始索引。
- * @param to 子区间的结束索引（不包含）。
- * @param cmp 比较函数，用于判断元素是否满足某个条件。
- * @param swap 交换函数，用于交换数组中两个元素的位置。
- * @returns 返回排序后基准元素的索引。
- */
-const pointSort = (from: number, to: number, cmp: (x: number) => boolean, swap: (a: number, b: number) => void) => {
-    let f = from;
-    let t = to - 1;
-    while (f < t) {
-        while ((f <= t) && cmp(f)) {
-            f++;
-        }
-        while ((f <= t) && !cmp(t)) {
-            t--;
-        }
-        if (f < t) {
-            swap(f, t);
-            f++;
-            t--;
-        } else {
-            break;
-        }
-    }
-    return t + 1;
-};
-
-export type QuadTreeSerialization = {
-    trees: {
-        offset: number
-        length: number
-        depth: number
-        box: Box3
-    }[]
-    index: Uint32Array
-}
-
-export class QuadTree extends Octree {
+export class QuadTree extends SpatialTree {
     /**
 	 * 构造函数，接受一个box参数
 	 *
@@ -145,39 +106,8 @@ export class QuadTree extends Octree {
      * @param data 四叉树的序列化数据
      * @returns 创建的四叉树，如果无法创建则返回 null
      */
-    static fromSerialization(geometry: BufferGeometry, data: QuadTreeSerialization): QuadTree | null {
-        const { trees, index } = data;
-        if ((trees.length === 0) || (index.length === 0)) {
-            return null; // 点云为空
-        }
-        const position = geometry.getAttribute('position') as BufferAttribute;
-        if (position.count !== index.length) {
-            return null; // 点云数量不匹配
-        }
-        const quadTree = new QuadTree(new Box3(
-            new Vector3(trees[0].box.min.x, trees[0].box.min.y, trees[0].box.min.z),
-            new Vector3(trees[0].box.max.x, trees[0].box.max.y, trees[0].box.max.z)
-        ), index, position);
-        const stack = [{ quadTree, data: trees[0] }];
-        for (let i = 1; i < trees.length; i++) {
-            const subtree = new QuadTree(new Box3(
-                new Vector3(trees[i].box.min.x, trees[i].box.min.y, trees[i].box.min.z),
-                new Vector3(trees[i].box.max.x, trees[i].box.max.y, trees[i].box.max.z)
-            ), index.subarray(trees[i].offset, trees[i].offset + trees[i].length), position);
-            while (stack.length > 0) {
-                const { quadTree: lastParentNode, data: tree } = stack[stack.length - 1];
-                if (tree.depth < trees[i].depth) {
-                    lastParentNode.subTrees.push(subtree);
-                    stack.push({ quadTree: subtree, data: trees[i] });
-                    break;
-                }
-                stack.pop();
-            }
-            if (stack.length === 0) {
-                return null; // 栈为空，无法创建四叉树
-            }
-        }
-        return quadTree;
+    static fromSerialization(geometry: BufferGeometry, data: SpatialTreeSerialization): QuadTree | null {
+        return fromSerialization(geometry, data, (box, index, position) => new QuadTree(box, index, position));
     }
 
     /**
@@ -189,16 +119,7 @@ export class QuadTree extends Octree {
 	 * @returns {QuadTree} 从点数组切片中获取的点的集合
 	 */
     static fromPointsGeometry(geometry: BufferGeometry, level = 8, maxPointCount = 256): QuadTree {
-        geometry.computeBoundingBox();
-        const box = new Box3().copy(geometry.boundingBox!);
-        const position = geometry.getAttribute('position') as BufferAttribute;
-        const index = new Uint32Array(position.count);
-        for (let i = 0; i < index.length; i++) {
-            index[i] = i;
-        }
-        const quadTree = new QuadTree(box, index, position);
-        quadTree.split(level, maxPointCount);
-        return quadTree;
+        return fromPointsGeometry(geometry, level, maxPointCount, (box, index, position) => new QuadTree(box, index, position));
     }
 
     /**
@@ -210,6 +131,6 @@ export class QuadTree extends Octree {
 	 * @returns {QuadTree} 从点数组切片中获取的点的集合
 	 */
     static fromPoints(points: Points, level = 8, maxPointCount = 256): QuadTree {
-        return QuadTree.fromPointsGeometry(points.geometry, level, maxPointCount);
+        return this.fromPointsGeometry(points.geometry, level, maxPointCount);
     }
 }

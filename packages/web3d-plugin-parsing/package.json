@@ -13,6 +13,6 @@
     "@cutie/web3d": "0.0.1"
   },
   "devDependencies": {
-    "vitest": "^1.4.0"
+    "vitest": "^1.5.2"
   }
 }
