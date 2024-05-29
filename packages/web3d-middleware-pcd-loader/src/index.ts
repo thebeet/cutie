@@ -1,6 +1,6 @@
 import { Frame, useDrama } from '@cutie/web3d';
 
-import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
+import { PCDLoader } from './libs/PCDLoader.js';
 import { usePCDCachedLoader } from './loader';
 
 export const useMiddleware = () => {
