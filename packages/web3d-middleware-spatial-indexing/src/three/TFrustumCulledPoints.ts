@@ -2,14 +2,33 @@ import * as THREE from 'three';
 import { Octree } from '../libs/Octree';
 import { LAYER_POINTS } from '@cutie/web3d/src/constants';
 
+type LodIndexConfig = {
+    distance: number;
+    k: number;
+    index: THREE.BufferAttribute;
+};
+
+const calcDistance = (point: THREE.Vector3, box: THREE.Box3): number => {
+    let distance = 0;
+    for (let i = 0; i < 3; i++) {
+        if (point.getComponent(i) < box.min.getComponent(i)) {
+            const d = box.min.getComponent(i) - point.getComponent(i);
+            distance += d * d;
+        } else if (point.getComponent(i) > box.max.getComponent(i)) {
+            const d = point.getComponent(i) - box.max.getComponent(i);
+            distance += d * d;
+        }
+    }
+    return Math.sqrt(distance);
+}
+
 export class TFrustumCulledPoints extends THREE.Points {
     private readonly octree: Octree;
+    private readonly indexLod: readonly LodIndexConfig[];
 
-    constructor(points: THREE.Points, octree: Octree, bufferIndex?: THREE.BufferAttribute, depth: number = 0) {
+    constructor(points: THREE.Points, octree: Octree, indexLod: readonly LodIndexConfig[], depth: number = 0) {
         const geometry = new THREE.BufferGeometry();
         geometry.attributes = points.geometry.attributes;
-        const index = bufferIndex ?? new THREE.BufferAttribute(octree.index, 1);
-        geometry.index = index;
 
         geometry.boundingBox = octree.box;
         const boundingSphere = new THREE.Sphere();
@@ -18,12 +37,13 @@ export class TFrustumCulledPoints extends THREE.Points {
 
         super(geometry, points.material);
         this.octree = octree;
+        this.indexLod = indexLod;
         this.layers.enable(LAYER_POINTS);
 
         if (octree.subTrees.length > 0) {
             this.geometry.setDrawRange(0, 0);
             for (const subTree of octree.subTrees) {
-                this.add(new TFrustumCulledPoints(points, subTree, index, depth + 1));
+                this.add(new TFrustumCulledPoints(points, subTree, indexLod, depth + 1));
             }
         } else {
             this.geometry.setDrawRange(octree.index.byteOffset / 4, octree.index.byteLength / 4);
@@ -36,23 +56,53 @@ export class TFrustumCulledPoints extends THREE.Points {
      *
      * @param frustum THREE.Frustum - 相机视锥体
      */
-    onBeforeProject(frustum: THREE.Frustum) {
+    onBeforeProject(frustum: THREE.Frustum, camera: THREE.OrthographicCamera) {
         if (frustum.intersectsBox(this.octree.box)) {
             this.visible = true;
             if (this.children.length > 0) {
-                if (this.octree.inside(frustum)) {
-                    this.geometry.setDrawRange(this.octree.index.byteOffset / 4, this.octree.index.byteLength / 4);
+                const n = this.octree.index.length;
+
+                if (n < 1_000_000 && this.octree.inside(frustum)) {
+                    const p = new THREE.Vector3();
+                    p.setFromMatrixPosition(camera.matrixWorld);
+
+                    const dis = calcDistance(p, this.octree.box) / camera.zoom;
+
+                    let level = 0;
+                    for (let i = 1; i < this.indexLod.length; i++) {
+                        if (dis >= this.indexLod[i].distance) {
+                            level = i;
+                        }
+                    }
+                    this.geometry.setIndex(this.indexLod[level].index);
+                    this.geometry.setDrawRange(
+                        Math.ceil(this.octree.index.byteOffset / 4 / this.indexLod[level].k),
+                        Math.floor(this.octree.index.byteLength / 4 / this.indexLod[level].k)
+                    );
                     for (const child of this.children) {
                         child.visible = false;
                     }
                 } else {
                     this.geometry.setDrawRange(0, 0);
                     for (const child of this.children) {
-                        (child as TFrustumCulledPoints).onBeforeProject(frustum);
+                        (child as TFrustumCulledPoints).onBeforeProject(frustum, camera);
                     }
                 }
             } else {
-                this.geometry.setDrawRange(this.octree.index.byteOffset / 4, this.octree.index.byteLength / 4);
+                const p = new THREE.Vector3();
+                p.setFromMatrixPosition(camera.matrixWorld);
+                const dis = calcDistance(p, this.octree.box) / camera.zoom;
+                let level = 0;
+                for (let i = 1; i < this.indexLod.length; i++) {
+                    if (dis >= this.indexLod[i].distance) {
+                        level = i;
+                    }
+                }
+                this.geometry.setIndex(this.indexLod[level].index);
+                this.geometry.setDrawRange(
+                    Math.ceil(this.octree.index.byteOffset / 4 / this.indexLod[level].k),
+                    Math.floor(this.octree.index.byteLength / 4 / this.indexLod[level].k)
+                );
             }
         } else {
             this.visible = false;

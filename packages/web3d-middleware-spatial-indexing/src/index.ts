@@ -81,7 +81,7 @@ export const useMiddleware = (config?: Partial<Config>) => {
 
         tPoints.forEach(p => {
             if (p.parent?.visible === true) {
-                p.onBeforeProject(frustum);
+                p.onBeforeProject(frustum, camera);
             }
         });
     });
@@ -93,7 +93,34 @@ export const useMiddleware = (config?: Partial<Config>) => {
                 frame.intersectDelegate = tree;
                 if (callback) {
                     //callback(points);
-                    const p = new TFrustumCulledPoints(points, tree);
+                    
+                    const lodIndices = [
+                        {distance: -1, k: 1, index: new THREE.BufferAttribute(tree.index, 1)},
+                    ];
+                    const lodConfig = [
+                        {distance: 50, k: 1.2},
+                        {distance: 70, k: 1.414},
+                        {distance: 100, k: 2},
+                        {distance: 150, k: 3},
+                        {distance: 200, k: 5},
+                        {distance: 250, k: 8},
+                        {distance: 300, k: 13},
+                        {distance: 400, k: 21},
+                        {distance: 500, k: 34},
+                    ]
+                    for (const config of lodConfig) {
+                        const { k, distance } = config;
+                        const m = Math.floor(tree.index.length / k);
+                        const indexLODArray = new Uint32Array(m);
+                        for (let i = 0; i < m; i++) {
+                            indexLODArray[i] = tree.index[Math.floor(k * i)]
+                        }
+                        const index = new THREE.BufferAttribute(indexLODArray, 1);
+                        lodIndices.push({
+                            distance, k, index
+                        });
+                    }
+                    const p = new TFrustumCulledPoints(points, tree, lodIndices);
                     tPoints.push(p);
                     callback(p);
                     //frame.add(new OctreeHelper(tree))
