@@ -35,7 +35,7 @@ onMounted(async () => {
         { name: 'frame-pagination', params: { } },
         { name: 'answer-cache', params: { auto: false } },
         { name: 'answer-history', params: { } },
-        { name: 'render-sampling', params: { } },
+        //{ name: 'render-sampling', params: { } },
         { name: 'spatial-indexing', params: { impl: 'octree' } },
         { name: 'three-view', params: { } },
         { name: 'fullscreen', params: { } },

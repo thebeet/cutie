@@ -56,22 +56,23 @@ export class TFrustumCulledPoints extends THREE.Points {
      *
      * @param frustum THREE.Frustum - 相机视锥体
      */
-    onBeforeProject(frustum: THREE.Frustum, camera: THREE.OrthographicCamera) {
+    onBeforeProject(frustum: THREE.Frustum, camera: THREE.OrthographicCamera | THREE.PerspectiveCamera) {
         if (frustum.intersectsBox(this.octree.box)) {
             this.visible = true;
             if (this.children.length > 0) {
                 const n = this.octree.index.length;
 
                 if (n < 1_000_000 && this.octree.inside(frustum)) {
-                    const p = new THREE.Vector3();
-                    p.setFromMatrixPosition(camera.matrixWorld);
-
-                    const dis = calcDistance(p, this.octree.box) / camera.zoom;
-
                     let level = 0;
-                    for (let i = 1; i < this.indexLod.length; i++) {
-                        if (dis >= this.indexLod[i].distance) {
-                            level = i;
+                    if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
+                        const p = new THREE.Vector3();
+                        p.setFromMatrixPosition(camera.matrixWorld);
+    
+                        const dis = calcDistance(p, this.octree.box) / camera.zoom;
+                        for (let i = 1; i < this.indexLod.length; i++) {
+                            if (dis >= this.indexLod[i].distance) {
+                                level = i;
+                            }
                         }
                     }
                     this.geometry.setIndex(this.indexLod[level].index);
@@ -89,13 +90,16 @@ export class TFrustumCulledPoints extends THREE.Points {
                     }
                 }
             } else {
-                const p = new THREE.Vector3();
-                p.setFromMatrixPosition(camera.matrixWorld);
-                const dis = calcDistance(p, this.octree.box) / camera.zoom;
                 let level = 0;
-                for (let i = 1; i < this.indexLod.length; i++) {
-                    if (dis >= this.indexLod[i].distance) {
-                        level = i;
+                if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
+                    const p = new THREE.Vector3();
+                    p.setFromMatrixPosition(camera.matrixWorld);
+
+                    const dis = calcDistance(p, this.octree.box) / camera.zoom;
+                    for (let i = 1; i < this.indexLod.length; i++) {
+                        if (dis >= this.indexLod[i].distance) {
+                            level = i;
+                        }
                     }
                 }
                 this.geometry.setIndex(this.indexLod[level].index);
