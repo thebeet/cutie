@@ -42,7 +42,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     toolbox: MaybeRefOrGetter<HTMLDivElement | undefined>,
     footer: MaybeRefOrGetter<HTMLDivElement | undefined>,
     rightsidebar?: MaybeRefOrGetter<HTMLDivElement | undefined>) => {
-    const { controls, scene, renderer, camera, controlMode, transform, attachTransform, onRender, onBeforeRender } = useScene(container);
+    const { controls, scene, renderer, camera, controlMode, transform, attachTransform, onRender, renderBeforeHook, onBeforeRender } = useScene(container);
 
     const { page } = usePageStore();
     const { frames, primaryFrame, activeFrames, selectFrame } = useFrame(page!, scene);
@@ -95,7 +95,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
         } as const,
 
         advance: {
-            controls, renderer, controlMode, mouseEventHook, onRender, onBeforeRender,
+            controls, renderer, controlMode, mouseEventHook, onRender, onBeforeRender, renderBeforeHook,
             threeViewConfirmEventHook, threeViewChangeEventHook,
             onSetupAnswer, originAnswer: answer
         } as const

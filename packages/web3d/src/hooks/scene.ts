@@ -65,6 +65,7 @@ export const useScene = (container: MaybeRefOrGetter<HTMLDivElement | undefined>
     return {
         scene, camera, renderer,
         controls, controlMode, transform, attachTransform,
+        renderBeforeHook,
         onBeforeRender: renderBeforeHook.on,
         onRender: renderHook.on
     } as const;

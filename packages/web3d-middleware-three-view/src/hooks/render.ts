@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { LAYER_POINTS, RBox, useDrama } from '@cutie/web3d';
+import { LAYER_POINTS, RBox, useAdvanceDrama } from '@cutie/web3d';
 import { MaybeRefOrGetter, computed, ref, toValue, watch, watchEffect } from 'vue';
 import { useElementSize, useEventListener, useRafFn, useResizeObserver } from '@vueuse/core';
 
@@ -15,7 +15,7 @@ type Containers = {
 }
 
 export const useRender = (containers: Containers) => {
-    const { scene } = useDrama();
+    const { scene, renderBeforeHook } = useAdvanceDrama();
     const { inner, outer, isChanging } = storeToRefs(useThreeViewStore());
     const renderer = new THREE.WebGLRenderer({
         powerPreference: 'high-performance',
@@ -112,12 +112,30 @@ export const useRender = (containers: Containers) => {
     };
     useRafFn(() => {
         if (dirty && cameras.front.value && cameras.side.value && cameras.top.value) {
+            console.log('ss')
             dirty = false;
             renderer.setScissorTest(false);
             renderer.clear();
             renderer.setScissorTest(true);
+            renderBeforeHook.trigger({
+                renderer,
+                camera: cameras.front.value,
+                scene,
+            });
             renderTo(cameras.front, containers.front);
+
+            renderBeforeHook.trigger({
+                renderer,
+                camera: cameras.side.value,
+                scene,
+            });
             renderTo(cameras.side, containers.side);
+
+            renderBeforeHook.trigger({
+                renderer,
+                camera: cameras.top.value,
+                scene,
+            });
             renderTo(cameras.top, containers.top);
         }
     });
