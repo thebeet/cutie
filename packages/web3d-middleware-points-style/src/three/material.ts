@@ -1,4 +1,4 @@
-import { GLSL3, RawShaderMaterial } from 'three';
+import { GLSL3, Matrix4, RawShaderMaterial } from 'three';
 
 type PointsAllInOneMaterialParam = {
     size: number
@@ -20,7 +20,10 @@ export class PointsAllInOneMaterial extends RawShaderMaterial {
                     value: 1
                 },
                 highlightColor: {
-                    value: new Float32Array(4).fill(1.0)
+                    value: [0.0, 0.0, 0.0, 0.0]
+                },
+                highlightMat: {
+                    value: new Matrix4(),
                 },
             },
             vertexShader: `
@@ -31,12 +34,12 @@ export class PointsAllInOneMaterial extends RawShaderMaterial {
             in int highlight;
             in lowp float intensity;
             uniform mat4 projectionMatrix;
-            uniform mat4 modelMatrix;
             uniform mat4 modelViewMatrix;
             uniform float pointSize;
             uniform int mode;
             uniform vec4 instanceColor[256];
             uniform vec4 highlightColor;
+            uniform mat4 highlightMat;
             out lowp vec4 v_color;
             vec3 hsv2rgb(vec3 c)
             {
@@ -74,6 +77,13 @@ export class PointsAllInOneMaterial extends RawShaderMaterial {
                         }
                     } else {
                         v_color = vec4(1, 1, 1, 1);
+                    }
+                    if (highlightColor.a > 0.1) {
+                        vec4 p = highlightMat * vec4(position, 1.0);
+                        if (p.x >= -.5 && p.x <= .5 && p.y >= -.5 && p.y <= .5 && p.z >= -.5 && p.z <= .5) {
+                            v_color = highlightColor;
+                            gl_PointSize = pointSize * 2.0;
+                        }
                     }
                 }
             }`,

@@ -8,6 +8,7 @@ import { usePageStore } from '../stores/page';
 import { useFrame } from './frame';
 import { useThreeView } from './threeview';
 import { useShader } from './shader';
+import * as THREE from 'three';
 
 export type Drama = ReturnType<typeof setupDrama>;
 let defaultDrama: Drama;
@@ -67,6 +68,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
     const activeTool = ref('');
 
     const focusedUUID = ref<string>();
+    const highlightMat = ref<THREE.Matrix4>();
     const selectedUUIDs = shallowRef<Set<string>>(new Set<string>([]));
 
     watchEffect(() => {
@@ -81,7 +83,7 @@ export const setupDrama = (container: MaybeRefOrGetter<HTMLDivElement | undefine
             rightsidebar: rightsidebar as MaybeRefOrGetter<HTMLDivElement>,
             mouseState, onAdvanceMouseEvent: mouseEventHook.on,
             frames, primaryFrame, activeFrames, selectFrame,
-            activeTool, focusedUUID, selectedUUIDs,
+            activeTool, focusedUUID, selectedUUIDs, highlightMat,
             page: page!, answer: readonly(answer), useSetupAnswer, applyOperation, onApplyOperation,
             scene, camera,
             shaderMode, material,
