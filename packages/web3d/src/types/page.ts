@@ -58,6 +58,7 @@ export type Frame = {
     readonly index: number
     readonly timestamp: number
     readonly url: string
+    readonly format: string | undefined
     readonly pose: readonly number[] & { readonly length: 9 }
     readonly points: number
     readonly cameras: readonly Camera2D[]

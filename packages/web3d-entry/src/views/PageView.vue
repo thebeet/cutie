@@ -42,6 +42,7 @@ onMounted(async () => {
         { name: 'mouse', params: { } },
         { name: 'points-style', params: { mode: 'label' } },
         { name: 'pcd-loader', params: { } },
+        { name: 'potree-loader', params: { } },
         { name: 'render-info', params: { } },
     ];
 

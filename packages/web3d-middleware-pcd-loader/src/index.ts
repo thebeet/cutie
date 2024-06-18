@@ -12,9 +12,10 @@ export const useMiddleware = () => {
         if (frame.index === 0) {
             return;
         }
-        const url = (frame.userData['data'] as Frame).url;
-        loader.load(url).then((obj) => {
-            frame.points = obj;
-        });
-    });
+        const { url, format = 'pcd' } = frame.userData['data'] as Frame;
+        if (format === 'pcd') {
+            loader.load(url).then((obj) => {
+                frame.points = obj;
+            });
+        }});
 };

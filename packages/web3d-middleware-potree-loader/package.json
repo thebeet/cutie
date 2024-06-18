@@ -1,0 +1,19 @@
+{
+  "name": "@cutie/web3d-middleware-potree-loader",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "test": "vitest",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+  },
+  "dependencies": {
+    "@cutie/web3d": "0.0.1",
+    "@pnext/three-loader": "^0.3.5",
+    "@vueuse/core": "^10.9.0",
+    "vue": "^3.4.25"
+  }
+}
