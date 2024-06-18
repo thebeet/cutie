@@ -24,14 +24,24 @@ export const usePointsStyleStore = defineStore('plugin::points-style', () => {
 
     watch([pointSize, shaderMode, highlightMat], ([size, mode, mat]) => {
         if (mode === 'normal') material.value.uniforms.mode.value = 0;
-        if (mode === 'label') material.value.uniforms.mode.value = 1;
+        if (mode === 'label') {
+            material.value.defines.USE_LABEL = '';
+            material.value.uniforms.mode.value = 1;
+        } else {
+            if (Object.prototype.hasOwnProperty.call(material.value.defines, 'USE_LABEL')) {
+                delete material.value.defines.USE_LABEL;
+            }
+        }
         if (mode === 'intensity') material.value.uniforms.mode.value = 2;
         if (mode === 'deep') material.value.uniforms.mode.value = 3;
         if (mat) {
+            material.value.defines.USE_HIGHLIGHT = '';
             material.value.uniforms.highlightMat.value = mat;
             material.value.uniforms.highlightColor.value = [1.0, 0.0, 0.0, 1.0];
         } else {
-            material.value.uniforms.highlightColor.value = [0.0, 0.0, 0.0, 0.0];
+            if (Object.prototype.hasOwnProperty.call(material.value.defines, 'USE_HIGHLIGHT')) {
+                delete material.value.defines.USE_HIGHLIGHT;
+            }
         }
         material.value.uniforms.pointSize.value = size;
         material.value.needsUpdate = true;

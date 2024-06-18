@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@cutie/web3d": "0.0.1",
-    "three": "^0.164.0"
+    "three": "^0.165.0"
   },
   "devDependencies": {
     "vitest": "^1.5.2"
