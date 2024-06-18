@@ -1,6 +1,6 @@
 import { h, watch } from 'vue';
 import ToolBox from './components/ToolBox.vue';
-import { RBox, addNodeToContainer, useDrama, useSetFocusOnClick } from '@cutie/web3d';
+import { RBox, addNodeToContainer, rbox2Matrix, useDrama, useSetFocusOnClick } from '@cutie/web3d';
 import { rectAction } from './actions/rect';
 import { AddBoxOperation } from './operations/AddBoxOperation';
 import { storeToRefs } from 'pinia';
@@ -12,7 +12,7 @@ import * as THREE from 'three';
 
 export const usePlugin = () => {
     const { activeTool, toolbox,
-        camera, primaryFrame,
+        camera, primaryFrame, highlightMat,
         setupThreeView, onThreeViewChange, onThreeViewConfirm,
         onAdvanceMouseEvent,
         applyOperation } = useDrama();
@@ -22,6 +22,13 @@ export const usePlugin = () => {
 
     useSetFocusOnClick(focused, boxes, (box: Readonly<TBox>) => box.element);
     watch(focused, setupThreeView);
+
+    watch(focused, (value) => {
+        if (value) {
+            const mat = rbox2Matrix(value);
+            highlightMat.value = mat.invert();
+        }
+    });
 
     onThreeViewChange((value: RBox) => {
         if (focused.value) {
