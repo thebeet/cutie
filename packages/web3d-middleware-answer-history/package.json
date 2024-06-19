@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@cutie/web3d": "0.0.1",
-    "@vueuse/core": "^10.9.0",
+    "@vueuse/core": "^10.11.0",
     "pinia": "^2.1.7",
-    "vue": "^3.4.25"
+    "vue": "^3.4.29"
   }
 }
