@@ -22,8 +22,8 @@ export const useRenderInfoStore = defineStore('plugin::render-info', () => {
 
         scene.traverseVisible(obj => {
             info.value.counts.objects++;
-            if (obj instanceof THREE.Points) {
-                const geometry = obj.geometry as THREE.BufferGeometry;
+            if ((obj as THREE.Points).isPoints) {
+                const geometry = (obj as THREE.Points).geometry as THREE.BufferGeometry;
                 if (geometry.index !== null) {
                     info.value.counts.vertices += Math.min(geometry.index.count, geometry.drawRange.count);
                 } else {
